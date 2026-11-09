@@ -79,9 +79,10 @@ in the project's own verification and corrects that record explicitly.
 
 ### Local measured checks
 
-- The nine isolated mutation probes all caught their intended defects after
-  passing baselines. These are assertion failures, not compilation failures or
-  empty test filters. Source files remained unchanged; the build cache was reused.
+- The initial nine isolated mutation probes caught their intended defects after
+  passing baselines. These were assertion failures, not compilation failures or
+  empty test filters. Production source stayed unchanged; sharing the regular
+  build cache nevertheless contaminated a later run, as recorded below.
 - The Rust workspace run passed 561 tests and explicitly ignored 15. Thirteen
   require physical-console opt-ins; one is a cold-route timing measurement and
   one a 20-second loopback synthetic soak. CI runs that last case separately.
@@ -160,7 +161,23 @@ revision; the test requires that exact revision to be consumed and rendered.
 All original visible/count/warning/empty assertions remain. It calls no production
 render/poll function directly. The complete Settings suite passed locally afterwards.
 
-The final local full gate also passed86 checks, including35 named browser suites
-and561 Rust tests;15 Rust cases were explicitly ignored. This is local evidence,
-not a replacement for final hosted acceptance. Packaged-app startup acceptance is
+The local full gate passed86 checks, including35 named browser suites and561 Rust
+tests;15 Rust cases were explicitly ignored. That full pass preceded the final
+Settings-only repair; the changed Settings suite passed separately afterwards.
+This is local evidence, not a replacement for final hosted acceptance. Packaged-app startup acceptance is
 tracked separately; waiting for readiness in a test does not close that task.
+
+### Native dialog close-event ordering
+
+[Run42712520984](https://github.com/marmoles-supply/wing-controller/actions/runs/42712520984)
+passed Settings and Rust but failed the design workstation's focus-return check.
+It read `dialog.open === false`, then waited a zero-delay timer before checking
+focus. **DOCUMENTED:** the [HTML dialog closing algorithm](https://html.spec.whatwg.org/multipage/interactive-elements.html#close-the-dialog)
+removes `open` before it says to “Queue an element task on the user interaction
+task source”. A timer is not a barrier for that event. The actual opener-focus
+handler is registered before `showModal()` in `design/workstation/interactions.js:34`.
+
+The test now observes the real native close event and waits boundedly for closed
+state plus exact opener focus, retaining both final assertions. It never focuses
+the opener or dispatches a synthetic close event itself. **INFERRED:** task ordering
+caused the hosted failure; no runtime focus defect was established by that run.

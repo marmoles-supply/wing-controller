@@ -25,10 +25,20 @@ try {
   await tab.call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 });
   assert.equal(await tab.evaluate('document.activeElement.id'), 'appearance-tab');
   assert.equal(await tab.evaluate(`document.getElementById('appearance-page').hidden`), false);
+  // Native dialog close events are queued separately from the key dispatch.
+  // A zero-delay timer need not run after that event on another renderer.
+  await tab.evaluate(`window.__SAMPLE_DIALOG_CLOSED = false; document.getElementById('sample-settings').addEventListener('close', () => { window.__SAMPLE_DIALOG_CLOSED = true; }, { once: true })`);
   await tab.call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
   await tab.call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+  await tab.evaluate(`new Promise((resolve, reject) => {
+    const start = Date.now();
+    const tick = () => {
+      if (window.__SAMPLE_DIALOG_CLOSED && !document.getElementById('sample-settings').open && document.activeElement?.dataset.wcDialog === 'sample-settings') return resolve(true);
+      if (Date.now() - start > 5000) return reject(new Error('Escape must close Properties and restore focus to its opener; active=' + document.activeElement?.outerHTML));
+      setTimeout(tick, 25);
+    }; tick();
+  })`);
   assert.equal(await tab.evaluate(`document.getElementById('sample-settings').open`), false);
-  await tab.evaluate('new Promise(resolve => setTimeout(resolve, 0))');
   assert.equal(await tab.evaluate(`document.activeElement.dataset.wcDialog`), 'sample-settings');
   await tab.evaluate(`document.getElementById('sample-select').value = 'Rehearsal'`);
   assert.match(await tab.evaluate(`document.getElementById('sample-select').parentElement.textContent`), /Rehearsal/);

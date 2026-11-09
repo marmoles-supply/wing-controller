@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "432d7652d037fc271669d77586d07dcf488925e2",
+  "sourceRevision": "31901449ef8ab2763c4f9d5630587277669f2454",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -2778,8 +2778,8 @@
     },
     {
       "path": "scripts/test-design-workstation-browser.mjs",
-      "bytes": 6514,
-      "sha256": "5447506c10f1f18338a2769bc7f9ae29f2f225fa288cc4281a8106295666bd0f"
+      "bytes": 7308,
+      "sha256": "86d91536e050106fc009f6c5204ca169540c741b6d165772adaa8a5d6d608f38"
     },
     {
       "path": "scripts/test-desktop-action-target-browser.mjs",
@@ -3458,8 +3458,8 @@
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 12677,
-      "sha256": "33cee79ce8e71566d66f4883a4e9170b7e7c658e97a747506fad22170fd9b596"
+      "bytes": 13867,
+      "sha256": "9f5a5127ee995667ac1699ff1271fa3f019601e28f5382d8a6f296a13d84f73c"
     },
     {
       "path": "docs/ROADMAP.md",
@@ -3559,10 +3559,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "8e92b32a517b49d639be38fa87cdc6c6d831489b94eba6bbb88e6007033b2ef1"
+      "sha256": "0caadb4f7fd5f3925c9e1932695f4cec4864b0b16e224e7d2e1096e94a0d4651"
     }
   ],
-  "bytes": 25169862,
+  "bytes": 25171846,
   "excludedTrackedPaths": 1111,
   "potentialSecrets": 0,
   "reviewFindings": 287,
