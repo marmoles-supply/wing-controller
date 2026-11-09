@@ -14,6 +14,15 @@ kit's own specimen; **this folder holds the application**, and the two are meant
 
 The file name is the window and the theme, so a reader knows both without opening anything.
 
+**Current renderer record, 2026-11-10:** the exact screenshot test explicitly uses
+software compositing (`--disable-gpu`). Automatic compositing produced two different
+images from the same bitmap and geometry. Five complete captures on each of two
+Macs repeated exactly (100 images); eight images also match between machines and
+two native numeric-input variants live in `github-macos26/`. See
+`SOFTWARE_RENDERER_REVIEW_2026-11-10.json`, `renderer-profiles.json` and
+the [test audit](../../docs/TEST_AUDIT_2026-11-09.md). This affects the screenshot
+test's own browser; the application and other browser callers retain their renderer.
+
 **Historical measurement, 2026-10-08:** these ten were refreshed and checked against the tree at that date: `node scripts/test-design-screens.mjs` reported **all ten byte-identical to a fresh render at 1600 px in
 both themes** (1,092,300 bytes, `design-screens: 10 image(s) in design/screens/ are exactly what this tree renders
 today`). That matters to a consumer for a reason this folder exists to make visible: the images a consumer is sent to
@@ -25,7 +34,7 @@ promise about the next one.
 
 **1600 × 1000, device scale factor 1**, the top of the window as it opens. 1600 px is the width `design/reference/`
 already uses, so the two folders can be compared without rescaling. The main window and the guide scroll past one
-screenful (the main window's document is 1923 px tall); the image shows the window, not the document, and every
+screenful (the current main window's document is 2024 px tall); the image shows the window, not the document, and every
 image is the same size so ten of them can be compared at a glance. A record taken at two different widths is a
 record nobody can compare, which is why the size is fixed and why the lock refuses a file at another size.
 
@@ -131,7 +140,7 @@ rather than committing a picture that is still moving. What makes it true, and w
 
 | Kept deterministic by | Broken by |
 |---|---|
-| A private Chrome, fresh profile, private port (never 9223), `--force-device-scale-factor=1`, `--font-render-hinting=none`, `TZ=UTC`, `--lang=en-US` | A different Chrome major version, or a machine whose font set or hinting differs |
+| A private Chrome, fresh profile, private port (never 9223), screenshot-only `--disable-gpu`, `--force-device-scale-factor=1`, `--font-render-hinting=none`, `TZ=UTC`, `--lang=en-US` | A changed renderer, or a machine whose font set or hinting differs; changed version strings alone are logged, not treated as a pixel change |
 | Every animation, transition, caret and smooth-scroll disabled by injected CSS, and the page sampled twice | A new animation the freeze does not reach, or a page that renders from a live clock |
 | The clock frozen and the time zone pinned; no network (`file://` only) | A date, a random value or a fetch in the UI; a locale-dependent format |
 | A fixed 1600 × 1000 viewport, captured from the viewport | A CSS change that makes a window's own height part of the layout |
@@ -141,11 +150,11 @@ The version string is the one legitimate source of a byte difference between two
 
 ## Cost, and whether it belongs in git
 
-**1,124,309 bytes (1.1 MB) for the ten images** — main window 435 KB, guide 474 KB, LTC 89 KB, meters 88 KB,
-timecode 37 KB. That is committed binary, and it is worth paying for here: the whole point of this record is that a
+**1,184,122 bytes for the ten shared images**, plus109,251 bytes for the two
+hosted native-input variants (measured2026-11-10). That is committed binary, and it is worth paying for here: the whole point of this record is that a
 reviewer opens it **from the repository**, at the commit under review, without a build, a console or a desk. A
 picture stored outside the history cannot answer "did this look like this before?" — and these ten files are
-regenerated only when the UI changes, not on every run.
+regenerated only after review when the UI or renderer changes, not on every run.
 
 The honest alternative, if it ever becomes too expensive: capture only the **top 1000 px of the two largest
 windows** (the main window and the guide are ~82 % of the total) or shrink the viewport to 1280 px, either of which

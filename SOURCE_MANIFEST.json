@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "264c66098f6cc1db3655b91a35c3e66509cc3b18",
+  "sourceRevision": "06440b2ca62c25a7785356f7c3c7e56402383e08",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -1133,8 +1133,8 @@
     },
     {
       "path": "design/screens/README.md",
-      "bytes": 13057,
-      "sha256": "33bdc898c455f6015773d2b60f69ae0c9240b7ef20c3ee7dd1844198425677f6"
+      "bytes": 13819,
+      "sha256": "9962c29279bb57f28e8866b9528f6f46135dc4aa09716ed8ad3a8e4ebc97f10c"
     },
     {
       "path": "design/screens/SOFTWARE_RENDERER_REVIEW_2026-11-10.json",
@@ -2523,8 +2523,8 @@
     },
     {
       "path": "scripts/mutation-check-ci.mjs",
-      "bytes": 10080,
-      "sha256": "0abe63e190129ea78dd59f2ab79a7d4c0499a8eb579e73227572935afb276180"
+      "bytes": 10405,
+      "sha256": "22b8417ca3fac96c355948c0c35759e8274039dd1d5c259e0175871b062f844e"
     },
     {
       "path": "scripts/mutation-check-courtesy-notice.mjs",
@@ -2968,8 +2968,8 @@
     },
     {
       "path": "scripts/test-desktop-meter-bridge-status-browser.mjs",
-      "bytes": 37537,
-      "sha256": "5ad0f9630affbecbc49c80d77033515248ede3292159f98a5c76ed73e4e7fb30"
+      "bytes": 38149,
+      "sha256": "bcf62d69c02de610100afffa2822581df3b6b4e246e578a7a06694afae33248e"
     },
     {
       "path": "scripts/test-desktop-meter-bridge-ui.mjs",
@@ -3448,18 +3448,18 @@
     },
     {
       "path": "docs/TESTING.md",
-      "bytes": 8339,
-      "sha256": "590b8e2fffdba767cfe0285de05d742e9939dcd6984c55e6fc5032cf1b4ee305"
+      "bytes": 8358,
+      "sha256": "2bd5f15d9c254b1b83b182bda0587ff20849b7b2146b74fb4a3d7b18dad1996a"
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 20809,
-      "sha256": "d4e1c90e2a0fdbe64de5d2974a7a553a44a6462529604b37e471df817e3696d5"
+      "bytes": 21654,
+      "sha256": "ffa5a5dbfa1207d2671679801b51d5afa2cb1e233ad0ca48926658e726eafdef"
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 9440,
-      "sha256": "27ff506b1572677ae3942f12552c4ebb47358124f0da0f62cc9b84ada890921e"
+      "bytes": 9442,
+      "sha256": "42cfaf81311db80ea5a0e73681dadbd5c9ba6358876668b50c5b11e8ad892f5d"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
@@ -3554,10 +3554,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "2479c8a17c1d29bf042066fa6fe11a877c937a530c3049b0f6e193a8498d68fe"
+      "sha256": "47eddf921cbcdee16e21b827d9dec7d0385449c5723c1fdb041ce73df64ed92e"
     }
   ],
-  "bytes": 25106094,
+  "bytes": 25108659,
   "excludedTrackedPaths": 1111,
   "potentialSecrets": 0,
   "reviewFindings": 285,

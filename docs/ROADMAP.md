@@ -112,7 +112,7 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
 - [ ] **ARCH-01 — Extract modules gradually.** Start with one high-change
   responsibility in `main.rs` or `index.html`; retain contracts and measure runtime
   cost. File size is not a reason for a broad rewrite before live use.
-- [ ] **CI-01 — Establish reproducible macOS CI.** Full gate and twelve isolated
+- [ ] **CI-01 — Establish reproducible macOS CI.** Full gate and thirteen isolated
   mutation probes are configured for push/PR on hosted arm64 macOS. Close only
   after a successful hosted installation/run; record the exact run in the
   [test audit](TEST_AUDIT_2026-11-09.md). Hardware is separate; signing keys stay private.

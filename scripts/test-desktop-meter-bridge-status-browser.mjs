@@ -121,7 +121,11 @@ const STUB = `
   window.__wingBridgeBooted = false;
   const originalSetItem = Storage.prototype.setItem;
   Storage.prototype.setItem = function (key, value) {
-    if (key === 'wing_meters_ready') window.__wingReadyWrites.push(value);
+    if (key === 'wing_meters_ready') window.__wingReadyWrites.push({
+      value, stateCalls: window.__wingStateCalls.length, stateReplies: window.__wingStateReplies.length,
+      revision: window.__wingStateReplies.at(-1)?.revision,
+      sessionId: bridgeSessionId, sessionActive: bridgeSessionActive,
+    });
     return originalSetItem.call(this, key, value);
   };
   window.__TAURI__ = {
@@ -496,9 +500,11 @@ try {
     stateCalls: window.__wingStateCalls.length,
     readyWrites: window.__wingReadyWrites.length,
     readyAfterState: window.__wingReadyWrites.length === 1
-      && window.__wingStateCalls.length === 1
-      && window.__wingReadyWrites[0] !== undefined
+      && window.__wingReadyWrites[0].stateCalls === 1
+      && window.__wingReadyWrites[0].stateReplies === 1
+      && window.__wingReadyWrites[0].revision === window.__wingBackendRevision
       && Number(localStorage.getItem('wing_meters_ready')) > 0,
+    readySession: window.__wingReadyWrites[0],
     badge: document.getElementById('bridge-status-badge').textContent,
     tone: document.getElementById('bridge-status-badge').className,
     message: document.getElementById('status-center').textContent,
@@ -522,6 +528,9 @@ try {
   assert(fromState.packets === 4242, `the health's packet count must arrive with it (got ${fromState.packets})`);
   assert(fromState.readyWrites === 1 && fromState.readyAfterState,
     `the dock must be told the bridge is ready exactly once, after the state was asked (got ${fromState.readyWrites})`);
+  assert(fromState.readySession.sessionId === fromState.sessionId
+    && fromState.readySession.sessionActive === fromState.sessionActive,
+    `ready announcement must follow state adoption: ${JSON.stringify(fromState.readySession)}`);
   console.log('10. the bridge paints a live session from get_stream_state before it announces itself');
 
   // A session that is over must not be handed to the window as if it were current: the health is null

@@ -288,3 +288,17 @@ Canvas2D flag did not fix repeatability. Software rendering does not establish
 GPU-driver or native WebKit correctness; that is an explicit acceptance limit.
 A reproducible normal-renderer record measured across both environments would
 overturn this choice. Future software-renderer differences still fail for review.
+
+### Final assertion review: readiness is an ordering contract
+
+**MEASURED:** removing only `await` from the real bridge startup query still
+passed the preceding suite. Its `readyAfterState` check counted calls after boot;
+it did not prove that the state had been adopted before announcing readiness.
+The name of that assertion overstated its evidence.
+
+The fixture now journals query/reply counts, revision and the actual adopted
+session at the instant `wing_meters_ready` is written. The unmodified application
+passes. The same missing-`await` mutation now fails with the captured session0 at
+announcement, even though session77 is adopted afterwards. This is the thirteenth
+mutation probe. The one-pixel probe also requires a numeric boundary and its exact
+1×1 region at(0,0), so an unrelated11-pixel difference cannot satisfy its evidence.
