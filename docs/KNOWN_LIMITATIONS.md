@@ -1,14 +1,15 @@
 # Known limitations and verification boundaries
 
-This is a community source preview. Publishing source and passing automated
+This is a community beta with published source and an Apple Silicon installer. Publishing source and passing automated
 checks do not certify a particular show or every firmware/device combination.
 The maintainer's reported stable live use is experience, not a guarantee.
 
 - Desktop targets Apple Silicon macOS. No Intel, Windows or Linux installer is
   provided. Initial checks use macOS 26.6.2; a wider runtime range is unverified.
   Mobile development is parked.
-- This source contains unreleased repairs. Historical binaries must not be
-  labelled as binaries of this snapshot; no installer accompanies it yet.
+- [Version 0.3.0](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0)
+  is the current published installer. Later documentation or source changes do not
+  alter that binary; compare release notes and tags before assuming a fix is included.
 - Hardware acceptance remains open for arbitrary WING model/firmware combinations,
   physical LTC audio, an independent MTC receiver and multi-hour show endurance.
   Synthetic tests do not replace these measurements.

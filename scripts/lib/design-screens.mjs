@@ -10,7 +10,7 @@
 //      `localStorage`. Chrome is started headless with `--force-device-scale-factor=1` and
 //      `--font-render-hinting=none`, and the two of those together are what make the same pixels come back.
 //   2. **A fixed viewport** (1600 px wide: the same width the kit's own reference images use) and a capture that
-//      grows to the page's full height, so the record shows the whole window rather than a fold.
+//      stays at 1600 × 1000, recording the initial window viewport rather than its full scroll height.
 //   3. **Motion is frozen by injection, not by waiting.** Every animation, transition, caret blink and scroll
 //      behaviour is switched off with one stylesheet, and the page is sampled **twice** and required to be identical
 //      before the image is accepted. A capture that caught a 400 ms pulse at t=390 ms would differ between runs and

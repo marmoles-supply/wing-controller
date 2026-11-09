@@ -88,6 +88,16 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
   list and edit controls while preserving unfinished edits and compact clock
   behaviour. Compare both themes/widths and rerun cue/keyboard contracts.
 
+- [ ] **UI-03 — Correct notice text hygiene.** Remove target addresses from manual
+  action-test notices and correct the help text that calls the courtesy notice a
+  pre-trigger warning. See the presentation-review evidence in the dated audit;
+  verify notice rendering and identity guards in a focused UI change.
+
+- [ ] **UI-04 / GUIDE-01 — Correct typed summaries and guide drift.** Make the
+  rich WHEN detail respect toggle/text kinds; correct the OSC-gate expiry and
+  Level/Dwell/current-value-fade explanations identified in the audit. Verify
+  source and generated operator content together.
+
 ## P3 — maintainability
 
 - [ ] **ARCH-01 — Extract modules gradually.** Start with one high-change

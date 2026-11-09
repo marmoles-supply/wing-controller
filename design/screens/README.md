@@ -14,8 +14,7 @@ kit's own specimen; **this folder holds the application**, and the two are meant
 
 The file name is the window and the theme, so a reader knows both without opening anything.
 
-**These ten were refreshed on 2026-10-08, and the refresh is measured rather than asserted.** Re-rendered from the tree
-as it stands: `node scripts/test-design-screens.mjs` reported **all ten byte-identical to a fresh render at 1600 px in
+**Historical measurement, 2026-10-08:** these ten were refreshed and checked against the tree at that date: `node scripts/test-design-screens.mjs` reported **all ten byte-identical to a fresh render at 1600 px in
 both themes** (1,092,300 bytes, `design-screens: 10 image(s) in design/screens/ are exactly what this tree renders
 today`). That matters to a consumer for a reason this folder exists to make visible: the images a consumer is sent to
 look at are only worth looking at while they are current, and **a consumer who reads only the pictures learns an
@@ -47,7 +46,8 @@ main window's session log reads `09:00:00 app_start …` instead of the minute t
 index images differ between two runs of the same tree — measured: 119 pixels, in the log pane's timestamp, and that
 alone would have made the lock fail on a tree nobody had changed.
 
-**The version string is in the picture** (`v0.2.95`, and the guide's footer carries `build 20261008.2`). That is on
+**The version string is in the picture** (currently `v0.3.0`, with `build 20261109.2` in the guide footer;
+the historical measurement below used `v0.2.95` / `build 20261008.2`). That is on
 purpose: a new version is a new window, and the lock should say so rather than silently accepting a stale picture.
 **Which makes a release a change to this folder** — eight of the ten images carry the string, and they move by 34–91
 pixels when it changes. Measured on 2026-10-08, when `099bc56c` bumped `version.json` and did not refresh: each of the

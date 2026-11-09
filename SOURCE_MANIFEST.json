@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "6533cc9536b76d01ef29a6c630736a6e7af35664",
+  "sourceRevision": "af1eac33ba9e74e58e3db0c26ee34ef5420016e4",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -155,6 +155,231 @@
       "path": "assets/images/tutorial-web.png",
       "bytes": 58959,
       "sha256": "e372ec23ad6262e2e0dc2799ce416b495a631a565bcd24f0615d4afc04dac3bd"
+    },
+    {
+      "path": "assets/product/README.md",
+      "bytes": 5369,
+      "sha256": "2ac9b3e6af34432d906f144bb8b847cfeeb99a9f2b4aaddf659ffcb64f493455"
+    },
+    {
+      "path": "assets/product/action-steps-dark.png",
+      "bytes": 30404,
+      "sha256": "af72ed140a3215e6a1edf705c5ae4c91aa6a88c9cbfab3aa900b50e102ee5baa"
+    },
+    {
+      "path": "assets/product/action-steps-light.png",
+      "bytes": 28447,
+      "sha256": "b3372a8b16ae86431de3edb4f604b03268cf78d4bb9ef75bf0283282ee635bd2"
+    },
+    {
+      "path": "assets/product/artboards.html",
+      "bytes": 9661,
+      "sha256": "ea64a2f2323ba7078e94a97f26eca151eed5adedf1f8da70a83d37f3452db568"
+    },
+    {
+      "path": "assets/product/channel-selection-dark.png",
+      "bytes": 46329,
+      "sha256": "82ffdb73c0485ca81f1337f87c7c6bfcbed7f8a90ff16f442f88b604f905fa6a"
+    },
+    {
+      "path": "assets/product/channel-selection-light.png",
+      "bytes": 44711,
+      "sha256": "a3797c82c20c7d42e99248c0daec45b4c5d7fd5dbdc25cc1ffad29361a7ed5ec"
+    },
+    {
+      "path": "assets/product/download-mac.svg",
+      "bytes": 758,
+      "sha256": "00dbe42c9d47c6083d77d00a5b466985bbaac2d779e627afba4f281c15e7fb4d"
+    },
+    {
+      "path": "assets/product/fade-amount-dark.png",
+      "bytes": 5354,
+      "sha256": "e0b08dd4cf2d20126dc624d891b0343ca547a443120580e586c1204d251b8928"
+    },
+    {
+      "path": "assets/product/fade-amount-light.png",
+      "bytes": 5074,
+      "sha256": "32fa49217e4bdf5b4c2c291d3974ea75ed5ddb06bcc553163dcc58c8f02a85cb"
+    },
+    {
+      "path": "assets/product/fade-duration-dark.png",
+      "bytes": 3568,
+      "sha256": "2ae8c831cdd8bc3f980484f7613e7b7f35a580db4d5d38b8dbaf5e4410e9a460"
+    },
+    {
+      "path": "assets/product/fade-duration-light.png",
+      "bytes": 3356,
+      "sha256": "e72badc4f317edb5d48666c0db521a61d59efe79d9b658b29160a1c3f0d8bb88"
+    },
+    {
+      "path": "assets/product/fade-from-dark.png",
+      "bytes": 7546,
+      "sha256": "d9e79440ae605bb0c0a0b28c61165f4273f63ee5ca8e50900a8f70652f2341ce"
+    },
+    {
+      "path": "assets/product/fade-from-light.png",
+      "bytes": 6689,
+      "sha256": "1147d7e4e75e7fdb32e0bd561f0c20e57e1bd0439024fe32ad41e6d8c47a20a6"
+    },
+    {
+      "path": "assets/product/fade-to-dark.png",
+      "bytes": 4939,
+      "sha256": "1e807d507fe15b4966f890b7a041e2dbb62834409de52923a251684614f1dbba"
+    },
+    {
+      "path": "assets/product/fade-to-light.png",
+      "bytes": 4560,
+      "sha256": "4474e02cfbfd113f9dd3af68e6b1c5efc108427c9c0d8c7416b476d73ca3ceb7"
+    },
+    {
+      "path": "assets/product/fade-type-dark.png",
+      "bytes": 5777,
+      "sha256": "f0620651e212a7e6d55e43826fe385e0657792c84a17469722bc207e0a55cf39"
+    },
+    {
+      "path": "assets/product/fade-type-light.png",
+      "bytes": 5273,
+      "sha256": "6dc1e0b3ceba873887b63b13140b2638634288748934e96e075e7859b1447d1d"
+    },
+    {
+      "path": "assets/product/hero.png",
+      "bytes": 124726,
+      "sha256": "d9a4fd8e45e89fb52edca213892983e78cb542df261945abb7c38c04dce3580e"
+    },
+    {
+      "path": "assets/product/hud-dark.png",
+      "bytes": 15208,
+      "sha256": "47e3bdf89bdac404d8254cbe33c50b2e8a0751b4a35a2c5cf4592081ef52df98"
+    },
+    {
+      "path": "assets/product/hud-light.png",
+      "bytes": 14151,
+      "sha256": "26f43876697ab8b847a18d70aa72aa47b29a65c3dd9e0f41dddd7fa8edd2686e"
+    },
+    {
+      "path": "assets/product/hud-preferences-dark.png",
+      "bytes": 93629,
+      "sha256": "f6ff51637e640e8e9dfbef9f3530a2e56a879cdf14aafe2ea5e08d2ea7a3c464"
+    },
+    {
+      "path": "assets/product/hud-preferences-light.png",
+      "bytes": 84123,
+      "sha256": "25a469cf362a3f190d8ed05924bfe540f9328c59719018bf8b7de703d2b98298"
+    },
+    {
+      "path": "assets/product/install.png",
+      "bytes": 32799,
+      "sha256": "f9a5567c32b9b421424177421f0d41d8be7a69d0c14fdbf4fef778705ed95734"
+    },
+    {
+      "path": "assets/product/macro-detail.png",
+      "bytes": 38638,
+      "sha256": "b8369cd6a3b5e1de4619aed44c8e3210cecad63813b07a348aeea9a0ed19ee11"
+    },
+    {
+      "path": "assets/product/macro-if-dark.png",
+      "bytes": 32585,
+      "sha256": "bed018116ef7c009c23380d83e0fa2e83a4944a5136b34ced14c53d58334dd83"
+    },
+    {
+      "path": "assets/product/macro-if-light.png",
+      "bytes": 30857,
+      "sha256": "95444b2c4be30216ed651da01ccba24054694fea85a1c42d3502b7c1c4063723"
+    },
+    {
+      "path": "assets/product/macro-recipe-dark.png",
+      "bytes": 22355,
+      "sha256": "c898566830ba8a577d28a13408356fb2348dbab6a38baa4dee7205d46d4e4f86"
+    },
+    {
+      "path": "assets/product/macro-recipe-light.png",
+      "bytes": 22265,
+      "sha256": "67198ed8af523e1c756d52b52136deb0519c2efde7ab05088a4a79ae305bd73c"
+    },
+    {
+      "path": "assets/product/macro-trigger-dark.png",
+      "bytes": 44946,
+      "sha256": "2784101230603234f5b96d5a1a4863590b6bfd125e12df1bdaff21b30a32d495"
+    },
+    {
+      "path": "assets/product/macro-trigger-light.png",
+      "bytes": 41708,
+      "sha256": "50cc585f8b6d3d237a1b9235dd93b3ca78ace10d40e8c5a771e2ea8e103a8200"
+    },
+    {
+      "path": "assets/product/mark.png",
+      "bytes": 174179,
+      "sha256": "fd608059bdc9338fb1c4901c12eff97b23b9a3c91b20599b7d300cde1b813d2c"
+    },
+    {
+      "path": "assets/product/media-manifest.json",
+      "bytes": 8627,
+      "sha256": "09cc6863a2ecbfa8e957ee72fa6abfb17ce7aa109d6ae47357a57d4e5abbb9f5"
+    },
+    {
+      "path": "assets/product/messages-detail.png",
+      "bytes": 50684,
+      "sha256": "6102f98f4fbbaa9bfbd08cd18e9177fb7c342d5f42c826b03f1ed3b56bbc4a89"
+    },
+    {
+      "path": "assets/product/meter-bridge-dark.png",
+      "bytes": 54286,
+      "sha256": "3bd1b9d62263bfafd066cc29508555e47a7abea5688e23466542a314cd982bb7"
+    },
+    {
+      "path": "assets/product/meter-bridge-light.png",
+      "bytes": 48601,
+      "sha256": "fdff700907e7c4240959c098b206d54097951d6113f42a625905e770dc7a8dad"
+    },
+    {
+      "path": "assets/product/meter-selection-dark.png",
+      "bytes": 68931,
+      "sha256": "bd423bd5516d790a5bace79f28b199a27276104e05c93d7dbdbd65883ca9bc3d"
+    },
+    {
+      "path": "assets/product/meter-selection-light.png",
+      "bytes": 66804,
+      "sha256": "aa93aa10f686b835204c6895ec8e6cac478179a8f9f478fbd77853facd0e2e22"
+    },
+    {
+      "path": "assets/product/meters-detail.png",
+      "bytes": 96803,
+      "sha256": "d6f53080ee6dfca6824e0c4d4d632e47c3ff5d4e91026a696060edc0c461e9dc"
+    },
+    {
+      "path": "assets/product/notice-dark.png",
+      "bytes": 12335,
+      "sha256": "6979ef423fe917297b5fb42e9561f39e4b42902c3e340296ac51995cd3f2519c"
+    },
+    {
+      "path": "assets/product/notice-light.png",
+      "bytes": 10574,
+      "sha256": "209feb049cf24fdc4e69641fdb4cce1ed806f19deeecd81217b9feaf81c2cec8"
+    },
+    {
+      "path": "assets/product/selection-detail.png",
+      "bytes": 122834,
+      "sha256": "e6fa100d063a0f9154a523d280add39c6014efa5af982bb30e2a4f86d1e365e0"
+    },
+    {
+      "path": "assets/product/steps-detail.png",
+      "bytes": 86445,
+      "sha256": "cc1740e2b62d5ae0779b5e708ee8fa734df6f3212b3fe816394fca17ca66d12c"
+    },
+    {
+      "path": "assets/product/themes.png",
+      "bytes": 126745,
+      "sha256": "dcc432cfc6c7ae8f4c92a5900377e69baf1c576db0f6715ede73a633a676004f"
+    },
+    {
+      "path": "assets/product/workstation-dark.png",
+      "bytes": 231521,
+      "sha256": "3a1d1b5f0ee3eaecbb07aca77bd9e1cfb0b10857c1351a5bec9be54d0f97ff8a"
+    },
+    {
+      "path": "assets/product/workstation-light.png",
+      "bytes": 215274,
+      "sha256": "9ac2bfc288b81c5b31bcb24fe9ab40933e65bbf859e57d2e0d24505565ea1368"
     },
     {
       "path": "crates/wing-core/Cargo.lock",
@@ -883,8 +1108,8 @@
     },
     {
       "path": "design/screens/README.md",
-      "bytes": 13010,
-      "sha256": "a67cbe4709265c6b0eb01b7f0b11c5759aa1acbeff270c66468fd9dc93c5ae68"
+      "bytes": 13057,
+      "sha256": "33bdc898c455f6015773d2b60f69ae0c9240b7ef20c3ee7dd1844198425677f6"
     },
     {
       "path": "design/screens/guide-dark.png",
@@ -2183,8 +2408,8 @@
     },
     {
       "path": "scripts/lib/design-screens.mjs",
-      "bytes": 33364,
-      "sha256": "7d6b3fe13a3b7ccaca06915c5aa127c75aa83048e156cebcbcc8fb0b1e741a03"
+      "bytes": 33371,
+      "sha256": "76f5170d0b4bbde20339258da089cfc48af71fe70c68e5224cca881e72b03e00"
     },
     {
       "path": "scripts/lib/design-tokens.mjs",
@@ -2340,6 +2565,11 @@
       "path": "scripts/release.sh",
       "bytes": 1825,
       "sha256": "edc1c9688c27782e9722b2513cc69db5b9073d901d23ec8aed415be14c82224f"
+    },
+    {
+      "path": "scripts/render-product-media.mjs",
+      "bytes": 12159,
+      "sha256": "d67bfa3c26182303e0d831184c284a3ee771b95120f6e82a04747d09a3df0c48"
     },
     {
       "path": "scripts/reset-project.js",
@@ -3038,8 +3268,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 6918,
-      "sha256": "a765fe228b08de05ca87b69cde2162f8721ec8714412cf920dec301d3597fa57"
+      "bytes": 14196,
+      "sha256": "61615ecfdeeb6382d09bb8e1a4a00973d25da089a72f5304288d0ba1c2134db0"
+    },
+    {
+      "path": "README.es.md",
+      "bytes": 9602,
+      "sha256": "f00ccca602b3e084b55ce07d76e502de22327cc575ded5f61ece5a2dcceb6480"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -3063,13 +3298,23 @@
     },
     {
       "path": "docs/INSTALLATION.md",
-      "bytes": 4405,
-      "sha256": "ac9585b2631951eaf00b6a6078e12a8506c8f20a939ed7c127bb23202013a174"
+      "bytes": 5532,
+      "sha256": "b148b0147f32b448b8418aa2b19244e1670935e2a5d16e4522d0006014d0a8ac"
+    },
+    {
+      "path": "docs/INSTALLATION.es.md",
+      "bytes": 3692,
+      "sha256": "06f8ae7e370c2a1a709468939e98d8616079416ded98ad9974a03bd4015c139f"
+    },
+    {
+      "path": "docs/SHARING.md",
+      "bytes": 3640,
+      "sha256": "7c9eaded054bfe2c5cf6bd355a5009ebc473aaed94ba1772def95bb8f97df25d"
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "bytes": 2209,
-      "sha256": "65717c5fe18eed91deca9896ec63b6acad34fc9138ccabbd4b3c7056980d083d"
+      "bytes": 2363,
+      "sha256": "461ea87bb86038b8045b1f308f8181397f06e02bc484330e55c74de6b81c8f51"
     },
     {
       "path": "docs/PROTOCOL_REFERENCE.md",
@@ -3088,13 +3333,13 @@
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 7694,
-      "sha256": "bc2f52680a4b35c3f43da083bc3c19e7795f6e9a243165afc017e3bbfcd04c29"
+      "bytes": 8299,
+      "sha256": "1288c0a88aa063486478473d779b76de2c37bed11db593af4d9b2886b0169be4"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
-      "bytes": 7694,
-      "sha256": "9c9cb8dcf45403c9e20f91265c24fcfe6c3531562c3fee38505b607fe7713357"
+      "bytes": 9886,
+      "sha256": "b6d3e6b1a079148c0b08936d15fe857c43d36e12dfe8dfdf5aa6eb42e5521e82"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -3119,13 +3364,13 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "807fbf76ae7fade4516d21a5c76342e28d27b1dcc5b2e09033b4d8b21973fc84"
+      "sha256": "b1346399f10a3ea407570c6f9074dfed0281a4d44c759525f12c7593e7b4fce5"
     }
   ],
-  "bytes": 21399596,
-  "excludedTrackedPaths": 1097,
+  "bytes": 23630547,
+  "excludedTrackedPaths": 1102,
   "potentialSecrets": 0,
-  "reviewFindings": 228,
+  "reviewFindings": 270,
   "transformations": [
     {
       "file": "crates/wing-core/src/lib.rs",

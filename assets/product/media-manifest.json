@@ -1,0 +1,302 @@
+{
+  "appVersion": "0.3.0",
+  "appBuild": "20261109.2",
+  "uiSha256": "a3723baa5582f620dcdc1ee2fdd52458219af25e9c0bba9a2fda27455ddd0242",
+  "sourceRevisionAtCapture": "c674916657af678f7760605868144134903378da",
+  "browser": "Chrome/156.0.8078.81",
+  "provenance": "Real production HTML/CSS rendered offline in an isolated browser with synthetic example configurations. No live session, console, audio signal or operator data. Element crops and CSS compositions of these renders.",
+  "colours": {
+    "desk": "#008080",
+    "face": "#c0c0c0",
+    "title": "#000080"
+  },
+  "files": [
+    {
+      "file": "workstation-dark.png",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 231521,
+      "sha256": "3a1d1b5f0ee3eaecbb07aca77bd9e1cfb0b10857c1351a5bec9be54d0f97ff8a"
+    },
+    {
+      "file": "macro-recipe-dark.png",
+      "width": 1056,
+      "height": 144,
+      "bytes": 22355,
+      "sha256": "c898566830ba8a577d28a13408356fb2348dbab6a38baa4dee7205d46d4e4f86"
+    },
+    {
+      "file": "macro-trigger-dark.png",
+      "width": 1056,
+      "height": 558,
+      "bytes": 44946,
+      "sha256": "2784101230603234f5b96d5a1a4863590b6bfd125e12df1bdaff21b30a32d495"
+    },
+    {
+      "file": "macro-if-dark.png",
+      "width": 1056,
+      "height": 407,
+      "bytes": 32585,
+      "sha256": "bed018116ef7c009c23380d83e0fa2e83a4944a5136b34ced14c53d58334dd83"
+    },
+    {
+      "file": "fade-type-dark.png",
+      "width": 804,
+      "height": 88,
+      "bytes": 5777,
+      "sha256": "f0620651e212a7e6d55e43826fe385e0657792c84a17469722bc207e0a55cf39"
+    },
+    {
+      "file": "fade-duration-dark.png",
+      "width": 804,
+      "height": 84,
+      "bytes": 3568,
+      "sha256": "2ae8c831cdd8bc3f980484f7613e7b7f35a580db4d5d38b8dbaf5e4410e9a460"
+    },
+    {
+      "file": "fade-from-dark.png",
+      "width": 804,
+      "height": 88,
+      "bytes": 7546,
+      "sha256": "d9e79440ae605bb0c0a0b28c61165f4273f63ee5ca8e50900a8f70652f2341ce"
+    },
+    {
+      "file": "fade-to-dark.png",
+      "width": 804,
+      "height": 88,
+      "bytes": 4939,
+      "sha256": "1e807d507fe15b4966f890b7a041e2dbb62834409de52923a251684614f1dbba"
+    },
+    {
+      "file": "fade-amount-dark.png",
+      "width": 804,
+      "height": 84,
+      "bytes": 5354,
+      "sha256": "e0b08dd4cf2d20126dc624d891b0343ca547a443120580e586c1204d251b8928"
+    },
+    {
+      "file": "action-steps-dark.png",
+      "width": 1056,
+      "height": 269,
+      "bytes": 30404,
+      "sha256": "af72ed140a3215e6a1edf705c5ae4c91aa6a88c9cbfab3aa900b50e102ee5baa"
+    },
+    {
+      "file": "channel-selection-dark.png",
+      "width": 760,
+      "height": 600,
+      "bytes": 46329,
+      "sha256": "82ffdb73c0485ca81f1337f87c7c6bfcbed7f8a90ff16f442f88b604f905fa6a"
+    },
+    {
+      "file": "meter-selection-dark.png",
+      "width": 760,
+      "height": 600,
+      "bytes": 68931,
+      "sha256": "bd423bd5516d790a5bace79f28b199a27276104e05c93d7dbdbd65883ca9bc3d"
+    },
+    {
+      "file": "notice-dark.png",
+      "width": 360,
+      "height": 144,
+      "bytes": 12335,
+      "sha256": "6979ef423fe917297b5fb42e9561f39e4b42902c3e340296ac51995cd3f2519c"
+    },
+    {
+      "file": "hud-dark.png",
+      "width": 480,
+      "height": 178,
+      "bytes": 15208,
+      "sha256": "47e3bdf89bdac404d8254cbe33c50b2e8a0751b4a35a2c5cf4592081ef52df98"
+    },
+    {
+      "file": "hud-preferences-dark.png",
+      "width": 760,
+      "height": 630,
+      "bytes": 93629,
+      "sha256": "f6ff51637e640e8e9dfbef9f3530a2e56a879cdf14aafe2ea5e08d2ea7a3c464"
+    },
+    {
+      "file": "meter-bridge-dark.png",
+      "width": 1280,
+      "height": 600,
+      "bytes": 54286,
+      "sha256": "3bd1b9d62263bfafd066cc29508555e47a7abea5688e23466542a314cd982bb7"
+    },
+    {
+      "file": "workstation-light.png",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 215274,
+      "sha256": "9ac2bfc288b81c5b31bcb24fe9ab40933e65bbf859e57d2e0d24505565ea1368"
+    },
+    {
+      "file": "macro-recipe-light.png",
+      "width": 1056,
+      "height": 146,
+      "bytes": 22265,
+      "sha256": "67198ed8af523e1c756d52b52136deb0519c2efde7ab05088a4a79ae305bd73c"
+    },
+    {
+      "file": "macro-trigger-light.png",
+      "width": 1056,
+      "height": 558,
+      "bytes": 41708,
+      "sha256": "50cc585f8b6d3d237a1b9235dd93b3ca78ace10d40e8c5a771e2ea8e103a8200"
+    },
+    {
+      "file": "macro-if-light.png",
+      "width": 1056,
+      "height": 407,
+      "bytes": 30857,
+      "sha256": "95444b2c4be30216ed651da01ccba24054694fea85a1c42d3502b7c1c4063723"
+    },
+    {
+      "file": "fade-type-light.png",
+      "width": 804,
+      "height": 88,
+      "bytes": 5273,
+      "sha256": "6dc1e0b3ceba873887b63b13140b2638634288748934e96e075e7859b1447d1d"
+    },
+    {
+      "file": "fade-duration-light.png",
+      "width": 804,
+      "height": 84,
+      "bytes": 3356,
+      "sha256": "e72badc4f317edb5d48666c0db521a61d59efe79d9b658b29160a1c3f0d8bb88"
+    },
+    {
+      "file": "fade-from-light.png",
+      "width": 804,
+      "height": 88,
+      "bytes": 6689,
+      "sha256": "1147d7e4e75e7fdb32e0bd561f0c20e57e1bd0439024fe32ad41e6d8c47a20a6"
+    },
+    {
+      "file": "fade-to-light.png",
+      "width": 804,
+      "height": 88,
+      "bytes": 4560,
+      "sha256": "4474e02cfbfd113f9dd3af68e6b1c5efc108427c9c0d8c7416b476d73ca3ceb7"
+    },
+    {
+      "file": "fade-amount-light.png",
+      "width": 804,
+      "height": 84,
+      "bytes": 5074,
+      "sha256": "32fa49217e4bdf5b4c2c291d3974ea75ed5ddb06bcc553163dcc58c8f02a85cb"
+    },
+    {
+      "file": "action-steps-light.png",
+      "width": 1056,
+      "height": 269,
+      "bytes": 28447,
+      "sha256": "b3372a8b16ae86431de3edb4f604b03268cf78d4bb9ef75bf0283282ee635bd2"
+    },
+    {
+      "file": "channel-selection-light.png",
+      "width": 760,
+      "height": 600,
+      "bytes": 44711,
+      "sha256": "a3797c82c20c7d42e99248c0daec45b4c5d7fd5dbdc25cc1ffad29361a7ed5ec"
+    },
+    {
+      "file": "meter-selection-light.png",
+      "width": 760,
+      "height": 600,
+      "bytes": 66804,
+      "sha256": "aa93aa10f686b835204c6895ec8e6cac478179a8f9f478fbd77853facd0e2e22"
+    },
+    {
+      "file": "notice-light.png",
+      "width": 360,
+      "height": 144,
+      "bytes": 10574,
+      "sha256": "209feb049cf24fdc4e69641fdb4cce1ed806f19deeecd81217b9feaf81c2cec8"
+    },
+    {
+      "file": "hud-light.png",
+      "width": 480,
+      "height": 178,
+      "bytes": 14151,
+      "sha256": "26f43876697ab8b847a18d70aa72aa47b29a65c3dd9e0f41dddd7fa8edd2686e"
+    },
+    {
+      "file": "hud-preferences-light.png",
+      "width": 760,
+      "height": 630,
+      "bytes": 84123,
+      "sha256": "25a469cf362a3f190d8ed05924bfe540f9328c59719018bf8b7de703d2b98298"
+    },
+    {
+      "file": "meter-bridge-light.png",
+      "width": 1280,
+      "height": 600,
+      "bytes": 48601,
+      "sha256": "fdff700907e7c4240959c098b206d54097951d6113f42a625905e770dc7a8dad"
+    },
+    {
+      "file": "hero.png",
+      "width": 1280,
+      "height": 640,
+      "bytes": 124726,
+      "sha256": "d9a4fd8e45e89fb52edca213892983e78cb542df261945abb7c38c04dce3580e"
+    },
+    {
+      "file": "macro-detail.png",
+      "width": 1280,
+      "height": 205,
+      "bytes": 38638,
+      "sha256": "b8369cd6a3b5e1de4619aed44c8e3210cecad63813b07a348aeea9a0ed19ee11"
+    },
+    {
+      "file": "selection-detail.png",
+      "width": 1280,
+      "height": 780,
+      "bytes": 122834,
+      "sha256": "e6fa100d063a0f9154a523d280add39c6014efa5af982bb30e2a4f86d1e365e0"
+    },
+    {
+      "file": "meters-detail.png",
+      "width": 1280,
+      "height": 705,
+      "bytes": 96803,
+      "sha256": "d6f53080ee6dfca6824e0c4d4d632e47c3ff5d4e91026a696060edc0c461e9dc"
+    },
+    {
+      "file": "messages-detail.png",
+      "width": 1280,
+      "height": 470,
+      "bytes": 50684,
+      "sha256": "6102f98f4fbbaa9bfbd08cd18e9177fb7c342d5f42c826b03f1ed3b56bbc4a89"
+    },
+    {
+      "file": "install.png",
+      "width": 1280,
+      "height": 310,
+      "bytes": 32799,
+      "sha256": "f9a5567c32b9b421424177421f0d41d8be7a69d0c14fdbf4fef778705ed95734"
+    },
+    {
+      "file": "themes.png",
+      "width": 1280,
+      "height": 650,
+      "bytes": 126745,
+      "sha256": "dcc432cfc6c7ae8f4c92a5900377e69baf1c576db0f6715ede73a633a676004f"
+    },
+    {
+      "file": "steps-detail.png",
+      "width": 1280,
+      "height": 601,
+      "bytes": 86445,
+      "sha256": "cc1740e2b62d5ae0779b5e708ee8fa734df6f3212b3fe816394fca17ca66d12c"
+    },
+    {
+      "file": "mark.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 174179,
+      "sha256": "fd608059bdc9338fb1c4901c12eff97b23b9a3c91b20599b7d300cde1b813d2c"
+    }
+  ]
+}

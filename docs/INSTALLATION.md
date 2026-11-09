@@ -1,4 +1,20 @@
-# Installation, first launch and permissions
+# Install WING CONTROLLER on your Mac
+
+[Español](INSTALLATION.es.md) · [Back to the project](../README.md)
+
+![Three installation steps: download the DMG, copy the app to Applications, eject and open](../assets/product/install.png)
+
+**You need an Apple Silicon Mac** (M-series). In **Apple menu → About This Mac**,
+look for an Apple M-series chip. Intel Macs are not supported. No developer tools
+are needed to install the application.
+
+1. **[Download WING CONTROLLER v0.3.0 for Apple Silicon](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg).** Check it against `SHA256SUMS.txt` from the same release before opening it.
+2. Open the DMG and **drag WING CONTROLLER.app into Applications**.
+3. **Eject the disk image**, then open the installed copy from Applications using the [first-launch instructions](#first-launch-on-macos).
+
+This is an independent, self-signed community beta, **not notarised by Apple**.
+Read the [disclaimer](../DISCLAIMER.md), release notes and the checks below before
+opening it. If macOS blocks first launch, use the app-specific instructions below.
 
 ## Download the application
 
@@ -33,6 +49,8 @@ an old binary contains newer source changes.
 3. Open the DMG and copy **WING CONTROLLER.app** to **Applications**.
 4. Eject the image and launch the installed copy. Do not run from the disk image.
 5. Follow permission prompts for the features you actually use.
+
+## First launch on macOS
 
 The release uses a stable **self-signed** certificate, not Apple Developer ID,
 and is **not notarised by Apple**. macOS may block first launch. Check the origin
