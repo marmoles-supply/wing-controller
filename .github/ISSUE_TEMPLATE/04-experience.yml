@@ -1,0 +1,37 @@
+name: Experience / Experiencia
+description: Share what worked, what did not, or what felt awkward.
+title: "[Experience] "
+labels: [feedback, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You do not need a formal test or a reproducible bug to share useful feedback. English or español welcome. Good results, setbacks and friction are all welcome; there is no need to invent a complaint. Remove private show/customer data from text and attachments.
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: A build or source commit is useful if available.
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: What was your experience?
+      description: What were you trying to do? What worked, failed or could be clearer? Say what you directly observed and what remains uncertain.
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Overall result (optional)
+      options:
+        - Worked for my use
+        - Mixed result
+        - Did not work for my use
+        - Still exploring
+  - type: textarea
+    id: context
+    attributes:
+      label: Setup, duration or related report (optional)
+      description: Mac/macOS, relevant hardware/app versions, a workaround or a linked issue. Do not include serials, discovery names, private addresses or personal data.

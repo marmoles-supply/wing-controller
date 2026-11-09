@@ -84,10 +84,18 @@ Before connecting to an active show, read the [disclaimer](../DISCLAIMER.md),
 and recovery on your hardware. Keep independent console/show backups and a way
 to operate manually.
 
-**LTC remains untested with real hardware by the owner.** Generated software
-checks do not validate an audio interface, microphone workflow or independent
-LTC/MTC interoperability. See the [audit](AUDIT_2026-11-09.md) and
+**Hardware and integration acceptance is incomplete**, including physical
+LTC/MTC. Generated software checks do not validate an audio interface, microphone
+workflow or independent interoperability. See the [audit](AUDIT_2026-11-09.md) and
 [roadmap](ROADMAP.md) before relying on these features.
+
+## Share the result
+
+Did installation work on your Mac, or did it fail? Both outcomes help.
+[Report an installation test](https://github.com/marmoles-supply/wing-controller/issues/new?template=03-test-report.yml)
+or [report a bug](https://github.com/marmoles-supply/wing-controller/issues/new?template=01-bug-report.yml).
+Include the app version and macOS/chip model, and remove personal details.
+[Community testing](COMMUNITY_TESTING.md) explains the process.
 
 ## Packaging your own build
 

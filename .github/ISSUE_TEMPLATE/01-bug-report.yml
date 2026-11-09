@@ -1,0 +1,52 @@
+name: Bug report / Error
+description: Something did not behave as expected.
+title: "[Bug] "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or español welcome. This report will be public: remove credentials, private addresses, serials and show/customer data from text, logs and screenshots. For a vulnerability, use [private reporting](https://github.com/marmoles-supply/wing-controller/security/advisories/new).
+  - type: input
+    id: version
+    attributes:
+      label: App version and build
+      description: Find them in Properties → About. For a source build, include the commit.
+      placeholder: Version, build or commit
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Mac and macOS
+      placeholder: Mac chip/model family and macOS version
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what should have happened?
+      description: Include the visible error or state. A sent command and a confirmed console value are different observations.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Use a small example without private show data. If it happened once and you cannot reproduce it, say so.
+      placeholder: |
+        1. Open…
+        2. Choose…
+        3. Observe…
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Relevant setup or workaround (optional)
+      description: Console model/firmware version, connection type, audio interface or other app version if relevant. No console discovery names, serials or private network addresses.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted evidence (optional)
+      description: Attach a reviewed screenshot or a short log excerpt. Mention checks already tried and any related issue.

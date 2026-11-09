@@ -1,15 +1,30 @@
 {
-  "sourceRevision": "af1eac33ba9e74e58e3db0c26ee34ef5420016e4",
+  "sourceRevision": "daabdfdda1c5bf8582a39e00175a291ec2b8c9d3",
   "files": [
     {
-      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
-      "bytes": 777,
-      "sha256": "76835ce6a85d09e32daf861226facd1b7994d7e400b82c9992e670b3be2cd01e"
+      "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
+      "bytes": 2006,
+      "sha256": "09d3a00ed1860cf21e2b8efbd0eeac73271dfdc7d446f9e3d9ccc2adc5074797"
     },
     {
-      "path": ".github/ISSUE_TEMPLATE/improvement.md",
-      "bytes": 469,
-      "sha256": "5f45cbae6581340d7aaf0b33d0b26a1aa8527e73c44929cc50c59ec9caaf70d3"
+      "path": ".github/ISSUE_TEMPLATE/02-improvement.yml",
+      "bytes": 1121,
+      "sha256": "4e139be75d3ab9ee083de79183aa30d1d3010fa33af46a9cb7668b580ce078f3"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/03-test-report.yml",
+      "bytes": 2660,
+      "sha256": "3e60718f3accadfab9dd52732e10149845c5d85bd9d330f4f06a4a756d002826"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/04-experience.yml",
+      "bytes": 1433,
+      "sha256": "302d96907c1828bfa8ca4dbf4321ef96a2ddcddedbf9f5120758ab6d546c6d9f"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/config.yml",
+      "bytes": 714,
+      "sha256": "08159f1859018928f273ecdb761abca774a667315a99b785bef9059e7f42e42f"
     },
     {
       "path": ".github/PULL_REQUEST_TEMPLATE.md",
@@ -3268,18 +3283,18 @@
     },
     {
       "path": "README.md",
-      "bytes": 14196,
-      "sha256": "61615ecfdeeb6382d09bb8e1a4a00973d25da089a72f5304288d0ba1c2134db0"
+      "bytes": 14641,
+      "sha256": "a22811c4fd1dd5d3ba41ae74f2f6d77d99801764c0030fdc16900d138366f60b"
     },
     {
       "path": "README.es.md",
-      "bytes": 9602,
-      "sha256": "f00ccca602b3e084b55ce07d76e502de22327cc575ded5f61ece5a2dcceb6480"
+      "bytes": 10225,
+      "sha256": "0302ebc1ed7e34fa830d53ccf14edc63451a2f33334764476745613079603e34"
     },
     {
       "path": "CONTRIBUTING.md",
-      "bytes": 3375,
-      "sha256": "c3d2a011e2a5e6a16bb000b62e8bbf22772273c802f5859849dc79f1c907c615"
+      "bytes": 3821,
+      "sha256": "bf2c3cf56570e8b2e4538bd075d6dff4c1cd64d511db8a237a62fda5a2bf468f"
     },
     {
       "path": "SECURITY.md",
@@ -3293,28 +3308,33 @@
     },
     {
       "path": "DISCLAIMER.md",
-      "bytes": 3336,
-      "sha256": "f8d686fc01bbb0037bd5a24fb80e9d8b971213c32091066e25c80ed2d487b9d4"
+      "bytes": 4163,
+      "sha256": "a5309434c06e200f7901e81a4fbb9f8e0b4401d0cebb54cb84d38f653f4c6978"
     },
     {
       "path": "docs/INSTALLATION.md",
-      "bytes": 5532,
-      "sha256": "b148b0147f32b448b8418aa2b19244e1670935e2a5d16e4522d0006014d0a8ac"
+      "bytes": 6011,
+      "sha256": "b5297d8ae814fdd74b37062bbe4082e13fd656af631f03a05b28fc1664355dad"
     },
     {
       "path": "docs/INSTALLATION.es.md",
-      "bytes": 3692,
-      "sha256": "06f8ae7e370c2a1a709468939e98d8616079416ded98ad9974a03bd4015c139f"
+      "bytes": 4175,
+      "sha256": "98c2667d2580f3a75c8d4c0bbe32283af4683ca7785a7dd0fd7691a61764e372"
     },
     {
       "path": "docs/SHARING.md",
-      "bytes": 3640,
-      "sha256": "7c9eaded054bfe2c5cf6bd355a5009ebc473aaed94ba1772def95bb8f97df25d"
+      "bytes": 3319,
+      "sha256": "9e06d8ca45dc34db097d02302329c61bba7a8d654d0b52d743553965cc7b4857"
+    },
+    {
+      "path": "docs/COMMUNITY_TESTING.md",
+      "bytes": 6182,
+      "sha256": "80612ae2fb01272bca9d4fcaa3c4ceb059356fac75b981914681815f15ee41da"
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "bytes": 2363,
-      "sha256": "461ea87bb86038b8045b1f308f8181397f06e02bc484330e55c74de6b81c8f51"
+      "bytes": 2537,
+      "sha256": "aee5d77538b5328d81e0fe8c0f58b98b3d882d13c730038774fa927d83daa125"
     },
     {
       "path": "docs/PROTOCOL_REFERENCE.md",
@@ -3338,8 +3358,8 @@
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
-      "bytes": 9886,
-      "sha256": "b6d3e6b1a079148c0b08936d15fe857c43d36e12dfe8dfdf5aa6eb42e5521e82"
+      "bytes": 10681,
+      "sha256": "10195b55fcd388d4e1d3f3bd3b1896c09dcdd871928aa42b945637623c49f451"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -3364,11 +3384,11 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "b1346399f10a3ea407570c6f9074dfed0281a4d44c759525f12c7593e7b4fce5"
+      "sha256": "571e6e68e4efe838911fdbb12ab30c4dc3615f6db85b360b645372a41f5ca567"
     }
   ],
-  "bytes": 23630547,
-  "excludedTrackedPaths": 1102,
+  "bytes": 23647368,
+  "excludedTrackedPaths": 1103,
   "potentialSecrets": 0,
   "reviewFindings": 270,
   "transformations": [

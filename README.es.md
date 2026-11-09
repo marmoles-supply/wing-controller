@@ -7,19 +7,21 @@ independiente para la comunidad, con una interfaz de escritorio clásica y códi
 disponible para estudiar, modificar y mejorar entre todos.
 
 Crea macros a partir de niveles de audio, estados de la consola o mensajes
-MIDI/OSC. Añade condiciones y acciones con tiempos, abre los medidores en otra
-ventana y muestra mensajes al operador. Sigue mezclando con la consola o con tu
+MIDI/OSC entre aplicaciones o cues de timecode LTC/MTC. Añade condiciones y
+acciones con tiempos, abre los medidores en otra ventana y muestra mensajes al operador. Sigue mezclando con la consola o con tu
 aplicación de control habitual.
 
 **[Descargar para Mac Apple Silicon — v0.3.0 beta](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg)**
 
-[Instalación paso a paso](docs/INSTALLATION.es.md) · [Release y checksums](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0) · [Guía de uso, en inglés](docs/guide/README.md) · [English](README.md)
+[Instalación paso a paso](docs/INSTALLATION.es.md) · [Release y checksums](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0) · [Guía de uso, en inglés](docs/guide/README.md) · [Feedback](https://github.com/marmoles-supply/wing-controller/issues/new/choose) · [English](README.md)
 
-**Solo para Mac Apple Silicon / serie M.** Es una beta firmada con un certificado
-propio, **sin notarización de Apple**. La guía explica cómo autorizar la primera
+**Solo para Mac Apple Silicon / serie M.** Está firmada con un certificado propio, **sin notarización de Apple**. La guía explica cómo autorizar la primera
 apertura. No hay instalador compatible con Intel, Windows o Linux; tampoco se ha
-establecido un rango amplio de versiones de macOS. **El propietario todavía no ha
-probado LTC con señal e interfaz físicas.**
+establecido un rango amplio de versiones de macOS.
+
+**Beta para la comunidad.** Muchas funciones con hardware e integraciones todavía
+necesitan pruebas reales. Lee el [disclaimer](DISCLAIMER.md#community-beta-and-incomplete-validation)
+y participa en las [pruebas de la comunidad](docs/COMMUNITY_TESTING.md).
 
 > **Software no oficial. Cada cual lo utiliza bajo su responsabilidad.** No es un
 > producto de Behringer ni de Music Tribe y no cuenta con su aprobación,
@@ -134,32 +136,27 @@ Estos ajustes se aplican a pasos nuevos. Los existentes conservan sus valores.
 
 </details>
 
-## Otras aplicaciones y timecode
+## MIDI/OSC entre aplicaciones y timecode
 
-Los mensajes MIDI/OSC pueden lanzar macros. Por ejemplo, puedes configurar
-controles MIDI en Mixing Station para enviarlos a WING CONTROLLER. Requiere
-configurar ambas aplicaciones; no es una integración oficial.
-[Guía de MIDI y otras aplicaciones, en inglés](docs/guide/12-midi-and-other-applications.md).
+Los mensajes MIDI y OSC entrantes pueden lanzar macros; las secuencias también
+pueden enviar mensajes MIDI/OSC. [Configuración inter-app, en inglés](docs/guide/12-midi-and-other-applications.md).
 
-Incluye herramientas LTC/MTC y cues en beta. Falta validar LTC con interfaz y
-señal reales y la interoperabilidad con un receptor MTC independiente.
-[Limitaciones](docs/KNOWN_LIMITATIONS.md) · [Guía de timecode](docs/guide/13-timecode.md), en inglés.
-
-## Uso del autor
-
-> Lo uso en mis giras en un MacBook Pro por Ethernet, mientras el mismo ordenador
-> ejecuta un host de plugins de audio en tiempo real. No he tenido dropouts ni
-> otros problemas en mi configuración.
->
-> — MÁRMOLES SUPPLY CO.
-
-Es la experiencia comunicada por el autor, no un benchmark ni una garantía para
-otros sistemas. No significa que todas las funciones estén probadas.
+Incluye herramientas de LTC (timecode de audio), MTC (timecode MIDI) y cues en
+beta: analizar archivos WAV de LTC, seguir entradas de timecode y asociar
+posiciones a macros. [Guía de timecode, en inglés](docs/guide/13-timecode.md).
+Los recorridos con hardware y otras aplicaciones necesitan pruebas de la
+comunidad; consulta las [prioridades](docs/COMMUNITY_TESTING.md#what-needs-testing).
 
 ## Colaborar
 
-Se agradecen informes de pruebas, correcciones, documentación, mejoras de
-accesibilidad y cambios de código concretos. El repositorio contiene:
+No hace falta programar para ayudar. Puedes informar de errores, proponer
+mejoras, comunicar pruebas y contar qué ha funcionado y qué no.
+
+**[Reportar un error](https://github.com/marmoles-supply/wing-controller/issues/new?template=01-bug-report.yml)** · **[Proponer una mejora](https://github.com/marmoles-supply/wing-controller/issues/new?template=02-improvement.yml)** · **[Comunicar una prueba](https://github.com/marmoles-supply/wing-controller/issues/new?template=03-test-report.yml)** · **[Compartir una experiencia](https://github.com/marmoles-supply/wing-controller/issues/new?template=04-experience.yml)**
+
+[Cómo probar y cómo se gestionan los informes, en inglés](docs/COMMUNITY_TESTING.md).
+Puedes escribir en español o inglés. Necesitas una cuenta de GitHub para enviar
+un informe. El repositorio contiene:
 
 - [To-do y prioridades](docs/ROADMAP.md), con trabajo sobre guardado y recuperación,
   LTC/MTC físico, hardware y mantenimiento.

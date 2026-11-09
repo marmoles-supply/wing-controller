@@ -1,0 +1,33 @@
+name: Improvement / Mejora
+description: Suggest a change to the app, documentation or workflow.
+title: "[Idea] "
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or español welcome. A concrete operator problem helps more than a long feature list. Keep private show/customer data out of the example.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would this help you do?
+      description: Describe the task or difficulty in your workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: What should change? An example or sketch is useful.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or trade-offs (optional)
+      description: Include existing ways to do it, effects on reliability or links to related issues.
+  - type: input
+    id: version
+    attributes:
+      label: Version or area concerned (optional)
+      placeholder: App version, guide chapter or roadmap task

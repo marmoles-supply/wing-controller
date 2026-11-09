@@ -16,9 +16,23 @@ compatible with every console/firmware/network/audio device/third-party tool,
 or available, uninterrupted, timely or error-free. No support, maintenance,
 response time or future update is guaranteed.
 
-The maintainer reports stable use in live shows. That is the maintainer's
-experience, not independent certification, a guarantee for another system or
-proof that every feature, fault condition or combination has been tested.
+## Community beta and incomplete validation
+
+**This is a community beta with incomplete real-world validation. Many features,
+operating paths and third-party workflows have not been independently tested
+with actual hardware, different console models and firmware, audio interfaces,
+other applications or failure conditions.** This includes physical LTC/MTC
+interoperability, inter-app workflows, installation/update behaviour on other
+Macs, and storage/recovery under interruption. See the current
+[known limitations](docs/KNOWN_LIMITATIONS.md).
+
+A feature being present, automated checks passing or favourable user feedback
+does not establish compatibility, uninterrupted operation or suitability for a
+particular show. **Community testing is needed.** Verify every function you
+intend to use in your complete setup and report reproducible results, including
+failures and limitations. A result applies to its stated version, setup and test;
+it does not validate other features or systems.
+[Community testing and reporting](docs/COMMUNITY_TESTING.md).
 
 ## Your responsibility when operating a live system
 

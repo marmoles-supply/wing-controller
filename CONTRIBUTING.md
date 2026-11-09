@@ -54,3 +54,11 @@ push. A successful pattern scan alone is not a publication clearance.
 Use `npm ci` and the verification commands described in README. Record checks
 that could not run rather than treating them as passing. Do not change version
 metadata or package a release as a side effect of a contribution.
+
+## Testing and use reports
+
+You can contribute without a code change. Use the dedicated forms for
+[bugs, improvements, test results and experiences](https://github.com/marmoles-supply/wing-controller/issues/new/choose).
+The [community testing guide](docs/COMMUNITY_TESTING.md) explains evidence, outcome
+labels and triage. Both successful and unsuccessful results are useful; neither
+should be generalised beyond the reported version and setup.

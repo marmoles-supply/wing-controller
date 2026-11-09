@@ -2,7 +2,7 @@
 
 This is a community beta with published source and an Apple Silicon installer. Publishing source and passing automated
 checks do not certify a particular show or every firmware/device combination.
-The maintainer's reported stable live use is experience, not a guarantee.
+Many hardware, integration and failure-condition paths still need community testing.
 
 - Desktop targets Apple Silicon macOS. No Intel, Windows or Linux installer is
   provided. Initial checks use macOS 26.6.2; a wider runtime range is unverified.
@@ -34,4 +34,6 @@ Read the [full disclaimer](../DISCLAIMER.md) and [licence](../LICENSE).
 
 The [dated audit](AUDIT_2026-11-09.md) and [prioritised roadmap](ROADMAP.md)
 record storage recovery, real LTC/MTC, hardware, dependency and accessibility
-follow-ups with evidence and closure criteria. The owner has not tested LTC.
+follow-ups with evidence and closure criteria. Named examples in technical guides
+are configuration recipes, not certification of third-party interoperability.
+[Community testing](COMMUNITY_TESTING.md) collects results for specific setups.

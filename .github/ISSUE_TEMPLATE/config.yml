@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Community testing / Pruebas de la comunidad
+    url: https://github.com/marmoles-supply/wing-controller/blob/main/docs/COMMUNITY_TESTING.md
+    about: What to test, how to report it, and how reports are reviewed.
+  - name: Private security report / Seguridad
+    url: https://github.com/marmoles-supply/wing-controller/security/advisories/new
+    about: Report vulnerabilities privately, rather than in a public issue.
+  - name: Installation guide / Instalación
+    url: https://github.com/marmoles-supply/wing-controller/blob/main/docs/INSTALLATION.md
+    about: Download, install and approve the first launch on macOS. Spanish instructions are linked there.

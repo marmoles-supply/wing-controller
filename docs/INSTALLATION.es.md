@@ -58,8 +58,17 @@ Sigue la [guía de primera conexión, en inglés](guide/01-start-here.md). Prueb
 primero fuera de un show activo, verifica destinos y valores, guarda copias de
 consola/show y conserva una forma de trabajar manualmente.
 
-**El propietario no ha probado LTC con señal e interfaz físicas.** Las pruebas
-sintéticas no validan ese recorrido ni la interoperabilidad MTC independiente.
+**La validación con hardware e integraciones está incompleta**, incluidos LTC/MTC
+físicos. Las pruebas sintéticas no validan esos recorridos ni su interoperabilidad
+independiente.
 Consulta las [limitaciones](KNOWN_LIMITATIONS.md) y el [to-do](ROADMAP.md), en inglés.
 
 Para compilar o empaquetar, utiliza las [instrucciones de desarrollo, en inglés](../README.md#development).
+
+## Comunicar el resultado
+
+Tanto una instalación correcta como un fallo ayudan.
+[Comunica la prueba](https://github.com/marmoles-supply/wing-controller/issues/new?template=03-test-report.yml)
+o [reporta un error](https://github.com/marmoles-supply/wing-controller/issues/new?template=01-bug-report.yml).
+Incluye versión de la app, macOS y chip, sin datos personales. Puedes escribir en
+español. [Pruebas de la comunidad, en inglés](COMMUNITY_TESTING.md).

@@ -13,19 +13,17 @@ These are offline interface examples, not a recorded live-console session.
 The paragraphs below are drafts for the maintainer to adapt. They have not been
 posted to any forum or service. Follow each community's posting rules and
 identify yourself as the project maintainer. Do not imply affiliation with
-Behringer, Music Tribe or Mixing Station.
+Behringer or Music Tribe.
 
 ## English
 
 I have shared WING CONTROLLER, a small independent project for Behringer WING on
 Apple Silicon Macs. It has macros with triggers, conditions and timed actions,
 a separate Meter Bridge, channel-selection grids, and on-screen notices/HUD
-messages. It works alongside the console or your usual control application.
+messages, inter-app MIDI/OSC and LTC/MTC cue tools. It works alongside the console or your usual control application.
 
-I use it on tour on my own MacBook Pro over Ethernet, alongside a real-time
-audio plug-in host. I have had no dropouts in that setup; that is my experience,
-rather than a guarantee for other systems. It is a community beta, and LTC still
-needs real signal/interface testing.
+It is a community beta and needs independent testing, including real signal/interface
+LTC and third-party workflows.
 
 Screenshots, the download, installation steps and contributor tasks are here:
 https://github.com/marmoles-supply/wing-controller
@@ -41,14 +39,12 @@ guide and disclaimer.
 
 He compartido WING CONTROLLER, un proyecto independiente para Behringer WING en
 Mac Apple Silicon. Permite crear macros con disparadores, condiciones y acciones
-con tiempos, abrir medidores en otra ventana, seleccionar canales con cuadrículas
-y mostrar notices y mensajes HUD. Lo utilizas junto a la consola o tu aplicación
-de control habitual.
+con tiempos, abrir medidores en otra ventana, seleccionar canales con cuadrículas,
+mostrar notices y mensajes HUD, usar MIDI/OSC entre aplicaciones y cues LTC/MTC.
+Lo utilizas junto a la consola o tu aplicación de control habitual.
 
-Lo uso en mis giras en un MacBook Pro por Ethernet mientras el mismo ordenador
-ejecuta un host de plugins de audio en tiempo real. No he tenido dropouts en esa
-configuración; es mi experiencia, no una garantía para otros sistemas. Es una
-beta para la comunidad y todavía falta probar LTC con señal e interfaz reales.
+Es una beta y necesita pruebas de la comunidad, incluidos LTC con señal e interfaz
+reales y los recorridos entre aplicaciones.
 
 Aquí están las imágenes, la descarga, las instrucciones y las tareas pendientes:
 https://github.com/marmoles-supply/wing-controller
@@ -60,10 +56,9 @@ Se agradecen pruebas, informes de errores y contribuciones concretas. La app
 lleva firma propia, sin notarización de Apple; no es oficial y se distribuye sin
 garantías. Conviene leer la guía de instalación y el disclaimer.
 
-## If posting to a Mixing Station community
+## Feedback links
 
-Explain the specific relationship: configured outgoing MIDI controls in Mixing
-Station can trigger WING CONTROLLER macros. Link the
-[configuration guide](guide/12-midi-and-other-applications.md). Avoid describing
-it as an official integration, plug-in or automatic setup. Do not claim it
-replaces a full mixer-control app.
+Link [community testing](COMMUNITY_TESTING.md) or the
+[report chooser](https://github.com/marmoles-supply/wing-controller/issues/new/choose)
+when asking for feedback. Successful, partial, failed and inconclusive tests are
+all useful; label them as reports for one version/setup, not compatibility claims.
