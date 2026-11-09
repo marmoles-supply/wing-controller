@@ -1,8 +1,8 @@
 {
   "summary": {
-    "sourceRevision": "ce8a8e6c180feea0813f1edf3dd78ca82f76dd98",
+    "sourceRevision": "432d7652d037fc271669d77586d07dcf488925e2",
     "files": 712,
-    "bytes": 25166303,
+    "bytes": 25169862,
     "excludedTrackedPaths": 1111,
     "potentialSecrets": 0,
     "reviewFindings": 287,

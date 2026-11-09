@@ -143,3 +143,24 @@ version-string rejection also rejects unchanged pictures after a renderer update
 versions are therefore logged, while platform family and exact images remain enforced.
 A common reproducible renderer proven on both machines would overturn the need
 for separate records. Wider or unexplained differences require another review.
+
+### Settings startup/polling repair
+
+[Run42707537543](https://github.com/marmoles-supply/wing-controller/actions/runs/42707537543)
+passed the four previously failing suites and Rust, then failed only the Settings
+cue-delivery check. The test waited600ms after a simulated state change.
+**DOCUMENTED:** its reload readiness allowed DOM presence before boot registered
+Settings handlers; cue rows can load independently of an open Settings page.
+**INFERRED:** an early lost click left polling inactive on this run.
+
+The repair waits for a fresh per-document token and registered Settings hooks on
+every reload, opens Settings and Timecode through their real controls, and verifies
+modal visibility, active tab and running polling. Each changed stub state has a
+revision; the test requires that exact revision to be consumed and rendered.
+All original visible/count/warning/empty assertions remain. It calls no production
+render/poll function directly. The complete Settings suite passed locally afterwards.
+
+The final local full gate also passed86 checks, including35 named browser suites
+and561 Rust tests;15 Rust cases were explicitly ignored. This is local evidence,
+not a replacement for final hosted acceptance. Packaged-app startup acceptance is
+tracked separately; waiting for readiness in a test does not close that task.

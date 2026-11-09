@@ -60,9 +60,27 @@ const evaluate = async (expression) => {
 };
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function waitForSettingsCondition(expression, label) {
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    try { if (await evaluate(expression)) return; }
+    catch (error) { if (!/context.*destroyed|Cannot find context|Inspected target navigated/i.test(String(error))) throw error; }
+    await sleep(50);
+  }
+  throw new Error(`Settings readiness timed out: ${label}`);
+}
+async function reloadReadySettingsPage() {
+  const previous = await evaluate('window.__SETTINGS_TEST_DOCUMENT || null');
+  await call('Page.reload', { ignoreCache: true });
+  await waitForSettingsCondition(`Boolean(window.__SETTINGS_TEST_DOCUMENT)
+    && window.__SETTINGS_TEST_DOCUMENT !== ${JSON.stringify(previous)}
+    && typeof window.openSettingsModal === 'function'`, 'new document with registered Settings handlers');
+}
+
 try {
   await call('Page.enable');
   await call('Runtime.enable');
+  await call('Page.addScriptToEvaluateOnNewDocument', { source: `window.__SETTINGS_TEST_DOCUMENT = String(Date.now()) + ':' + Math.random();` });
   // The visible tab, not a background one: Chrome throttles the timers of a hidden tab (350 ms becomes
   // seconds, and after five minutes it drops to one timer a minute), and this walk is built on the
   // page settling between clicks — a backgrounded tab made it crawl instead of failing.
@@ -71,10 +89,10 @@ try {
   // Chrome profile: a run that died after choosing the cards left the key behind and the next run
   // failed the "lines is the default" assertion below. Clear it and load once more, so this test
   // always starts from the real default no matter what ran before it.
-  await call('Page.reload', { ignoreCache: true });
+  await reloadReadySettingsPage();
   await sleep(2400);
   await evaluate(`localStorage.removeItem('wing_macro_summary')`);
-  await call('Page.reload', { ignoreCache: true });
+  await reloadReadySettingsPage();
   await sleep(2400);
 
   // The gear opens the window; it must start closed.
@@ -179,7 +197,7 @@ try {
   assert.ok(summaryCards.trigger.length > 10, `the trigger card must say what is watched (got "${summaryCards.trigger}")`);
 
   // The choice survives a reload: it is a preference, not a view state of this session.
-  await call('Page.reload', { ignoreCache: true });
+  await reloadReadySettingsPage();
   await sleep(2400);
   const summaryAfterReload = await readSummary();
   assert.equal(summaryAfterReload.blocks, true, 'the cards must come back after a reload');
@@ -241,7 +259,7 @@ try {
     assert.equal(reach.grab, true, `${label}: a press on the visible strip must land on the titlebar`);
   };
 
-  await call('Page.reload', { ignoreCache: true });
+  await reloadReadySettingsPage();
   await sleep(2400);
   await evaluate(`localStorage.removeItem('wing_settings_pos'); localStorage.removeItem('wing_matrix_pos');`);
   await evaluate(`document.getElementById('open-settings-btn').click()`);
@@ -1140,7 +1158,7 @@ await call('Page.addScriptToEvaluateOnNewDocument', {
     })();
   `,
 });
-await call('Page.reload', { ignoreCache: true });
+await reloadReadySettingsPage();
 for (let attempt = 0; attempt < 200; attempt += 1) {
   if (await evaluate(`Boolean(window.__TAURI__?.core?.invoke) && Boolean(document.getElementById('open-settings-btn'))`)) break;
   await sleep(50);
@@ -1449,7 +1467,7 @@ await call('Page.addScriptToEvaluateOnNewDocument', {
     })();
   `,
 });
-await call('Page.reload', { ignoreCache: true });
+await reloadReadySettingsPage();
 for (let attempt = 0; attempt < 200; attempt += 1) {
   if (await evaluate(`Boolean(window.__NUMBER_STUB) && Boolean(document.getElementById('open-settings-btn'))`)) break;
   await sleep(50);
@@ -1614,7 +1632,7 @@ await call('Page.addScriptToEvaluateOnNewDocument', {
     })();
   `,
 });
-await call('Page.reload', { ignoreCache: true });
+await reloadReadySettingsPage();
 for (let attempt = 0; attempt < 200; attempt += 1) {
   if (await evaluate(`Boolean(window.__PLAIN_STUB) && Boolean(document.getElementById('open-settings-btn'))`)) break;
   await sleep(50);
@@ -1664,7 +1682,7 @@ await call('Page.addScriptToEvaluateOnNewDocument', {
               if (window.__FAULT_ADD) throw new Error(window.__FAULT_ADD);
               return { schema_version: 1, cues, offset_frames: 0, sort };
             case 'set_timecode_macro_library': return args?.macroCount ?? 0;
-            case 'timecode_state': return window.__STATE_OVERRIDE
+            case 'timecode_state': window.__STATE_READ_REV = window.__STATE_REV || 0; return window.__STATE_OVERRIDE
               || { state: 'running', position: '01:00:12:15', rate: '25', drop_frame: false, pieces: 8, positions: 1, source: 'MTC', cues: cues.length };
             case 'get_inter_app_settings': return { enabled: false, triggers: [] };
             case 'load_macro_library': return { macros: [{ name: 'Macro A', steps: [] }], selectedIndex: 0 };
@@ -1683,24 +1701,13 @@ await call('Page.addScriptToEvaluateOnNewDocument', {
     })();
   `,
 });
-await call('Page.reload', { ignoreCache: true });
-// The new document, not the one the reload is replacing: the marker is set by the stub registered just above, and a
-// wait for "four cue rows" would otherwise be satisfied by the previous page and measure the stub that was replaced.
-for (let attempt = 0; attempt < 200; attempt += 1) {
-  if (await evaluate(`Boolean(window.__LABEL_STUB)`)) break;
-  await sleep(50);
-}
-for (let attempt = 0; attempt < 200; attempt += 1) {
-  if (await evaluate(`Boolean(window.__TAURI__?.core?.invoke) && Boolean(document.getElementById('open-settings-btn'))`)) break;
-  await sleep(50);
-}
+await reloadReadySettingsPage();
+await waitForSettingsCondition(`Boolean(window.__LABEL_STUB)`, 'label fixture');
 await evaluate(`document.getElementById('open-settings-btn').click()`);
-await sleep(300);
+await waitForSettingsCondition(`getComputedStyle(document.getElementById('settings-modal-backdrop')).display === 'flex'`, 'Settings opened through its button');
 await evaluate(`document.querySelector('.settings-nav-item[data-tab="timecode"]').click()`);
-for (let attempt = 0; attempt < 120; attempt += 1) {
-  if (await evaluate(`document.querySelectorAll('#timecode-cue-list .cue-row').length === 4`)) break;
-  await sleep(50);
-}
+await waitForSettingsCondition(`document.getElementById('tabpage-timecode').classList.contains('is-active')
+  && interAppMidiTimer !== null && document.querySelectorAll('#timecode-cue-list .cue-row').length === 4`, 'visible Timecode page with its poll running');
 const labelledUi = await evaluate(`(() => {
   const row = document.querySelector('#timecode-cue-list .cue-row[data-cue-id="cue-1"]');
   const inputs = Array.from(document.querySelectorAll('#timecode-cue-list .cue-label'));
@@ -1735,31 +1742,45 @@ assert.equal(labelledUi.otherName, 'Parked',
 // question it exists for.
 const deliveryUi = () => evaluate(`(() => {
   const line = document.getElementById('timecode-cue-delivery');
-  return { hidden: line.hidden, text: line.textContent.trim(), trouble: line.classList.contains('is-cue-trouble') };
+  return { hidden: line.hidden, text: line.textContent.trim(), trouble: line.classList.contains('is-cue-trouble'),
+    readRevision: window.__STATE_READ_REV || 0, modal: getComputedStyle(document.getElementById('settings-modal-backdrop')).display,
+    active: document.getElementById('tabpage-timecode').classList.contains('is-active'),
+    polling: interAppMidiTimer !== null, visibility: document.visibilityState };
 })()`);
 /// What the poll is answered with, from the stub's own box: the page keeps one reference to its backend, so this is
 /// the seam, and the render below it is the only thing that changes between the cases.
-const answerState = (state) => evaluate(`window.__STATE_OVERRIDE = ${JSON.stringify(state)}`);
+const answerState = (state) => evaluate(`(() => {
+  window.__STATE_OVERRIDE = ${JSON.stringify(state)};
+  window.__STATE_REV = (window.__STATE_REV || 0) + 1;
+  return window.__STATE_REV;
+})()`);
+async function waitForDelivery(revision, predicate, label) {
+  const deadline = Date.now() + 10_000;
+  let last;
+  do {
+    last = await deliveryUi();
+    if (last.readRevision >= revision && predicate(last)) return last;
+    await sleep(50);
+  } while (Date.now() < deadline);
+  throw new Error(`Timecode delivery did not consume/render ${label}: ${JSON.stringify(last)}`);
+}
 
-await answerState({ state: 'running', position: '01:00:12:15', rate: '25', drop_frame: false, pieces: 8, positions: 1, source: 'MTC', cues: 4 });
-await sleep(600);
-const deliveryRunning = await deliveryUi();
+const runningRevision = await answerState({ state: 'running', position: '01:00:12:15', rate: '25', drop_frame: false, pieces: 8, positions: 1, source: 'MTC', cues: 4 });
+const deliveryRunning = await waitForDelivery(runningRevision, row => !row.hidden && /Cues fired: 0/.test(row.text) && !row.trouble, 'running with zero deliveries');
 assert.equal(deliveryRunning.hidden, false, 'while timecode runs the delivery line is on screen');
 assert.match(deliveryRunning.text, /Cues fired: 0 · executed: 0 · awaiting outcome: 0/,
   `with zeros, which both answers "was anything lost?" and proves the counter is alive (got ${JSON.stringify(deliveryRunning.text)})`);
 assert.equal(deliveryRunning.trouble, false, 'and zeros are not a warning');
 
-await answerState({ state: 'running', position: '01:00:12:15', rate: '25', drop_frame: false, pieces: 8, positions: 1, source: 'MTC',
+const troubleRevision = await answerState({ state: 'running', position: '01:00:12:15', rate: '25', drop_frame: false, pieces: 8, positions: 1, source: 'MTC',
   cues: 4, cues_fired: 3, cues_delivered: 2, fired_unconfirmed: 1, deliveries_deferred: 1, deliveries_lost: 0 });
-await sleep(600);
-const deliveryTrouble = await deliveryUi();
+const deliveryTrouble = await waitForDelivery(troubleRevision, row => !row.hidden && /awaiting outcome: 1/.test(row.text) && row.trouble, 'an unconfirmed delivery');
 assert.equal(deliveryTrouble.hidden, false, 'a cue the window has not confirmed keeps the line on screen');
 assert.match(deliveryTrouble.text, /awaiting outcome: 1/, `naming what is outstanding (got ${JSON.stringify(deliveryTrouble.text)})`);
 assert.equal(deliveryTrouble.trouble, true, 'and an unconfirmed order is the one case that carries the warning colour');
 
-await answerState({ state: 'nothing', pieces: 0, positions: 0, source: 'MTC' });
-await sleep(600);
-const deliveryNothing = await deliveryUi();
+const nothingRevision = await answerState({ state: 'nothing', pieces: 0, positions: 0, source: 'MTC' });
+const deliveryNothing = await waitForDelivery(nothingRevision, row => row.hidden && row.text === '', 'no incoming timecode');
 assert.equal(deliveryNothing.hidden, true,
   'with no timecode at all — and nothing counted — the line is out of the page: there is nothing it could say');
 assert.equal(deliveryNothing.text, '', 'and it renders no counters rather than an empty box');

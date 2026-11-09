@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "ce8a8e6c180feea0813f1edf3dd78ca82f76dd98",
+  "sourceRevision": "432d7652d037fc271669d77586d07dcf488925e2",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -2993,8 +2993,8 @@
     },
     {
       "path": "scripts/test-desktop-settings-tabs-browser.mjs",
-      "bytes": 123334,
-      "sha256": "7bc94b2a6563855625ee0cf6747bb2ec191cb6be00a0a853ac517ea7b87f2a9a"
+      "bytes": 125089,
+      "sha256": "787d1f9a9e5ef49fefb7020673bd43620684a05978b24610108ab9dbee351314"
     },
     {
       "path": "scripts/test-desktop-shoot-and-guards-browser.mjs",
@@ -3458,13 +3458,13 @@
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 11348,
-      "sha256": "f3f982fc00d9be64f75042288d3020422a34bfbb16beaedfd1b6d003e42299ad"
+      "bytes": 12677,
+      "sha256": "33cee79ce8e71566d66f4883a4e9170b7e7c658e97a747506fad22170fd9b596"
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 8962,
-      "sha256": "78ee8a181bd8e95d81094c464c992669411c9da78e100c15d0ef3d0c5f6e5a68"
+      "bytes": 9437,
+      "sha256": "685aa78248978c13e19b18f36ad550ded422e9146d937b67b2c6637c56dff5cc"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
@@ -3559,10 +3559,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "0dbe1a974b735718ecfe2f617b8aeb87fc3b535a488e4cd714e558881fe4b3a5"
+      "sha256": "8e92b32a517b49d639be38fa87cdc6c6d831489b94eba6bbb88e6007033b2ef1"
     }
   ],
-  "bytes": 25166303,
+  "bytes": 25169862,
   "excludedTrackedPaths": 1111,
   "potentialSecrets": 0,
   "reviewFindings": 287,

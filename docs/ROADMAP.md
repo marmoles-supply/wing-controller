@@ -100,6 +100,13 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
   Explain where macro IF gates run and where external bindings use their own
   conditions. Verify source and generated operator content together.
 
+- [ ] **UI-05 — Verify earliest startup interactions.** Delayed native geometry
+  restoration can leave mounted DOM before Settings handlers are registered
+  (`desktop/ui/index.html:32195`, `:32211`). Reproduce with controlled startup
+  delays and in the packaged app; verify that controls communicate readiness and
+  early actions are not silently lost. The automated Settings suite now waits for
+  readiness; native operator behaviour during startup remains unmeasured.
+
 ## P3 — maintainability
 
 - [ ] **ARCH-01 — Extract modules gradually.** Start with one high-change
