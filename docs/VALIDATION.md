@@ -1,5 +1,8 @@
 # Public-source verification history — 9 November 2026
 
+The subsequent [Desktop 0.3.0 package validation](RELEASE_VALIDATION_0.3.0.md)
+records the first binary release, installation checks and actual artefact hashes.
+
 ## Measured source checks
 
 The standalone source checkout completed **82 checks** in the full

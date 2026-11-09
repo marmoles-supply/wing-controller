@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "434174e0a7846a1b001ded7a8aa79fdd24942874",
+  "sourceRevision": "6533cc9536b76d01ef29a6c630736a6e7af35664",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -2328,8 +2328,8 @@
     },
     {
       "path": "scripts/prepare-release-legal.mjs",
-      "bytes": 10994,
-      "sha256": "115b0cae11a46d856d58e4741fc46554143834b42eaa12d5749d31dd8d1989ef"
+      "bytes": 11141,
+      "sha256": "e6cc376a0e958eae60faa811eb5805c9e189248ea9da826c674750a23800f871"
     },
     {
       "path": "scripts/probe-cue-mutations.mjs",
@@ -2783,8 +2783,8 @@
     },
     {
       "path": "scripts/verify-install.sh",
-      "bytes": 43831,
-      "sha256": "f2fdf07b0cc56d529b9457d7eeb26bed134da85dd0376e290214001677a744b8"
+      "bytes": 43714,
+      "sha256": "054772ab4c2a41cc53c37e98379cc751fb14f6d0c5cac7e95bf204c5d0372ecc"
     },
     {
       "path": "scripts/verify-release-legal.mjs",
@@ -3038,8 +3038,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6793,
-      "sha256": "87c8bd7ee25c5447b90223158834ea3872d563969d2b817121468ba79d8cef96"
+      "bytes": 6918,
+      "sha256": "a765fe228b08de05ca87b69cde2162f8721ec8714412cf920dec301d3597fa57"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -3083,13 +3083,13 @@
     },
     {
       "path": "docs/VALIDATION.md",
-      "bytes": 2895,
-      "sha256": "ee464ec718d891f754ce577727fd9e8363f7836f5403a1cc773e2d8f791e0b27"
+      "bytes": 3057,
+      "sha256": "49f7393e1cc325209d573a5a5512bc2a36942c49a13a1eb34fee6b81eb39c8e8"
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 6671,
-      "sha256": "08798f616d03a805faab34e4f3d92d83004a090aa43743f0b3d1b3a3effcf22f"
+      "bytes": 7694,
+      "sha256": "bc2f52680a4b35c3f43da083bc3c19e7795f6e9a243165afc017e3bbfcd04c29"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
@@ -3107,6 +3107,11 @@
       "sha256": "1b3d904633b17e4851e59b32278b8411787264e0ee7b729440d26771a81c450b"
     },
     {
+      "path": "docs/RELEASE_VALIDATION_0.3.0.md",
+      "bytes": 3949,
+      "sha256": "1a98efa07e7ac76ff3612e9c38d5859e519c38557cb2a85632be62b6de527194"
+    },
+    {
       "path": ".gitignore",
       "bytes": 1809,
       "sha256": "4067bb4e015b137f57ff9f86a181adc1b0c3ecd12a5e9bcaccfeaf7cc8c23a48"
@@ -3114,11 +3119,11 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "e4a7be7e0928ce9bb21f1aaaedcd988e6abd40bb61fd419a9194722881d67245"
+      "sha256": "807fbf76ae7fade4516d21a5c76342e28d27b1dcc5b2e09033b4d8b21973fc84"
     }
   ],
-  "bytes": 21394307,
-  "excludedTrackedPaths": 1096,
+  "bytes": 21399596,
+  "excludedTrackedPaths": 1097,
   "potentialSecrets": 0,
   "reviewFindings": 228,
   "transformations": [

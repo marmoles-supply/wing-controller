@@ -519,7 +519,7 @@ fi
 
 # Both the archive and app must retain the legal/source information.
 for legal_file in LICENSE DISCLAIMER.md THIRD_PARTY.md THIRD-PARTY-NOTICES.txt DEPENDENCIES.json SOURCE.txt; do
-  for legal_prefix in "WING_CONTROLLER_v${VERSION}_AppleSilicon/Legal" "WING_CONTROLLER_v${VERSION}_AppleSilicon/WING CONTROLLER.app/Contents/Resources/Legal"; do
+  for legal_prefix in "Legal" "WING CONTROLLER.app/Contents/Resources/Legal"; do
     if /usr/bin/unzip -p "$ZIP" "$legal_prefix/$legal_file" 2>/dev/null | wc -c | awk '{exit !($1 > 0)}'; then
       pass "ZIP legal: $legal_file"
     else
@@ -530,8 +530,8 @@ done
 
 # Extract only the legal folders for complete archive hash validation.
 ZIP_LEGAL_DIR="$(mktemp -d "${TMPDIR:-/tmp}/wing-zip-legal.XXXXXX")"
-if /usr/bin/unzip -qq "$ZIP" '*/Legal/*' -d "$ZIP_LEGAL_DIR"; then
-  for zip_legal in "$ZIP_LEGAL_DIR/WING_CONTROLLER_v${VERSION}_AppleSilicon/Legal" "$ZIP_LEGAL_DIR/WING_CONTROLLER_v${VERSION}_AppleSilicon/WING CONTROLLER.app/Contents/Resources/Legal"; do
+if /usr/bin/unzip -qq "$ZIP" 'Legal/*' 'WING CONTROLLER.app/Contents/Resources/Legal/*' -d "$ZIP_LEGAL_DIR"; then
+  for zip_legal in "$ZIP_LEGAL_DIR/Legal" "$ZIP_LEGAL_DIR/WING CONTROLLER.app/Contents/Resources/Legal"; do
     node scripts/verify-release-legal.mjs "$zip_legal" "$VERSION" && pass "ZIP legal hashes and source links" || fail "ZIP legal" "notice validation failed"
   done
 else

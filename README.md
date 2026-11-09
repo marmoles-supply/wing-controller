@@ -86,6 +86,8 @@ this source checkout.
 
 See the [dated verification record](docs/VALIDATION.md) for measured results,
 environment, dependency-cache use and what was not established.
+The [0.3.0 package validation](docs/RELEASE_VALIDATION_0.3.0.md) records installer,
+signature, architecture and checksum checks separately.
 
 ```sh
 ./scripts/verify-all.sh --quick   # Everyday checks; omits named browser suites
@@ -100,8 +102,8 @@ rendering environment: review differences rather than accepting them blindly.
 Ordinary checks are console-free. Hardware tests need explicit `LIVE_WING_*`
 opt-ins; inspect them before enabling anything against a console. A source gate
 does not certify a live show, packaged app or installed system. Historical
-provenance preserves 85 build records; 15 archival notes lack surviving build
-evidence and are explicitly labelled unverified.
+provenance is retained; 15 archival notes lack surviving build evidence and are
+explicitly labelled unverified.
 
 ## Source layout
 

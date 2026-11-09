@@ -1,9 +1,9 @@
 {
   "summary": {
-    "sourceRevision": "434174e0a7846a1b001ded7a8aa79fdd24942874",
-    "files": 623,
-    "bytes": 21394307,
-    "excludedTrackedPaths": 1096,
+    "sourceRevision": "6533cc9536b76d01ef29a6c630736a6e7af35664",
+    "files": 624,
+    "bytes": 21399596,
+    "excludedTrackedPaths": 1097,
     "potentialSecrets": 0,
     "reviewFindings": 228,
     "transformations": 6,

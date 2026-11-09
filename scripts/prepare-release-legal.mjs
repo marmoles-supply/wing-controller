@@ -121,7 +121,8 @@ try {
   fs.writeFileSync(path.join(destination, 'SOURCE.txt'), sourceInfo);
   fs.writeFileSync(path.join(sources, 'README.txt'), sourceInfo);
   fs.copyFileSync(path.join(destination, 'DEPENDENCIES.json'), path.join(sources, 'DEPENDENCIES.json'));
-  run('tar', ['-czf', path.join(bundle, `THIRD_PARTY_SOURCES_v${version}.tar.gz`), '-C', sources, '.']);
+  // BSD tar otherwise records this Mac's account name in the outer tar headers.
+  run('tar', ['--uid', '0', '--gid', '0', '--uname', 'root', '--gname', 'root', '-czf', path.join(bundle, `THIRD_PARTY_SOURCES_v${version}.tar.gz`), '-C', sources, '.']);
   console.log(`Prepared ${manifest.length} checked upstream source archives, preserved notices, MPL sources and Rust notices.`);
 } finally {
   fs.rmSync(sources, { recursive: true, force: true });

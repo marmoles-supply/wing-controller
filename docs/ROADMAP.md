@@ -49,6 +49,19 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
 
 ## P2 — focused improvements
 
+- [ ] **DOC-01 — Correct the in-app help summary.** Installed-app smoke found
+  `desktop/ui/index.html:9702` still says eleven chapters and `:9754` says three
+  windows. The actual guide has 13 chapters and describes five windows. Update
+  these counts/descriptions together and verify the installed help route and
+  generated guide; preserve the dated historical release notes.
+- [ ] **SAVE-03 — Review the show-file format and saving workflow.** Inventory
+  what the existing station export includes/excludes, its schema/version rules,
+  independent stores, recovery copies and saved/unsaved indications. Propose a
+  simpler portable-show workflow, explicit save state, backup/history policy and
+  compatible migrations while retaining the existing recovery path. Close with
+  complete synthetic-station round trips, old/new schema handling, clear recovery
+  choices and measured write cost. Decide any autosave/journal changes from this
+  inventory and SAVE-01 evidence, not from a presumed missing storage feature.
 - [ ] **SAVE-02 — Report durability uncertainty after rename.** Directory-open/
   directory-fsync errors are currently ignored after content has committed. Define
   a result that distinguishes committed bytes from uncertain durability. Inject
