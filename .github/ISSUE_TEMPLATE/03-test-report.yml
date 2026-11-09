@@ -49,6 +49,7 @@ body:
     id: outcome
     attributes:
       label: Outcome
+      default: 3
       options:
         - Worked as expected
         - Partly worked

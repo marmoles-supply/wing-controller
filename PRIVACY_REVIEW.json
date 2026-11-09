@@ -1,11 +1,11 @@
 {
   "summary": {
-    "sourceRevision": "daabdfdda1c5bf8582a39e00175a291ec2b8c9d3",
-    "files": 677,
-    "bytes": 23647368,
-    "excludedTrackedPaths": 1103,
+    "sourceRevision": "0e8e8f19bed4e273a8cb133a4361bbf681b0bff7",
+    "files": 696,
+    "bytes": 24882818,
+    "excludedTrackedPaths": 1107,
     "potentialSecrets": 0,
-    "reviewFindings": 270,
+    "reviewFindings": 283,
     "transformations": 6,
     "privateIdentityFragmentsChecked": 1,
     "limits": [
@@ -1489,6 +1489,71 @@
       "file": "src/osc/WingSession.js",
       "line": 34,
       "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/mark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/hero.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/macro-recipe-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/macro-detail.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/macro-trigger-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/macro-if-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/steps-detail.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/channel-selection-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/meter-bridge-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/meters-detail.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/messages-detail.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/workstation-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/assets/product/workstation-dark.png",
+      "kind": "binary-human-review",
       "severity": "review"
     }
   ]

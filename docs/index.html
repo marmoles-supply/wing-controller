@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WING CONTROLLER — macros, meters, and more for Behringer WING</title>
+<meta name="description" content="An independent community project for Behringer WING on Apple Silicon Macs. Macros, meters, inter-app MIDI/OSC and LTC/MTC cues. Download the beta, read the guide and help test it.">
+<link rel="canonical" href="https://marmoles-supply.github.io/wing-controller/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WING CONTROLLER">
+<meta property="og:description" content="Macros, meters, and more for Behringer WING. A community beta for Apple Silicon Macs.">
+<meta property="og:url" content="https://marmoles-supply.github.io/wing-controller/">
+<meta property="og:image" content="https://marmoles-supply.github.io/wing-controller/assets/product/hero.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/product/mark.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content / Ir al contenido</a>
+<div class="desktop-window">
+<header>
+ <div class="titlebar"><img src="assets/product/mark.png" width="22" height="22" alt=""><span>WING CONTROLLER</span><span class="by">MÁRMOLES SUPPLY CO.</span><div class="languages" aria-label="Language / Idioma"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="es" aria-pressed="false">ES</button></div></div>
+ <nav class="commandbar" aria-label="Main navigation">
+  <a class="button primary" href="https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg"><span data-lang="en">↓ Download Mac beta</span><span data-lang="es" hidden>↓ Descargar beta Mac</span></a>
+  <a class="button" href="#install"><span data-lang="en">Install</span><span data-lang="es" hidden>Instalar</span></a>
+  <a class="button" href="#features"><span data-lang="en">Features</span><span data-lang="es" hidden>Funciones</span></a>
+  <a class="button" href="#community"><span data-lang="en">Testing & feedback</span><span data-lang="es" hidden>Pruebas y feedback</span></a>
+  <a class="button" href="https://github.com/marmoles-supply/wing-controller"><span data-lang="en">Source on GitHub</span><span data-lang="es" hidden>Código en GitHub</span></a>
+ </nav>
+</header>
+<main id="main">
+ <h1 class="visually-hidden">WING CONTROLLER — macros, meters, and more for Behringer WING</h1>
+ <img class="cover" src="assets/product/hero.png" width="1280" height="640" alt="WING CONTROLLER: macros, meters, and more for Behringer WING, with a crop of the main workstation">
+ <p class="intro" data-lang="en">Build macros from audio thresholds, console state, inter-app MIDI/OSC or LTC/MTC timecode cues. Add conditions and timed actions, keep meters in their own window, and display messages for the operator.</p>
+ <p class="intro" data-lang="es" hidden>Crea macros a partir de niveles de audio, estados de la consola, MIDI/OSC entre aplicaciones o cues LTC/MTC. Añade condiciones y acciones con tiempos, abre los medidores en otra ventana y muestra mensajes al operador.</p>
+ <aside class="beta-note" aria-label="Beta status">
+  <p data-lang="en"><strong>Apple Silicon Macs · v0.3.0 community beta.</strong> Self-signed and not notarised by Apple. Many hardware and integration paths still need community testing. Independent, unofficial software, supplied without warranties. <a href="https://github.com/marmoles-supply/wing-controller/blob/main/DISCLAIMER.md">Read the disclaimer</a>.</p>
+  <p data-lang="es" hidden><strong>Mac Apple Silicon · v0.3.0 beta para la comunidad.</strong> Firma propia, sin notarización de Apple. Muchos recorridos con hardware e integraciones necesitan pruebas. Software independiente, no oficial y sin garantías. <a href="https://github.com/marmoles-supply/wing-controller/blob/main/DISCLAIMER.md">Lee el disclaimer</a>.</p>
+ </aside>
+ <section id="features" class="section">
+  <h2><span data-lang="en">Macros</span><span data-lang="es" hidden>Macros</span></h2>
+  <p data-lang="en">Combine a WHEN, optional IF conditions, and an ordered THEN sequence. This inactive example includes two gates, messages, a relative smooth fade, a wait and a multi-channel action.</p>
+  <p data-lang="es" hidden>Combina un WHEN, condiciones IF opcionales y una secuencia THEN. Este ejemplo inactivo incluye dos condiciones, mensajes, un smooth fade relativo, una espera y una acción sobre varios canales.</p>
+  <a class="image-link" href="assets/product/macro-recipe-light.png" aria-label="Open full-size macro summary"><img loading="lazy" src="assets/product/macro-detail.png" width="1280" height="206" alt="Real WHEN / IF / THEN summary: channel 40 meter trigger, two AND gates and five ordered steps"></a>
+  <dl class="capabilities">
+   <div><dt>WHEN</dt><dd data-lang="en">Meter levels or typed console-state comparisons. MIDI/OSC bindings and timecode cues provide other firing routes.</dd><dd data-lang="es" hidden>Niveles de medidores o comparaciones de estado. Las asignaciones MIDI/OSC y los cues ofrecen otras rutas de disparo.</dd></div>
+   <div><dt>IF</dt><dd data-lang="en">Up to 16 gates with AND or OR, evaluated when a meter or console-state trigger arrives.</dd><dd data-lang="es" hidden>Hasta 16 condiciones con AND u OR, evaluadas al llegar un disparador por medidor o estado de consola.</dd></div>
+   <div><dt>THEN</dt><dd data-lang="en">Up to 32 sequential steps: Set, Toggle, Wait, Wait then Set, Fade, Smooth Fade, HUD, Send MIDI and Send OSC. Modes depend on the target.</dd><dd data-lang="es" hidden>Hasta 32 pasos: Set, Toggle, Wait, Wait then Set, Fade, Smooth Fade, HUD, Send MIDI y Send OSC. Los modos dependen del destino.</dd></div>
+   <div><dt><span data-lang="en">Detail</span><span data-lang="es" hidden>Detalle</span></dt><dd data-lang="en">Current or authored fade starts, absolute or relative ends, trigger tuning, and Drop / Queue one / Restart behaviour.</dd><dd data-lang="es" hidden>Fades desde el valor actual o uno elegido, finales absolutos o relativos, ajustes del disparador y políticas Drop / Queue one / Restart.</dd></div>
+  </dl>
+  <details class="editor-details"><summary><span data-lang="en">Open the trigger, IF and action editor details</span><span data-lang="es" hidden>Ver los detalles del disparador, los IF y las acciones</span></summary>
+   <h3><span data-lang="en">Trigger tuning</span><span data-lang="es" hidden>Ajustes del disparador</span></h3>
+   <img loading="lazy" src="assets/product/macro-trigger-light.png" width="1056" height="557" alt="Custom transient trigger controls including threshold, overlap, cooldown, rearm, dwell and staleness">
+   <p class="small" data-lang="en">Rearm and dwell apply to rising transients; other paths use crossing and cooldown rules.</p><p class="small" data-lang="es" hidden>Rearm y dwell se aplican al transitorio ascendente; las otras rutas usan cruce y cooldown.</p>
+   <h3><span data-lang="en">IF conditions</span><span data-lang="es" hidden>Condiciones IF</span></h3>
+   <img loading="lazy" src="assets/product/macro-if-light.png" width="1056" height="406" alt="Two enabled AND gates and the selected gate's typed on/off editor">
+   <p class="small" data-lang="en">One AND or OR list, rather than nested branches. Gates are checked at the meter/state trigger, not continuously through the timeline.</p><p class="small" data-lang="es" hidden>Una lista con AND u OR, sin ramas anidadas. Se comprueba al llegar el disparador, no continuamente durante la secuencia.</p>
+   <h3><span data-lang="en">Action settings and timeline</span><span data-lang="es" hidden>Valores y secuencia de acciones</span></h3>
+   <img loading="lazy" src="assets/product/steps-detail.png" alt="Actual smooth fade control excerpts and the complete five-step timeline">
+   <p class="small" data-lang="en">Control excerpts are arranged for readability. The example reads the current fader, reduces it by 12 dB over 1,500 ms, then continues through a wait and later steps. These channel roles are fictional; this is not a tested show preset.</p><p class="small" data-lang="es" hidden>Los recortes se han compuesto para facilitar su lectura. El ejemplo lee el fader actual, lo reduce 12 dB en 1.500 ms y continúa con una espera y otros pasos. Los roles de canales son ficticios; no es un preset de show probado.</p>
+  </details>
+  <p class="small"><a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/guide/03-actions-and-timing.md"><span data-lang="en">Actions and timing guide</span><span data-lang="es" hidden>Guía de acciones y tiempos, en inglés</span></a></p>
+ </section>
+ <section class="section" id="selection">
+  <h2><span data-lang="en">Channel selection</span><span data-lang="es" hidden>Selección de canales</span></h2>
+  <p data-lang="en">Select supported channels and groups visually, with bank tools and generated ID ranges for action targets and meter views. The trigger grid selects one channel; its text field also supports lists and ranges.</p><p data-lang="es" hidden>Selecciona canales y grupos compatibles con herramientas por bancos y rangos para destinos y medidores. La cuadrícula del disparador selecciona un canal; el campo escrito admite listas y rangos.</p>
+  <a class="image-link selector" href="assets/product/channel-selection-light.png"><img loading="lazy" src="assets/product/channel-selection-light.png" width="760" height="600" alt="Actual channel-selection grid with ten selected channels and generated ID ranges"></a>
+ </section>
+ <section class="section" id="meters">
+  <h2>Meter Bridge</h2>
+  <p data-lang="en">A separate window for meters, with named banks, layouts, size controls and visual styles. Keep it beside the editor or on another display.</p><p data-lang="es" hidden>Una ventana independiente de medidores con bancos, distribuciones, tamaños y estilos visuales. Puedes dejarla junto al editor o en otra pantalla.</p>
+  <a class="image-link" href="assets/product/meter-bridge-light.png"><img loading="lazy" src="assets/product/meters-detail.png" alt="Offline Meter Bridge with channel strips, bank selection and layout/style controls"></a>
+  <p class="small" data-lang="en">Availability depends on the console/source. The analogue VU option is a visual style, not calibrated VU ballistics.</p><p class="small" data-lang="es" hidden>La disponibilidad depende de la consola y la fuente. El estilo VU analógico no implica balística VU calibrada.</p>
+ </section>
+ <section class="section" id="messages">
+  <h2><span data-lang="en">Notices and HUD</span><span data-lang="es" hidden>Notices y HUD</span></h2>
+  <p data-lang="en">An optional courtesy notice reports macro activity. A HUD message is a separate macro action: a centred card, corner notice or full-screen message, with optional sound.</p><p data-lang="es" hidden>El courtesy notice opcional informa de la actividad de una macro. El HUD es una acción independiente: mensaje centrado, en una esquina o a pantalla completa, con sonido opcional.</p>
+  <a class="image-link" href="assets/product/messages-detail.png"><img loading="lazy" src="assets/product/messages-detail.png" width="1280" height="470" alt="A courtesy notice and a centred HUD message, both rendered locally as examples"></a>
+ </section>
+ <section class="section" id="themes">
+  <h2><span data-lang="en">Themes</span><span data-lang="es" hidden>Temas</span></h2>
+  <div class="theme-buttons" aria-label="Screenshot theme"><button type="button" data-screenshot="light" aria-pressed="true">Light · Classic Slate</button><button type="button" data-screenshot="dark" aria-pressed="false">Dark · FOH Low Glare</button></div>
+  <a id="theme-full" class="image-link" href="assets/product/workstation-light.png"><img id="theme-shot" loading="lazy" src="assets/product/workstation-light.png" width="1600" height="1000" alt="Full workstation in the light theme with an inactive example configuration"></a>
+  <p class="small" data-lang="en">All screenshots use the real interface, rendered offline with example configurations. No console is connected, no macro is executed and no meter signal is simulated.</p><p class="small" data-lang="es" hidden>Las capturas muestran la interfaz real con configuraciones de ejemplo, sin consola conectada, ejecución de macros ni señal simulada.</p>
+ </section>
+ <section id="install" class="section">
+  <h2><span data-lang="en">Install on your Mac</span><span data-lang="es" hidden>Instalar en tu Mac</span></h2>
+  <ol class="installation">
+   <li><strong data-lang="en">Download the DMG.</strong><strong data-lang="es" hidden>Descarga el DMG.</strong><p data-lang="en">Use the <a href="https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0">v0.3.0 release</a> and compare its checksum with SHA256SUMS.txt.</p><p data-lang="es" hidden>Utiliza la <a href="https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0">release v0.3.0</a> y compara el checksum con SHA256SUMS.txt.</p></li>
+   <li><strong data-lang="en">Copy to Applications.</strong><strong data-lang="es" hidden>Copia a Aplicaciones.</strong><p data-lang="en">Open the DMG and drag WING CONTROLLER.app into Applications.</p><p data-lang="es" hidden>Abre el DMG y arrastra WING CONTROLLER.app a Aplicaciones.</p></li>
+   <li><strong data-lang="en">Eject and open.</strong><strong data-lang="es" hidden>Expulsa y abre.</strong><p data-lang="en">Launch the installed copy. For macOS approval, follow the app-specific <a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/INSTALLATION.md#first-launch-on-macos">first-launch guide</a>.</p><p data-lang="es" hidden>Abre la copia instalada. Para autorizarla en macOS, sigue la <a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/INSTALLATION.es.md#primera-apertura">guía de primera apertura</a>.</p></li>
+  </ol>
+  <p data-lang="en">Apple Silicon / M-series Macs only. No developer tools needed. Intel, Windows and Linux installers are not supported; a wider macOS runtime range is unverified.</p><p data-lang="es" hidden>Solo Mac Apple Silicon / serie M. No necesitas herramientas de desarrollo. No hay instalador compatible con Intel, Windows o Linux; el rango amplio de versiones de macOS no está validado.</p>
+  <div class="button-row"><a class="button primary" href="https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg"><span data-lang="en">↓ Download v0.3.0</span><span data-lang="es" hidden>↓ Descargar v0.3.0</span></a><a class="button" href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/INSTALLATION.md" data-href-es="https://github.com/marmoles-supply/wing-controller/blob/main/docs/INSTALLATION.es.md"><span data-lang="en">Full installation guide</span><span data-lang="es" hidden>Guía de instalación</span></a></div>
+ </section>
+ <section class="section" id="community">
+  <h2><span data-lang="en">Community testing and contributions</span><span data-lang="es" hidden>Pruebas y contribuciones</span></h2>
+  <p data-lang="en">Help test the beta, share what worked and what did not, or improve the source and documentation. English and Spanish reports are welcome. You do not need to write code.</p><p data-lang="es" hidden>Ayuda a probar la beta, cuenta qué ha funcionado y qué no, o mejora el código y la documentación. Puedes escribir en español o inglés. No hace falta programar.</p>
+  <div class="feedback-grid">
+   <a class="button" href="https://github.com/marmoles-supply/wing-controller/issues/new?template=01-bug-report.yml"><span data-lang="en">Report a bug</span><span data-lang="es" hidden>Reportar un error</span></a>
+   <a class="button" href="https://github.com/marmoles-supply/wing-controller/issues/new?template=02-improvement.yml"><span data-lang="en">Suggest an improvement</span><span data-lang="es" hidden>Proponer una mejora</span></a>
+   <a class="button" href="https://github.com/marmoles-supply/wing-controller/issues/new?template=03-test-report.yml"><span data-lang="en">Report a test</span><span data-lang="es" hidden>Comunicar una prueba</span></a>
+   <a class="button" href="https://github.com/marmoles-supply/wing-controller/issues/new?template=04-experience.yml"><span data-lang="en">Share an experience</span><span data-lang="es" hidden>Compartir una experiencia</span></a>
+  </div>
+  <p class="small" data-lang="en">Reports are public and need a GitHub account. Remove private data. A result applies to the version/setup tested, not every system. <a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/COMMUNITY_TESTING.md">Testing priorities and how reports are reviewed</a>.</p><p class="small" data-lang="es" hidden>Los informes son públicos y requieren cuenta de GitHub. Elimina datos privados. Cada resultado corresponde a su versión y equipo. <a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/COMMUNITY_TESTING.md">Prioridades y gestión de informes, en inglés</a>.</p>
+  <p class="resource-links"><a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/ROADMAP.md">Roadmap / To-do</a><a href="https://github.com/marmoles-supply/wing-controller/blob/main/CONTRIBUTING.md">Contributing</a><a href="https://github.com/marmoles-supply/wing-controller/blob/main/docs/guide/README.md">Operator guide</a><a href="https://github.com/marmoles-supply/wing-controller/blob/main/SECURITY.md">Security</a></p>
+ </section>
+</main>
+<footer>
+ <p data-lang="en"><strong>Source available.</strong> Free to use, study, modify and share under the project licence. Paid professional use is allowed; selling copies or derivatives is prohibited. Redistributed versions must include their corresponding source under the same licence. These are not OSI open-source or GPL terms.</p><p data-lang="es" hidden><strong>Código disponible.</strong> Puedes usar, estudiar, modificar y compartir bajo la licencia del proyecto. Se permite el uso profesional remunerado; se prohíbe vender copias o derivados. Las redistribuciones deben incluir su código bajo la misma licencia. No es una licencia open source OSI ni GPL.</p>
+ <div class="footer-links"><span>© 2026 MÁRMOLES SUPPLY CO.</span><a href="https://github.com/marmoles-supply/wing-controller/blob/main/LICENSE">Licence</a><a href="https://github.com/marmoles-supply/wing-controller/blob/main/DISCLAIMER.md">Disclaimer</a><a href="https://github.com/marmoles-supply/wing-controller">GitHub</a></div>
+</footer>
+</div>
+<script>
+(() => {
+  const languageButtons = [...document.querySelectorAll('[data-language]')];
+  const translatedLinks = [...document.querySelectorAll('[data-href-es]')];
+  translatedLinks.forEach(link => { link.dataset.hrefEn = link.href; });
+  function setLanguage(lang, updateUrl = true) {
+    const chosen = lang === 'es' ? 'es' : 'en';
+    document.documentElement.lang = chosen;
+    document.querySelectorAll('[data-lang]').forEach(el => { el.hidden = el.dataset.lang !== chosen; });
+    languageButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.language === chosen)));
+    translatedLinks.forEach(link => { link.href = chosen === 'es' ? link.dataset.hrefEs : link.dataset.hrefEn; });
+    if (updateUrl) { const url = new URL(location.href); if (chosen === 'es') url.searchParams.set('lang','es'); else url.searchParams.delete('lang'); history.replaceState(null,'',url); }
+  }
+  languageButtons.forEach(button => button.addEventListener('click', () => setLanguage(button.dataset.language)));
+  setLanguage(new URL(location.href).searchParams.get('lang'), false);
+  document.querySelectorAll('[data-screenshot]').forEach(button => button.addEventListener('click', () => {
+    const theme = button.dataset.screenshot === 'dark' ? 'dark' : 'light';
+    const src = 'assets/product/workstation-' + theme + '.png';
+    document.getElementById('theme-shot').src = src;
+    document.getElementById('theme-shot').alt = 'Full offline workstation — ' + (theme === 'dark' ? 'FOH Low Glare' : 'Classic Slate');
+    document.getElementById('theme-full').href = src;
+    document.querySelectorAll('[data-screenshot]').forEach(item => item.setAttribute('aria-pressed',String(item === button)));
+  }));
+})();
+</script>
+</body></html>

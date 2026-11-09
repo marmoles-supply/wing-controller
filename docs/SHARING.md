@@ -1,9 +1,10 @@
 # Sharing the project
 
-Use the repository as the main link:
-**https://github.com/marmoles-supply/wing-controller**.
-The README contains screenshots, a Mac download and installation instructions.
-For Spanish readers, link [README.es.md](../README.es.md).
+Use the product page as the main link:
+**https://marmoles-supply.github.io/wing-controller/**.
+It opens directly with the product, download, installation and feedback links.
+For Spanish readers, use `?lang=es`. The
+[repository](https://github.com/marmoles-supply/wing-controller) holds source and contributions.
 
 The [1280 × 640 cover](../assets/product/hero.png) is available for a post image.
 The [channel selector](../assets/product/channel-selection-light.png) and
@@ -26,7 +27,7 @@ It is a community beta and needs independent testing, including real signal/inte
 LTC and third-party workflows.
 
 Screenshots, the download, installation steps and contributor tasks are here:
-https://github.com/marmoles-supply/wing-controller
+https://marmoles-supply.github.io/wing-controller/
 
 The code is available to study and improve. Professional use, including paid
 shows, is allowed; selling copies or derivatives is prohibited. Redistributed
@@ -47,7 +48,7 @@ Es una beta y necesita pruebas de la comunidad, incluidos LTC con señal e inter
 reales y los recorridos entre aplicaciones.
 
 Aquí están las imágenes, la descarga, las instrucciones y las tareas pendientes:
-https://github.com/marmoles-supply/wing-controller
+https://marmoles-supply.github.io/wing-controller/?lang=es
 
 El código está disponible para estudiarlo y mejorarlo. Se permite el uso
 profesional, incluidos shows remunerados; se prohíbe vender copias o derivados.

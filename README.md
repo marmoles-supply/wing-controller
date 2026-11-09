@@ -1,5 +1,7 @@
 # WING CONTROLLER
 
+**[Product page](https://marmoles-supply.github.io/wing-controller/)** · [Español](https://marmoles-supply.github.io/wing-controller/?lang=es)
+
 ![WING CONTROLLER — macros, meters, and more for Behringer WING](assets/product/hero.png)
 
 **Macros, meters, and more for Behringer WING.** An independent community project

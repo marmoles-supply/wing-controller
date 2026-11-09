@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "daabdfdda1c5bf8582a39e00175a291ec2b8c9d3",
+  "sourceRevision": "0e8e8f19bed4e273a8cb133a4361bbf681b0bff7",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -13,13 +13,13 @@
     },
     {
       "path": ".github/ISSUE_TEMPLATE/03-test-report.yml",
-      "bytes": 2660,
-      "sha256": "3e60718f3accadfab9dd52732e10149845c5d85bd9d330f4f06a4a756d002826"
+      "bytes": 2677,
+      "sha256": "0f6e3ff010f12ca0cb1258dbea17430cdc66a1981a58a2b1fc8be22ad17188f3"
     },
     {
       "path": ".github/ISSUE_TEMPLATE/04-experience.yml",
-      "bytes": 1433,
-      "sha256": "302d96907c1828bfa8ca4dbf4321ef96a2ddcddedbf9f5120758ab6d546c6d9f"
+      "bytes": 1450,
+      "sha256": "2335db1b5b244e347ba0c2f10721d349ddade389242ceb01917eb9cd930d78a2"
     },
     {
       "path": ".github/ISSUE_TEMPLATE/config.yml",
@@ -2442,6 +2442,11 @@
       "sha256": "a2395de87029ac7371b4262cf2e7d872c455b6849a835008e98a7eee6a39427e"
     },
     {
+      "path": "scripts/lib/product-page-assets.mjs",
+      "bytes": 434,
+      "sha256": "d0a411d7b68cfde1e84b4de98d30da5fdee6a9e4ad2e48269825fe99b42a0d94"
+    },
+    {
       "path": "scripts/lib/protocol-reference.mjs",
       "bytes": 1518,
       "sha256": "03fde6ef2436dca676d7a795cc3c474ae493224367f844b18b04d198c9283b12"
@@ -2625,6 +2630,11 @@
       "path": "scripts/sync-design-tokens.mjs",
       "bytes": 2973,
       "sha256": "99731148a36595fee509988f3b5c916fea8ea2899babbe38413954351181a1cb"
+    },
+    {
+      "path": "scripts/sync-product-site.mjs",
+      "bytes": 649,
+      "sha256": "d1ad6f11c187493908a91ac32b0cbef9f21a9bee5ae726461e638c26a96ed05c"
     },
     {
       "path": "scripts/sync-version.mjs",
@@ -3283,13 +3293,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 14641,
-      "sha256": "a22811c4fd1dd5d3ba41ae74f2f6d77d99801764c0030fdc16900d138366f60b"
+      "bytes": 14787,
+      "sha256": "8982bb08b61a992c77614adf8ae704874e8f05d7d06cba7b99bc3c37be05fa18"
     },
     {
       "path": "README.es.md",
-      "bytes": 10225,
-      "sha256": "0302ebc1ed7e34fa830d53ccf14edc63451a2f33334764476745613079603e34"
+      "bytes": 10378,
+      "sha256": "f33a552a3bfbcdc8ccbb9a62d933a06ec4cb3f375284c894156cdc2fc0f25313"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -3323,13 +3333,33 @@
     },
     {
       "path": "docs/SHARING.md",
-      "bytes": 3319,
-      "sha256": "9e06d8ca45dc34db097d02302329c61bba7a8d654d0b52d743553965cc7b4857"
+      "bytes": 3408,
+      "sha256": "813f45bd2c9378b9118b74438d5b56123fc07aca7af85ff8e692c580144d3d76"
     },
     {
       "path": "docs/COMMUNITY_TESTING.md",
       "bytes": 6182,
       "sha256": "80612ae2fb01272bca9d4fcaa3c4ceb059356fac75b981914681815f15ee41da"
+    },
+    {
+      "path": "docs/index.html",
+      "bytes": 20417,
+      "sha256": "9af31fa0904b28a4d7b6137f44ca7c74c0ee1378c59f59f2bb1379ccaa922dd9"
+    },
+    {
+      "path": "docs/site.css",
+      "bytes": 4974,
+      "sha256": "b3279a0043d53816da5a285d8692713fd03726035d852a6d8e7af7ad8cd1fd7b"
+    },
+    {
+      "path": "docs/.nojekyll",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/SITE.md",
+      "bytes": 2142,
+      "sha256": "672f4113b5e5239a39cb6c28fef2b7e5eb911476083e9c0d6ff8de979aa71990"
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
@@ -3382,15 +3412,80 @@
       "sha256": "4067bb4e015b137f57ff9f86a181adc1b0c3ecd12a5e9bcaccfeaf7cc8c23a48"
     },
     {
+      "path": "docs/assets/product/mark.png",
+      "bytes": 174179,
+      "sha256": "fd608059bdc9338fb1c4901c12eff97b23b9a3c91b20599b7d300cde1b813d2c"
+    },
+    {
+      "path": "docs/assets/product/hero.png",
+      "bytes": 124726,
+      "sha256": "d9a4fd8e45e89fb52edca213892983e78cb542df261945abb7c38c04dce3580e"
+    },
+    {
+      "path": "docs/assets/product/macro-recipe-light.png",
+      "bytes": 22265,
+      "sha256": "67198ed8af523e1c756d52b52136deb0519c2efde7ab05088a4a79ae305bd73c"
+    },
+    {
+      "path": "docs/assets/product/macro-detail.png",
+      "bytes": 38638,
+      "sha256": "b8369cd6a3b5e1de4619aed44c8e3210cecad63813b07a348aeea9a0ed19ee11"
+    },
+    {
+      "path": "docs/assets/product/macro-trigger-light.png",
+      "bytes": 41708,
+      "sha256": "50cc585f8b6d3d237a1b9235dd93b3ca78ace10d40e8c5a771e2ea8e103a8200"
+    },
+    {
+      "path": "docs/assets/product/macro-if-light.png",
+      "bytes": 30857,
+      "sha256": "95444b2c4be30216ed651da01ccba24054694fea85a1c42d3502b7c1c4063723"
+    },
+    {
+      "path": "docs/assets/product/steps-detail.png",
+      "bytes": 86445,
+      "sha256": "cc1740e2b62d5ae0779b5e708ee8fa734df6f3212b3fe816394fca17ca66d12c"
+    },
+    {
+      "path": "docs/assets/product/channel-selection-light.png",
+      "bytes": 44711,
+      "sha256": "a3797c82c20c7d42e99248c0daec45b4c5d7fd5dbdc25cc1ffad29361a7ed5ec"
+    },
+    {
+      "path": "docs/assets/product/meter-bridge-light.png",
+      "bytes": 48601,
+      "sha256": "fdff700907e7c4240959c098b206d54097951d6113f42a625905e770dc7a8dad"
+    },
+    {
+      "path": "docs/assets/product/meters-detail.png",
+      "bytes": 96803,
+      "sha256": "d6f53080ee6dfca6824e0c4d4d632e47c3ff5d4e91026a696060edc0c461e9dc"
+    },
+    {
+      "path": "docs/assets/product/messages-detail.png",
+      "bytes": 50684,
+      "sha256": "6102f98f4fbbaa9bfbd08cd18e9177fb7c342d5f42c826b03f1ed3b56bbc4a89"
+    },
+    {
+      "path": "docs/assets/product/workstation-light.png",
+      "bytes": 215274,
+      "sha256": "9ac2bfc288b81c5b31bcb24fe9ab40933e65bbf859e57d2e0d24505565ea1368"
+    },
+    {
+      "path": "docs/assets/product/workstation-dark.png",
+      "bytes": 231521,
+      "sha256": "3a1d1b5f0ee3eaecbb07aca77bd9e1cfb0b10857c1351a5bec9be54d0f97ff8a"
+    },
+    {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "571e6e68e4efe838911fdbb12ab30c4dc3615f6db85b360b645372a41f5ca567"
+      "sha256": "3d42b4980f0a2541b122900c1967a89d810a6cab38c46f2a9e6102246a76724f"
     }
   ],
-  "bytes": 23647368,
-  "excludedTrackedPaths": 1103,
+  "bytes": 24882818,
+  "excludedTrackedPaths": 1107,
   "potentialSecrets": 0,
-  "reviewFindings": 270,
+  "reviewFindings": 283,
   "transformations": [
     {
       "file": "crates/wing-core/src/lib.rs",
