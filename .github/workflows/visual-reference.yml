@@ -28,27 +28,21 @@ jobs:
             uname -m
             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --version
           } > capture-evidence/environment.log
-      - name: Compare fresh browser processes for renderer stability
+      - name: Repeat complete captures with software Canvas 2D
         shell: bash
         run: |
           mkdir -p capture-evidence/samples
-          printf '%s\n' '#!/bin/sh' 'exec "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --disable-gpu "$@"' > "$RUNNER_TEMP/software-chrome"
-          chmod +x "$RUNNER_TEMP/software-chrome"
-          for renderer in normal software; do
-            for sample in 1 2 3 4 5; do
-              out="capture-evidence/samples/$renderer-$sample"
-              mkdir -p "$out"
-              if [ "$renderer" = software ]; then
-                WING_CHROME_BIN="$RUNNER_TEMP/software-chrome" node scripts/test-design-screens.mjs --only index --write > "$out/capture.log" 2>&1
-              else
-                node scripts/test-design-screens.mjs --only index --write > "$out/capture.log" 2>&1
-              fi
-              cp design/screens/index-*.png "$out/"
-            done
+          printf '%s\n' '#!/bin/sh' 'exec "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --disable-accelerated-2d-canvas "$@"' > "$RUNNER_TEMP/canvas-chrome"
+          chmod +x "$RUNNER_TEMP/canvas-chrome"
+          for sample in 1 2 3; do
+            out="capture-evidence/samples/canvas-$sample"
+            mkdir -p "$out"
+            WING_CHROME_BIN="$RUNNER_TEMP/canvas-chrome" node scripts/test-design-screens.mjs --write > "$out/capture.log" 2>&1
+            cp design/screens/*.png "$out/"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: renderer-stability-candidate
+          name: software-canvas-candidate
           path: |
             capture-evidence/
           retention-days: 7
