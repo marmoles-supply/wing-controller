@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "e58a9baf4d54b875b4d1d29849e773acc015632e",
+  "sourceRevision": "5c7c4b7f543475313458e246f399c95b4df52cc0",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -33,8 +33,8 @@
     },
     {
       "path": ".github/workflows/tests.yml",
-      "bytes": 2390,
-      "sha256": "7475451ae873d34c4768cc6a2c663775000dba246ff687b07505d200a919ddc7"
+      "bytes": 3034,
+      "sha256": "22ce68c6287ccb07e3540b10b2879f1a81edcb2088530d1c3ed14cfea6e0b316"
     },
     {
       "path": "CHANGELOG.md",
@@ -2478,8 +2478,8 @@
     },
     {
       "path": "scripts/lib/verification-steps.sh",
-      "bytes": 6115,
-      "sha256": "1069cc92c53b5dff30a720044c280d5482f27c7b6e45a23d422a78c418549145"
+      "bytes": 6135,
+      "sha256": "7360967b0f2aa6388dfaf692a39cd6e88e637884f605b65ac729650818cdb18f"
     },
     {
       "path": "scripts/licence-keygen.mjs",
@@ -3038,8 +3038,8 @@
     },
     {
       "path": "scripts/test-release-provenance.mjs",
-      "bytes": 4939,
-      "sha256": "c273c4044ec5a2e4492710e75db4a067dd8bb56fd45e49bb8912b9cb993856a8"
+      "bytes": 4951,
+      "sha256": "1edd66f59590ba2f89c1ba57ff5dd6153d12f941f8b729daa67c9fab148745ec"
     },
     {
       "path": "scripts/test-specimen-browser.mjs",
@@ -3413,18 +3413,18 @@
     },
     {
       "path": "docs/TESTING.md",
-      "bytes": 4268,
-      "sha256": "c8b34ccf3e8a06b3d3ff053ba131b0adba553e4b6492a4d5d1ca489d5c687788"
+      "bytes": 4649,
+      "sha256": "20dd0150a9ab4788d62b9b608f27fe83ce1b07b8e29c5370f28a5c3392f71003"
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 6160,
-      "sha256": "06bfeaf59fdc92b6d21ac2de4cbd3e870bff2632f1cf176ac131fe3b8c16dc35"
+      "bytes": 7125,
+      "sha256": "a77e08444bb90043b12b0b92f46d238493f163ca95b2e72ee950dd1680f93dd3"
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 8843,
-      "sha256": "e5cf0e83a9d6216262a78e1dba34aa8cc5f38925f35c915262928fc6d745ad44"
+      "bytes": 8963,
+      "sha256": "beee0ea95c7852b655955b7e7134400a90db4016db8bc47ce40ff43031e4cfb3"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
@@ -3519,10 +3519,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "3d421c30eae4a2e10c7adbce874d869f963a1df9399d05b41643060581dc6ad2"
+      "sha256": "86016907f546b893d4d7ee61e3a83d6e3e8627df8440d0f958ddad3cddf35aef"
     }
   ],
-  "bytes": 24937951,
+  "bytes": 24940093,
   "excludedTrackedPaths": 1110,
   "potentialSecrets": 0,
   "reviewFindings": 283,

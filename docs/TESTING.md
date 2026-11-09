@@ -10,6 +10,12 @@ Cancelled or pending runs have not established a passing result. Open a run's
 **Desktop tests (macOS arm64)** job to see each step; its downloadable test-logs
 artefact retains full per-suite output and tool versions for 14 days.
 
+The default Rust run lists its ignored cases explicitly. CI separately runs the
+20-second synthetic runtime soak against a loopback fake console and verifies
+that exactly one test executed. Physical-console cases and a cold-route timing
+probe stay excluded. A short synthetic soak does not establish show endurance.
+Fork runs may require GitHub's first-time contributor approval.
+
 ## What runs
 
 | Layer | Location | What it establishes |

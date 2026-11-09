@@ -38,7 +38,7 @@ step() {
 # Anything a passing step admits it did not check, kept visible next to its PASS.
 note_from_output() {
   local output="$1"
-  echo "$output" | grep -iE 'skipp|unverified|not build-verified|not landed|no chrome|not checked|no browser' | head -n 5 | sed 's/^/    note: /' || true
+  echo "$output" | grep -iE 'skipp|unverified|not build-verified|not landed|no chrome|not checked|no browser|[1-9][0-9]* ignored' | head -n 5 | sed 's/^/    note: /' || true
 }
 
 # A failure's first lines, in full in a log file, because a suite prints its failures before its summary.

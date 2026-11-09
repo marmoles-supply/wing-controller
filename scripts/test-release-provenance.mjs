@@ -55,7 +55,7 @@ try {
   write(exported, 'version.json', version('2.1.0', 'three'));
   write(exported, 'desktop/release-notes/2.1.0.md', note('three'));
   assert.equal(run().status, 0, 'A pending release may match the working version metadata');
-  const gate = fs.readFileSync(new URL('verify-all.sh', import.meta.url), 'utf8');
+  const gate = fs.readFileSync(new URL('lib/verification-steps.sh', import.meta.url), 'utf8');
   const outputFunction = /^note_from_output\(\) \{[\s\S]*?^\}/m.exec(gate)?.[0];
   assert.ok(outputFunction, 'The gate must retain its passing-note reporter');
   const reported = spawnSync('bash', ['-c', `${outputFunction}\nnote_from_output "$1"`, 'gate-fixture', 'UNVERIFIED archival build claims\n15 archival notes not build-verified'], { encoding: 'utf8' });

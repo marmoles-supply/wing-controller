@@ -74,3 +74,18 @@ they finish. No external LTC, live-console or multi-hour show testing is claimed
 Lesson retained: our earlier explanation correctly said tests existed, but their
 presence did not establish their sensitivity. The audit found real false greens
 in the project's own verification and corrects that record explicitly.
+
+### Local measured checks
+
+- The nine isolated mutation probes all caught their intended defects after
+  passing baselines. These are assertion failures, not compilation failures or
+  empty test filters. Source files remained unchanged; the build cache was reused.
+- The Rust workspace run passed 561 tests and explicitly ignored 15. Thirteen
+  require physical-console opt-ins; one is a cold-route timing measurement and
+  one a 20-second loopback synthetic soak. CI runs that last case separately.
+- The initial full audit run failed on an unclosed socket in our new browser test
+  and on the provenance test still reading the Bash reporter's old file location.
+  Both are repaired. That failed run is retained as a lesson; it is not relabelled
+  green because the underlying assertions had passed.
+- Actionlint accepted the workflow. Gitleaks reported no detected secrets in
+  the source candidate or the scanned public history; this is pattern-based evidence.

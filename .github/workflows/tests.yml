@@ -64,6 +64,12 @@ jobs:
         run: |
           set -o pipefail
           node scripts/mutation-check-ci.mjs 2>&1 | tee "$WING_VERIFY_LOG_DIR/mutations.log"
+      - name: Synthetic runtime soak (loopback console, 20 seconds)
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --locked -p wing-controller-desktop tests::a_runtime_soak_keeps_every_action_bounded_and_reports_its_latency -- --ignored --exact --nocapture 2>&1 | tee "$WING_VERIFY_LOG_DIR/runtime-soak.log"
+          node -e 'const fs = require("node:fs"); const assert = require("node:assert/strict"); assert.ok(fs.readFileSync(process.argv[1], "utf8").includes("test result: ok. 1 passed; 0 failed; 0 ignored"), "the selected soak must actually execute and pass");' "$WING_VERIFY_LOG_DIR/runtime-soak.log"
       - name: Upload complete test logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

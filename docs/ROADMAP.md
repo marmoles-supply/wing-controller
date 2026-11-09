@@ -113,6 +113,8 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
   suites to strict IPC fixtures and uncaught-exception assertions. Add independent
   LTC fixtures with provenance, packaged-app IPC acceptance and process-kill
   station-restore tests. Do not treat source-string contracts as behaviour coverage.
+  Explicitly invoked hardware tests must refuse missing opt-in flags rather than
+  return early and appear to have run.
 
 Mobile work remains parked. Commercial activation is not a prerequisite for
 this source-available project and must not be enabled as incidental cleanup.
