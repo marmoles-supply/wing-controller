@@ -40,7 +40,7 @@ echo "=== checksums"
 (
   cd "dist/v${VERSION}" || exit 1
   rm -f SHA256SUMS.txt
-  shasum -a 256 WING_CONTROLLER_v"${VERSION}"_AppleSilicon.dmg WING_CONTROLLER_v"${VERSION}"_AppleSilicon.zip > SHA256SUMS.txt || exit 1
+  shasum -a 256 WING_CONTROLLER_v"${VERSION}"_AppleSilicon.dmg WING_CONTROLLER_v"${VERSION}"_AppleSilicon.zip THIRD_PARTY_SOURCES_v"${VERSION}".tar.gz > SHA256SUMS.txt || exit 1
   cat SHA256SUMS.txt
 )
 

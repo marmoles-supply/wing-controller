@@ -14,7 +14,7 @@ BSD-3-Clause alternative to GPL-2.0.
 
 The locked Cargo graph for `aarch64-apple-darwin`, resolved offline, contains 297
 packages: 292 external packages with declared licences and five project crates
-without licence metadata. The MPL-2.0 packages in that graph are `cssparser`,
+whose manifests now refer to the adopted project LICENSE. The MPL-2.0 packages in that graph are `cssparser`,
 `cssparser-macros`, `dtoa-short`, `option-ext` and `selectors`. Of 535 registry
 packages in Cargo.lock, 78 had no cached manifest available during this review.
 Other platforms and future dependency changes require their own inventory.
@@ -23,7 +23,15 @@ Do not apply a project-wide no-sale restriction to these independently licensed
 components. Distribution must meet their original notice, attribution and, where
 applicable, covered-source obligations. Before distributing a binary, generate
 and verify the actual dependency notice bundle and corresponding source
-information. This file is not that bundle.
+information. This overview alone is not that bundle. The public binary packages
+include **Legal/** beside the app and inside its Resources: preserved dependency
+notices, exact package inventory/checksums, Rust standard-library notices,
+MPL-covered pristine crate sources and release-specific source instructions.
+The same release also provides `THIRD_PARTY_SOURCES_v0.3.0.tar.gz`, containing
+all 292 original crate archives verified against Cargo.lock, including conservative
+build/proc-macro dependencies. Their own terms remain unchanged. Upstream objc2
+licensing explanations, including its stated SDK-binding uncertainty, are retained;
+this inventory does not establish legal clearance for every upstream source file.
 
 ## Manuals and assets
 

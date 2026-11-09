@@ -1,9 +1,9 @@
 {
   "summary": {
-    "sourceRevision": "d9f9577791926858cfa475f3a414e3c369457edb",
-    "files": 615,
-    "bytes": 21344387,
-    "excludedTrackedPaths": 1090,
+    "sourceRevision": "658618b77144aaddbb76876b9bd5b42a624ba4b4",
+    "files": 623,
+    "bytes": 21395706,
+    "excludedTrackedPaths": 1096,
     "potentialSecrets": 0,
     "reviewFindings": 228,
     "transformations": 6,
@@ -1144,31 +1144,19 @@
     },
     {
       "file": "scripts/verify-install.sh",
-      "line": 181,
+      "line": 187,
       "kind": "home-path",
       "severity": "review"
     },
     {
       "file": "scripts/verify-install.sh",
-      "line": 341,
+      "line": 349,
       "kind": "home-path",
       "severity": "review"
     },
     {
       "file": "scripts/verify-install.sh",
-      "line": 344,
-      "kind": "home-path",
-      "severity": "review"
-    },
-    {
-      "file": "scripts/verify-install.sh",
-      "line": 351,
-      "kind": "home-path",
-      "severity": "review"
-    },
-    {
-      "file": "scripts/verify-install.sh",
-      "line": 353,
+      "line": 352,
       "kind": "home-path",
       "severity": "review"
     },
@@ -1180,19 +1168,31 @@
     },
     {
       "file": "scripts/verify-install.sh",
-      "line": 374,
+      "line": 361,
       "kind": "home-path",
       "severity": "review"
     },
     {
       "file": "scripts/verify-install.sh",
-      "line": 378,
+      "line": 367,
       "kind": "home-path",
       "severity": "review"
     },
     {
       "file": "scripts/verify-install.sh",
-      "line": 381,
+      "line": 382,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 386,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 389,
       "kind": "home-path",
       "severity": "review"
     },

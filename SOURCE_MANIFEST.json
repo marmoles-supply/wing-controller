@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "d9f9577791926858cfa475f3a414e3c369457edb",
+  "sourceRevision": "658618b77144aaddbb76876b9bd5b42a624ba4b4",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -18,13 +18,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 277629,
-      "sha256": "234f5c3bd1903f10458113760e9a06531654907c076d000c140ea20339e4f019"
+      "bytes": 278040,
+      "sha256": "210e48e50e216ddab8769887f9191fd803dc9e03f3a1bd4f31a607b8e70d3e90"
     },
     {
       "path": "Cargo.lock",
-      "bytes": 139351,
-      "sha256": "2247d6448b7c88e7da83d82ee0f85fa27bdc74fdd4d95146d0b4d98bd685aeef"
+      "bytes": 139350,
+      "sha256": "a19093a010d39d9e0eda94b1289bf234633369547662b86d62b083e954f70cf5"
     },
     {
       "path": "Cargo.toml",
@@ -1032,9 +1032,14 @@
       "sha256": "5d7c6abe36b6613f40206a0c0f1205a077a63fda6acc634a3c949b48691d752f"
     },
     {
+      "path": "desktop/INSTALLATION.txt",
+      "bytes": 2652,
+      "sha256": "39d2e8a1193e4f5ebfbc1f9d28ff9f1c744862e8f7d5b737ab23cc623a93e519"
+    },
+    {
       "path": "desktop/build-dist.sh",
-      "bytes": 36645,
-      "sha256": "ad4b177c641438046db7b2b0e16740ecfa057be4013753f3900455b549da6734"
+      "bytes": 32000,
+      "sha256": "a951e4503eeb4fdfc905f3f88132d9a2c09c1c21ed53ece35417ca7f029152fe"
     },
     {
       "path": "desktop/release-notes/0.1.2.md",
@@ -1432,6 +1437,11 @@
       "sha256": "9b1a3c656e7eaf281583d1e5a03259a8e2ba898c7220157b8d2da465d732b1c0"
     },
     {
+      "path": "desktop/release-notes/0.3.0.md",
+      "bytes": 3799,
+      "sha256": "147da3b2f3298ef853da133699fba722c10a91817b11e1f41355fe9ff6e55a87"
+    },
+    {
       "path": "desktop/release-notes/1.2.1.md",
       "bytes": 1800,
       "sha256": "741415755b3ae6d95df9bb95225684c51efab75cd7fdc0c7b0a40ef9f632e8be"
@@ -1543,8 +1553,8 @@
     },
     {
       "path": "desktop/src-tauri/Cargo.toml",
-      "bytes": 4908,
-      "sha256": "5cccde0eb6d40358ff73691914ae631e124894f0464eab954660226e39384148"
+      "bytes": 4907,
+      "sha256": "b91eb59651bce6e8c3115caee874af055c6867e7dd7a95eb78a8cf2825397f0b"
     },
     {
       "path": "desktop/src-tauri/Info.plist",
@@ -1873,8 +1883,8 @@
     },
     {
       "path": "desktop/src-tauri/tauri.conf.json",
-      "bytes": 1356,
-      "sha256": "70ac2fb18280d163b0c17f077e3f5043f224cff6b94cca7b7124059a76a542cf"
+      "bytes": 1355,
+      "sha256": "5ed1c10210372691bd49329d61e58be1dda7b6c7b6c4516f98d4b403dc82f415"
     },
     {
       "path": "desktop/ui/allow.mjs",
@@ -1973,8 +1983,8 @@
     },
     {
       "path": "desktop/ui/version.js",
-      "bytes": 433,
-      "sha256": "ff89f172006ce9b8204e050ee86d9df3131b087fe19eba1faf7e89358b89899a"
+      "bytes": 429,
+      "sha256": "9c765afa11615bfc8601e36f3044b00093fc4935f5f5dc056f584dd8b9574f10"
     },
     {
       "path": "desktop/ui/vu-draw.js",
@@ -2317,14 +2327,19 @@
       "sha256": "6bae83b0516fcb6bc97ae4237fa2e9557eeed8b86048ddca62bb874c4b8f51de"
     },
     {
+      "path": "scripts/prepare-release-legal.mjs",
+      "bytes": 10994,
+      "sha256": "115b0cae11a46d856d58e4741fc46554143834b42eaa12d5749d31dd8d1989ef"
+    },
+    {
       "path": "scripts/probe-cue-mutations.mjs",
       "bytes": 6744,
       "sha256": "e70f7b5d327fbb2f7120dae1c3688e021494f5656ca68ce132d32ec0adad536b"
     },
     {
       "path": "scripts/release.sh",
-      "bytes": 1784,
-      "sha256": "e8b56344515dde86272dc05ca1f06d302974f904384b195341478f3c9b9cfd3a"
+      "bytes": 1825,
+      "sha256": "edc1c9688c27782e9722b2513cc69db5b9073d901d23ec8aed415be14c82224f"
     },
     {
       "path": "scripts/reset-project.js",
@@ -2768,8 +2783,13 @@
     },
     {
       "path": "scripts/verify-install.sh",
-      "bytes": 40146,
-      "sha256": "2af87d17ab59567933bdfce10148cde294b60c50459f75294621a8718d938022"
+      "bytes": 43831,
+      "sha256": "f2fdf07b0cc56d529b9457d7eeb26bed134da85dd0376e290214001677a744b8"
+    },
+    {
+      "path": "scripts/verify-release-legal.mjs",
+      "bytes": 2118,
+      "sha256": "e54bdf563f28aec4dd2ee5ea68e97575aeb7c7a51b74aa3e8aefa6e3fe5a0491"
     },
     {
       "path": "scripts/wing-burst-hardware.sh",
@@ -3013,18 +3033,18 @@
     },
     {
       "path": "version.json",
-      "bytes": 327,
-      "sha256": "44e85b2ff539ad1bdea4d3399c7a7bbde2e786dc96b80dd42f0fb56363cadbe3"
+      "bytes": 326,
+      "sha256": "cbbd5e70edb8176590aaaaba50ecf8df7f9ffcca78927f00518502800e979ee0"
     },
     {
       "path": "README.md",
-      "bytes": 6361,
-      "sha256": "59dd936a92fffa117ba7dc5a8b6e4b392e2396f43110523545704890b4a8b2b4"
+      "bytes": 6793,
+      "sha256": "87c8bd7ee25c5447b90223158834ea3872d563969d2b817121468ba79d8cef96"
     },
     {
       "path": "CONTRIBUTING.md",
-      "bytes": 1597,
-      "sha256": "fa32112e73ed16c75c1bfd0e960a59f906e25d469f30caf80dd55d839bb40e93"
+      "bytes": 3375,
+      "sha256": "c3d2a011e2a5e6a16bb000b62e8bbf22772273c802f5859849dc79f1c907c615"
     },
     {
       "path": "SECURITY.md",
@@ -3033,8 +3053,8 @@
     },
     {
       "path": "THIRD_PARTY.md",
-      "bytes": 3506,
-      "sha256": "6e85350f5ca48c63ad3bf82fa139c48a29ad55ae91f1886269ab346b46c47b45"
+      "bytes": 4217,
+      "sha256": "47d3ea4c78352104cce3ec8d707680e151d832f271ffe9bf8b542a8f19c834fb"
     },
     {
       "path": "DISCLAIMER.md",
@@ -3043,13 +3063,13 @@
     },
     {
       "path": "docs/INSTALLATION.md",
-      "bytes": 3092,
-      "sha256": "2b7079b7096693392e9522fa28f1f024cf248d934e9661875356f32f26409c32"
+      "bytes": 4405,
+      "sha256": "ac9585b2631951eaf00b6a6078e12a8506c8f20a939ed7c127bb23202013a174"
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "bytes": 1947,
-      "sha256": "cf5bc80c4a2d389d742136904a01b595769b3c20e60fc37ff14a7dd951ac9d25"
+      "bytes": 2209,
+      "sha256": "65717c5fe18eed91deca9896ec63b6acad34fc9138ccabbd4b3c7056980d083d"
     },
     {
       "path": "docs/PROTOCOL_REFERENCE.md",
@@ -3063,8 +3083,28 @@
     },
     {
       "path": "docs/VALIDATION.md",
-      "bytes": 2831,
-      "sha256": "1bac8d9ab2ef47b98e7685531fba5361be3a7aee8affabf1841817407a8395b0"
+      "bytes": 2895,
+      "sha256": "ee464ec718d891f754ce577727fd9e8363f7836f5403a1cc773e2d8f791e0b27"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "bytes": 6671,
+      "sha256": "08798f616d03a805faab34e4f3d92d83004a090aa43743f0b3d1b3a3effcf22f"
+    },
+    {
+      "path": "docs/AUDIT_2026-11-09.md",
+      "bytes": 7567,
+      "sha256": "9334216dad8e27be15fba38c123defed694ea148726f971c0fb0e363a6aecb0e"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 3597,
+      "sha256": "54a88c1e228e5ba732ad077d3d3d616d19fb6d217ab069f4dd4314d86fcb7d7e"
+    },
+    {
+      "path": "docs/dependency-audit-2026-11-09.json",
+      "bytes": 9589,
+      "sha256": "1b3d904633b17e4851e59b32278b8411787264e0ee7b729440d26771a81c450b"
     },
     {
       "path": ".gitignore",
@@ -3073,12 +3113,12 @@
     },
     {
       "path": "desktop/release-notes/provenance.json",
-      "bytes": 29211,
-      "sha256": "73f131755bd69614da91986a8d3380c6a30b4c27394b33cb7e78ff0a741500ca"
+      "bytes": 29499,
+      "sha256": "cd3170c793cb3b2658e5035d3ddb7344e8c387175b9acaa7a98ac53b5b994ef6"
     }
   ],
-  "bytes": 21344387,
-  "excludedTrackedPaths": 1090,
+  "bytes": 21395706,
+  "excludedTrackedPaths": 1096,
   "potentialSecrets": 0,
   "reviewFindings": 228,
   "transformations": [

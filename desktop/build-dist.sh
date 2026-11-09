@@ -133,6 +133,13 @@ if [ ! -d "$APP_SOURCE" ]; then
   exit 1
 fi
 
+# The legal/source inventory is required for public binary distribution. Prepare it
+# before sealing the app, and retain a copy inside the app as well as beside it.
+LEGAL_DIR="$BUNDLE_DIR/Legal"
+node "$ROOT_DIR/scripts/prepare-release-legal.mjs" "$LEGAL_DIR"
+rm -rf "$APP_SOURCE/Contents/Resources/Legal"
+cp -R "$LEGAL_DIR" "$APP_SOURCE/Contents/Resources/Legal"
+
 # 3.1. The binary that is about to be packaged must carry the interface encrypted and no symbol table.
 #
 # This is a measurement of the artefact, not a review of the source, and it is deliberately here — after the
@@ -406,7 +413,11 @@ fi
 for TARGET in "${TARGETS[@]}"; do
   echo "[-] Found: $TARGET"
   echo "[-] Removing the Gatekeeper quarantine attributes (xattr -cr)..."
-  xattr -cr "$TARGET" || echo "  [!] xattr -cr reported an error: the copy may still be quarantined"
+  if ! xattr -cr "$TARGET"; then
+    echo "[!] Quarantine removal failed for: $TARGET"
+    echo "    The application has not been launched. Review its permissions and macOS approval."
+    exit 1
+  fi
   chmod 755 "$TARGET/Contents/MacOS/wing-controller-desktop" 2>/dev/null || true
   # `xattr -cr` ALSO deletes the custom icon (it lives in com.apple.FinderInfo), so it is re-applied here:
   # this is the only moment at which it is lost. Without this, macOS 26 puts the app back into its box.
@@ -418,9 +429,12 @@ done
 
 echo "[✓] WING CONTROLLER has been unblocked successfully!"
 echo "[-] Launching the app..."
-open "$OPEN_THIS"
+if ! open "$OPEN_THIS"; then
+  echo "[!] macOS refused the launch request. Open the installed application manually after reviewing Privacy & Security."
+  exit 1
+fi
 echo ""
-echo "The app is running. You can close this window."
+echo "The launch request was accepted by macOS. Check the application window."
 echo ""
 read -p "Press Enter to close..."
 HELPER_EOF
@@ -480,75 +494,19 @@ python3 "$ROOT_DIR/scripts/write-custom-icon.py" --check "$MOUNT_PATH/WING CONTR
   || { echo "  [!] the copy inside the disk image has no custom icon image"; exit 1; }
 
 # The changelog travels with the image: the operator asked for the version's changelog inside the DMG.
-cp "$ROOT_DIR/CHANGELOG.md" "$MOUNT_PATH/CHANGELOG.md" 2>/dev/null || true
+cp "$ROOT_DIR/CHANGELOG.md" "$MOUNT_PATH/CHANGELOG.md"
+cp -R "$LEGAL_DIR" "$MOUNT_PATH/Legal"
 cp "$RELEASE_NOTES_FILE" "$MOUNT_PATH/RELEASE NOTES ${APP_VERSION}.md" 2>/dev/null || true
 
 write_unblock_helper "$MOUNT_PATH/Unblock WING CONTROLLER.command"
 
-cat << 'EOF' > "$MOUNT_PATH/README FIRST.txt"
-========================================================================
-   WING CONTROLLER (macOS Apple Silicon M1 / M2 / M3 / M4 / M5)
-   Quick Install and Gatekeeper Unblock Guide
-========================================================================
-
-IMPORTANT: install it first, then run it from /Applications.
-Do NOT run the application from this disk image: macOS can wedge an
-application that runs from a mounted volume (its window stops answering
-and the process has to be force-quit), which is why step 1 below is
-copying it into your Applications folder.
-
-If macOS shows this message when you open the app:
-  "The application 'WING CONTROLLER' can't be opened."
-  (or "The application can't be opened")
-
-This happens because of Gatekeeper security in macOS Sequoia and Sonoma
-when a file is downloaded from the Internet without going through the Mac App Store.
-
-------------------------------------------------------------------------
-OPTION 1: DOUBLE-CLICK THE UNBLOCK COMMAND (EASIEST)
-------------------------------------------------------------------------
-1. Drag or copy 'WING CONTROLLER.app' into your 'Applications' folder.
-2. Double-click the attached file:
-   'Unblock WING CONTROLLER.command'
-3. The Terminal window opens for an instant. It first checks that the application it found is the
-   one from this download (and refuses, changing nothing at all, if it is not), then removes the
-   quarantine, restores the application's icon and opens WING CONTROLLER. If the application is
-   already installed in Applications, that copy is unblocked too, and that is the one that opens.
-
-The attached 'CHANGELOG.md' is the record of every release, and
-'RELEASE NOTES <version>.md' is what changed in this one.
-
-------------------------------------------------------------------------
-OPTION 2: RUN THE COMMAND IN TERMINAL MANUALLY
-------------------------------------------------------------------------
-Open the Terminal application (in Applications > Utilities) and paste:
-
-   xattr -cr "/Applications/WING CONTROLLER.app"
-
-Press Enter and open WING CONTROLLER normally.
-
-------------------------------------------------------------------------
-OPTION 3: FROM SYSTEM SETTINGS (NO TERMINAL)
-------------------------------------------------------------------------
-1. After trying to open the app and seeing the warning message, press "OK".
-2. Go to:
-   System Settings
-   > Privacy & Security
-3. Scroll down to the "Security" section.
-4. You will see the button:
-   "Open Anyway".
-5. Press the button, enter your password or Touch ID and the app opens.
-
-========================================================================
-WING CONTROLLER
-========================================================================
-EOF
+sed "s/__WING_VERSION__/${APP_VERSION}/g" "$ROOT_DIR/desktop/INSTALLATION.txt" > "$MOUNT_PATH/README FIRST.txt"
 
 # The happy-path detach needs the same resilience as `cleanup_dmg`: with ten of our own DMGs already
 # mounted, macOS mounts the new one as "WING CONTROLLER 10" and a busy volume (Spotlight, Finder) made
 # this detach fail, which aborted the build with `set -e` and left no artifacts at all.
 hdiutil detach "$MOUNT_DEV" > /dev/null 2>&1 \
-  || { sleep 1; hdiutil detach "$MOUNT_DEV" > /dev/null 2>&1; } \
+  || hdiutil detach "$MOUNT_DEV" > /dev/null 2>&1 \
   || hdiutil detach -force "$MOUNT_DEV" > /dev/null 2>&1 \
   || echo "  [!] WARNING: could not detach $MOUNT_DEV; a volume may be left mounted" \
   || true
@@ -586,68 +544,12 @@ fi
 python3 "$ROOT_DIR/scripts/write-custom-icon.py" --check \
   "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/WING CONTROLLER.app" > /dev/null \
   || { echo "  [!] the copy inside the ZIP has no custom icon image"; exit 1; }
-cp "$ROOT_DIR/CHANGELOG.md" "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/CHANGELOG.md" 2>/dev/null || true
+cp "$ROOT_DIR/CHANGELOG.md" "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/CHANGELOG.md"
+cp -R "$LEGAL_DIR" "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/Legal"
 cp "$RELEASE_NOTES_FILE" "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/RELEASE NOTES ${APP_VERSION}.md" 2>/dev/null || true
 write_unblock_helper "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/Unblock WING CONTROLLER.command"
 
-cat << 'EOF' > "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/README FIRST.txt"
-========================================================================
-   WING CONTROLLER (macOS Apple Silicon M1 / M2 / M3 / M4 / M5)
-   Quick Install and Gatekeeper Unblock Guide
-========================================================================
-
-IMPORTANT: install it first, then run it from /Applications.
-Do NOT run the application from this disk image: macOS can wedge an
-application that runs from a mounted volume (its window stops answering
-and the process has to be force-quit), which is why step 1 below is
-copying it into your Applications folder.
-
-If macOS shows this message when you open the app:
-  "The application 'WING CONTROLLER' can't be opened."
-  (or "The application can't be opened")
-
-This happens because of Gatekeeper security in macOS Sequoia and Sonoma
-when a file is downloaded from the Internet without going through the Mac App Store.
-
-------------------------------------------------------------------------
-OPTION 1: DOUBLE-CLICK THE UNBLOCK COMMAND (EASIEST)
-------------------------------------------------------------------------
-1. Drag or copy 'WING CONTROLLER.app' into your 'Applications' folder.
-2. Double-click the attached file:
-   'Unblock WING CONTROLLER.command'
-3. The Terminal window opens for an instant. It first checks that the application it found is the
-   one from this download (and refuses, changing nothing at all, if it is not), then removes the
-   quarantine, restores the application's icon and opens WING CONTROLLER. If the application is
-   already installed in Applications, that copy is unblocked too, and that is the one that opens.
-
-The attached 'CHANGELOG.md' is the record of every release, and
-'RELEASE NOTES <version>.md' is what changed in this one.
-
-------------------------------------------------------------------------
-OPTION 2: RUN THE COMMAND IN TERMINAL MANUALLY
-------------------------------------------------------------------------
-Open the Terminal application (in Applications > Utilities) and paste:
-
-   xattr -cr "/Applications/WING CONTROLLER.app"
-
-Press Enter and open WING CONTROLLER normally.
-
-------------------------------------------------------------------------
-OPTION 3: FROM SYSTEM SETTINGS (NO TERMINAL)
-------------------------------------------------------------------------
-1. After trying to open the app and seeing the warning message, press "OK".
-2. Go to:
-   System Settings
-   > Privacy & Security
-3. Scroll down to the "Security" section.
-4. You will see the button:
-   "Open Anyway".
-5. Press the button, enter your password or Touch ID and the app opens.
-
-========================================================================
-WING CONTROLLER
-========================================================================
-EOF
+sed "s/__WING_VERSION__/${APP_VERSION}/g" "$ROOT_DIR/desktop/INSTALLATION.txt" > "$ZIP_STAGING/WING_CONTROLLER_${VERSION_TAG}_AppleSilicon/README FIRST.txt"
 
 cd "$ZIP_STAGING"
 ditto -c -k --sequesterRsrc "WING_CONTROLLER_${VERSION_TAG}_AppleSilicon" "$ZIP_RELEASE"

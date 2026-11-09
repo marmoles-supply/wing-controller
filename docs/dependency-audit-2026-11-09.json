@@ -1,0 +1,338 @@
+{
+  "date": "2026-11-09",
+  "scope": "npm production-filtered lockfile, including parked mobile/development dependencies; separate Apple Silicon desktop Cargo closure",
+  "npmSummary": {
+    "info": 0,
+    "low": 2,
+    "moderate": 14,
+    "high": 17,
+    "critical": 1,
+    "total": 34
+  },
+  "npmAffectedPackages": [
+    {
+      "name": "@babel/core",
+      "severity": "low",
+      "advisories": [
+        "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8"
+      ]
+    },
+    {
+      "name": "@expo/cli",
+      "severity": "high",
+      "advisories": []
+    },
+    {
+      "name": "@expo/config",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "@expo/config-plugins",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "@expo/fingerprint",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "@expo/local-build-cache-provider",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "@expo/metro-config",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "@expo/prebuild-config",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "@react-navigation/core",
+      "severity": "high",
+      "advisories": []
+    },
+    {
+      "name": "@xmldom/xmldom",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-6gmq-8vp8-gcm6",
+        "https://github.com/advisories/GHSA-6gmq-8vp8-gcm6",
+        "https://github.com/advisories/GHSA-6mj3-qw4j-hgrw",
+        "https://github.com/advisories/GHSA-g53g-w8rj-fmg7",
+        "https://github.com/advisories/GHSA-w2rr-34g9-rvrj",
+        "https://github.com/advisories/GHSA-w2rr-34g9-rvrj",
+        "https://github.com/advisories/GHSA-4w3w-2rp5-g8jm",
+        "https://github.com/advisories/GHSA-4w3w-2rp5-g8jm",
+        "https://github.com/advisories/GHSA-c7q8-3ch8-vqpv",
+        "https://github.com/advisories/GHSA-c7q8-3ch8-vqpv",
+        "https://github.com/advisories/GHSA-27p8-2357-5qqv",
+        "https://github.com/advisories/GHSA-27p8-2357-5qqv",
+        "https://github.com/advisories/GHSA-3px3-54cx-rmw9",
+        "https://github.com/advisories/GHSA-vr34-hp96-76pp",
+        "https://github.com/advisories/GHSA-6h8r-xr42-gp59",
+        "https://github.com/advisories/GHSA-6h8r-xr42-gp59",
+        "https://github.com/advisories/GHSA-8344-3jmq-59r6",
+        "https://github.com/advisories/GHSA-8344-3jmq-59r6",
+        "https://github.com/advisories/GHSA-x4fp-j954-r2f4",
+        "https://github.com/advisories/GHSA-965w-775f-mr7g",
+        "https://github.com/advisories/GHSA-965w-775f-mr7g",
+        "https://github.com/advisories/GHSA-93r5-fhx6-vmg9",
+        "https://github.com/advisories/GHSA-93r5-fhx6-vmg9"
+      ]
+    },
+    {
+      "name": "baseline-browser-mapping",
+      "severity": "moderate",
+      "advisories": [
+        "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv"
+      ]
+    },
+    {
+      "name": "brace-expansion",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+        "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+        "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+        "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+        "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+        "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+        "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+        "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+        "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+        "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+        "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+        "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p"
+      ]
+    },
+    {
+      "name": "browserslist",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+        "https://github.com/advisories/GHSA-73wf-gq98-2v4g"
+      ]
+    },
+    {
+      "name": "compression",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-vc2v-76pw-4v95"
+      ]
+    },
+    {
+      "name": "decode-uri-component",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-vcc3-ghjq-m6fr",
+        "https://github.com/advisories/GHSA-qr28-fpjm-wq7f"
+      ]
+    },
+    {
+      "name": "deepmerge",
+      "severity": "low",
+      "advisories": [
+        "https://github.com/advisories/GHSA-gcqx-w48m-w2h4"
+      ]
+    },
+    {
+      "name": "expo",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "expo-router",
+      "severity": "high",
+      "advisories": []
+    },
+    {
+      "name": "expo-sharing",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "expo-splash-screen",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "glob",
+      "severity": "moderate",
+      "advisories": [
+        "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4"
+      ]
+    },
+    {
+      "name": "image-size",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-5p2g-fcmc-qvqq",
+        "https://github.com/advisories/GHSA-w3rx-r6r6-pgpr"
+      ]
+    },
+    {
+      "name": "js-yaml",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+        "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+        "https://github.com/advisories/GHSA-2883-xcg3-v3hh"
+      ]
+    },
+    {
+      "name": "minimatch",
+      "severity": "moderate",
+      "advisories": [
+        "https://github.com/advisories/GHSA-g3hv-75wg-m249"
+      ]
+    },
+    {
+      "name": "nanoid",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+        "https://github.com/advisories/GHSA-2v37-7h3g-55p8"
+      ]
+    },
+    {
+      "name": "node-forge",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-86w9-cpqp-85rv",
+        "https://github.com/advisories/GHSA-4642-5mcj-2rqw",
+        "https://github.com/advisories/GHSA-6wvx-3r32-xmcg",
+        "https://github.com/advisories/GHSA-525v-9gp9-w22h",
+        "https://github.com/advisories/GHSA-7wch-p9px-956x",
+        "https://github.com/advisories/GHSA-h6cr-wjv9-3cpp",
+        "https://github.com/advisories/GHSA-4487-j8r4-4g2f",
+        "https://github.com/advisories/GHSA-5cwg-6vw7-rj6p",
+        "https://github.com/advisories/GHSA-jc66-7q78-782g",
+        "https://github.com/advisories/GHSA-8hrf-8g6f-7xwp",
+        "https://github.com/advisories/GHSA-hqq3-7jhf-c5jx",
+        "https://github.com/advisories/GHSA-5x38-2vff-x55p"
+      ]
+    },
+    {
+      "name": "postcss",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+        "https://github.com/advisories/GHSA-r28c-9q8g-f849"
+      ]
+    },
+    {
+      "name": "query-string",
+      "severity": "high",
+      "advisories": []
+    },
+    {
+      "name": "shell-quote",
+      "severity": "critical",
+      "advisories": [
+        "https://github.com/advisories/GHSA-395f-4hp3-45gv",
+        "https://github.com/advisories/GHSA-pqg4-j6r4-53mv"
+      ]
+    },
+    {
+      "name": "source-map-js",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-68fv-2mgg-jv7q"
+      ]
+    },
+    {
+      "name": "uuid",
+      "severity": "moderate",
+      "advisories": [
+        "https://github.com/advisories/GHSA-w5hq-g745-h8pq"
+      ]
+    },
+    {
+      "name": "ws",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-96hv-2xvq-fx4p",
+        "https://github.com/advisories/GHSA-96hv-2xvq-fx4p"
+      ]
+    },
+    {
+      "name": "xcode",
+      "severity": "moderate",
+      "advisories": []
+    },
+    {
+      "name": "zod",
+      "severity": "high",
+      "advisories": [
+        "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5"
+      ]
+    }
+  ],
+  "rustQuery": {
+    "endpoint": "https://api.osv.dev/v1/querybatch",
+    "packages": 292,
+    "tokioPatchedVersion": "1.53.3",
+    "results": [
+      {
+        "package": {
+          "name": "unic-char-property",
+          "version": "0.9.0"
+        },
+        "advisories": [
+          "RUSTSEC-2025-0081"
+        ]
+      },
+      {
+        "package": {
+          "name": "unic-char-range",
+          "version": "0.9.0"
+        },
+        "advisories": [
+          "RUSTSEC-2025-0075"
+        ]
+      },
+      {
+        "package": {
+          "name": "unic-common",
+          "version": "0.9.0"
+        },
+        "advisories": [
+          "RUSTSEC-2025-0080"
+        ]
+      },
+      {
+        "package": {
+          "name": "unic-ucd-ident",
+          "version": "0.9.0"
+        },
+        "advisories": [
+          "RUSTSEC-2025-0100"
+        ]
+      },
+      {
+        "package": {
+          "name": "unic-ucd-version",
+          "version": "0.9.0"
+        },
+        "advisories": [
+          "RUSTSEC-2025-0098"
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "No claim that npm advisories are reachable from the desktop binary.",
+    "Unmaintained notices are not demonstrated exploits.",
+    "Undisclosed vulnerabilities are not ruled out."
+  ]
+}

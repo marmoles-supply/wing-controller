@@ -1,4 +1,4 @@
-# Initial public-source verification — 9 November 2026
+# Public-source verification history — 9 November 2026
 
 ## Measured source checks
 
@@ -44,8 +44,9 @@ presence is not a claim that those builds were validated.
 
 ## What this does not establish
 
-No new release package was built or installed for this source publication.
-There is no verified installer for this snapshot. Hardware opt-ins, installed
+The initial source-publication pass built or installed no release package.
+The subsequent v0.3.0 binary release is verified separately; see its release
+notes and package validation report. Hardware opt-ins, installed
 native permission workflows, independent LTC/MTC interoperability and multi-hour
 show acceptance are outside this source-check pass. See
 [known limitations](KNOWN_LIMITATIONS.md) and the [disclaimer](../DISCLAIMER.md).

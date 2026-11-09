@@ -28,3 +28,9 @@ The maintainer's reported stable live use is experience, not a guarantee.
 No support, maintenance or response time is promised. Report bugs with redacted
 data; use [private security reporting](../SECURITY.md) for vulnerabilities.
 Read the [full disclaimer](../DISCLAIMER.md) and [licence](../LICENSE).
+
+## Current contributor work
+
+The [dated audit](AUDIT_2026-11-09.md) and [prioritised roadmap](ROADMAP.md)
+record storage recovery, real LTC/MTC, hardware, dependency and accessibility
+follow-ups with evidence and closure criteria. The owner has not tested LTC.

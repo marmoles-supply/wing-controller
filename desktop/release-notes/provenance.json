@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceRevision": "d9f9577791926858cfa475f3a414e3c369457edb",
+  "sourceRevision": "658618b77144aaddbb76876b9bd5b42a624ba4b4",
   "notes": [
     {
       "version": "0.1.2",
@@ -633,6 +633,14 @@
       "sha256": "9b1a3c656e7eaf281583d1e5a03259a8e2ba898c7220157b8d2da465d732b1c0",
       "status": "version-json-history",
       "recordedAt": "e7908d45d0b6e31ec6bda4138b3d1877f8ebc266"
+    },
+    {
+      "version": "0.3.0",
+      "build": "20261109.2",
+      "buildDate": "2026-11-09",
+      "sha256": "147da3b2f3298ef853da133699fba722c10a91817b11e1f41355fe9ff6e55a87",
+      "status": "version-json-history",
+      "recordedAt": "658618b77144aaddbb76876b9bd5b42a624ba4b4"
     },
     {
       "version": "1.2.1",

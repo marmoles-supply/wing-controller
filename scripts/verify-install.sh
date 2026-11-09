@@ -93,7 +93,13 @@ check_stable_signature() { # $1 label, $2 path of a bundle or a Mach-O
     fail "${label} requirement" "it is not anchored to a certificate: ${requirement:-unreadable}"
     return 1
   fi
-  pass "${label} is signed with ${WING_SIGNING_IDENTITY}"
+  local architecture
+  architecture="$(lipo -archs "$path/Contents/MacOS/wing-controller-desktop" 2>/dev/null || lipo -archs "$path" 2>/dev/null || true)"
+  if [ "$architecture" != "arm64" ]; then
+    fail "${label} architecture" "expected arm64, found ${architecture:-unreadable}"
+    return 1
+  fi
+  pass "${label} is arm64 and signed with ${WING_SIGNING_IDENTITY}"
   STABLE_REQUIREMENTS+=("${label}|${requirement}")
   return 0
 }
@@ -180,8 +186,10 @@ check_unlock_helper() { # $1 the helper as it ships, $2 this release's bundle id
   sandbox="$(cd "$sandbox" && pwd)"
   mkdir -p "$sandbox/bin" "$sandbox/apps" "$sandbox/home/Applications"
   # `open` is the one command that must never reach this machine: it records what it was asked to open.
-  printf '#!/bin/sh\nprintf "%%s\\n" "$@" >> "%s/opened.txt"\nexit 0\n' "$sandbox" > "$sandbox/bin/open"
+  printf '#!/bin/sh\n[ "${WING_TEST_OPEN_FAIL:-0}" = 1 ] && exit 1\nprintf "%%s\\n" "$@" >> "%s/opened.txt"\nexit 0\n' "$sandbox" > "$sandbox/bin/open"
   chmod +x "$sandbox/bin/open"
+  printf '#!/bin/sh\n[ "${WING_TEST_XATTR_FAIL:-0}" = 1 ] && [ "$1" = -cr ] && exit 1\nexec /usr/bin/xattr "$@"\n' > "$sandbox/bin/xattr"
+  chmod +x "$sandbox/bin/xattr"
 
   # Two tiny Mach-O files, compiled and ad-hoc signed here: the helper verifies the signature and the CDHash of the
   # candidate's main executable, and a shell script has no signature to verify. Nothing of the application is built
@@ -234,7 +242,7 @@ check_unlock_helper() { # $1 the helper as it ships, $2 this release's bundle id
     rm -f "$sandbox/opened.txt"
     cp "$redirected" "$dir/Unblock WING CONTROLLER.command"
     chmod +x "$dir/Unblock WING CONTROLLER.command"
-    ( cd "$dir" && printf '\n' | PATH="$sandbox/bin:$PATH" HOME="$sandbox/home" \
+    ( cd "$dir" && printf '\n' | PATH="$sandbox/bin:$PATH" HOME="$sandbox/home" WING_TEST_XATTR_FAIL="${2:-0}" WING_TEST_OPEN_FAIL="${3:-0}" \
         bash "$dir/Unblock WING CONTROLLER.command" > "$dir/out.txt" 2>&1 )
     echo $? > "$dir/status"
   }
@@ -384,6 +392,24 @@ check_unlock_helper() { # $1 the helper as it ships, $2 this release's bundle id
     fail "unlock helper (this build)" "exit $(cat "$case_dir/status"): $(tail -n 4 "$case_dir/out.txt" | tr '\n' ' ')"
   fi
 
+  # Refusals after identity validation must not be reported as a successful launch.
+  case_dir="$sandbox/case-xattr-failure"; mkdir -p "$case_dir"
+  unlock_sandbox_bundle "$case_dir/WING CONTROLLER.app" "$expected_id" "$expected_version"
+  unlock_helper_run "$case_dir" 1 0
+  if [ "$(cat "$case_dir/status")" -ne 0 ] && [ ! -f "$sandbox/opened.txt" ] \
+     && grep -q 'Quarantine removal failed' "$case_dir/out.txt"; then
+    pass "unlock helper refuses to launch after quarantine failure"
+  else
+    fail "unlock helper quarantine failure" "failure was not reported accurately"
+  fi
+  case_dir="$sandbox/case-launch-failure"; mkdir -p "$case_dir"
+  unlock_sandbox_bundle "$case_dir/WING CONTROLLER.app" "$expected_id" "$expected_version"
+  unlock_helper_run "$case_dir" 0 1
+  if [ "$(cat "$case_dir/status")" -ne 0 ] && grep -q 'macOS refused the launch request' "$case_dir/out.txt"; then
+    pass "unlock helper reports a refused launch request"
+  else
+    fail "unlock helper launch failure" "failure was not reported accurately"
+  fi
   rm -rf "$sandbox"
 }
 
@@ -406,6 +432,7 @@ done
 
 echo "verifying ${VERSION} from ${BUNDLE_DIR}"
 echo "--------------------------------------------------------------"
+node scripts/verify-release-legal.mjs "${BUNDLE_DIR}/Legal" "$VERSION" && pass "release legal hashes and source links" || fail "release legal" "notice validation failed"
 
 # 1. The artefacts exist and carry their own checksum file.
 [ -f "$DMG" ] && [ -f "$ZIP" ] && pass "DMG and ZIP exist" || fail "artefacts" "missing $DMG or $ZIP"
@@ -490,6 +517,28 @@ else
   fail "unlock helper" "no ZIP (or no /usr/bin/unzip) to read the shipped helper from"
 fi
 
+# Both the archive and app must retain the legal/source information.
+for legal_file in LICENSE DISCLAIMER.md THIRD_PARTY.md THIRD-PARTY-NOTICES.txt DEPENDENCIES.json SOURCE.txt; do
+  for legal_prefix in "WING_CONTROLLER_v${VERSION}_AppleSilicon/Legal" "WING_CONTROLLER_v${VERSION}_AppleSilicon/WING CONTROLLER.app/Contents/Resources/Legal"; do
+    if /usr/bin/unzip -p "$ZIP" "$legal_prefix/$legal_file" 2>/dev/null | wc -c | awk '{exit !($1 > 0)}'; then
+      pass "ZIP legal: $legal_file"
+    else
+      fail "ZIP legal" "$legal_prefix/$legal_file missing"
+    fi
+  done
+done
+
+# Extract only the legal folders for complete archive hash validation.
+ZIP_LEGAL_DIR="$(mktemp -d "${TMPDIR:-/tmp}/wing-zip-legal.XXXXXX")"
+if /usr/bin/unzip -qq "$ZIP" '*/Legal/*' -d "$ZIP_LEGAL_DIR"; then
+  for zip_legal in "$ZIP_LEGAL_DIR/WING_CONTROLLER_v${VERSION}_AppleSilicon/Legal" "$ZIP_LEGAL_DIR/WING_CONTROLLER_v${VERSION}_AppleSilicon/WING CONTROLLER.app/Contents/Resources/Legal"; do
+    node scripts/verify-release-legal.mjs "$zip_legal" "$VERSION" && pass "ZIP legal hashes and source links" || fail "ZIP legal" "notice validation failed"
+  done
+else
+  fail "ZIP legal" "could not extract legal files"
+fi
+rm -rf "$ZIP_LEGAL_DIR"
+
 # 4. What the DMG really carries, then leave no volume mounted.
 if [ "$MOUNT_CHECK" -eq 1 ]; then
   MOUNT_DEVICE="$(hdiutil attach "$DMG" -nobrowse -readonly 2>/dev/null | tail -1 | awk '{print $1}')"
@@ -514,6 +563,12 @@ if [ "$MOUNT_CHECK" -eq 1 ]; then
       echo "    [i] codesign said: ${dmg_verify_error:-nothing}" >&2
       fail "DMG signature" "the image is not signed with '${WING_SIGNING_IDENTITY}'"
     fi
+    for legal_file in LICENSE DISCLAIMER.md THIRD_PARTY.md THIRD-PARTY-NOTICES.txt DEPENDENCIES.json SOURCE.txt; do
+      [ -s "$VOLUME/Legal/$legal_file" ] && pass "DMG legal: $legal_file" || fail "DMG legal" "$legal_file missing"
+      [ -s "$VOLUME/WING CONTROLLER.app/Contents/Resources/Legal/$legal_file" ] || fail "app legal" "$legal_file missing"
+    done
+    node scripts/verify-release-legal.mjs "$VOLUME/Legal" "$VERSION" && pass "DMG legal hashes and source links" || fail "DMG legal" "notice validation failed"
+    node scripts/verify-release-legal.mjs "$VOLUME/WING CONTROLLER.app/Contents/Resources/Legal" "$VERSION" && pass "DMG app legal hashes and source links" || fail "DMG app legal" "notice validation failed"
     [ -f "$VOLUME/README FIRST.txt" ] && pass "the DMG carries its install instructions" || fail "DMG contents" "README FIRST.txt is missing"
     # What an operator needs beside the app, and what the owner asked to always be there (2026-10-02): the
     # consolidated changelog and this version's release note, and an unlock helper whose name is English.
@@ -559,13 +614,10 @@ if [ "$MOUNT_CHECK" -eq 1 ]; then
     # insists, and only then fails.
     for attempt in 1 2 3; do
       hdiutil detach "$MOUNT_DEVICE" >/dev/null 2>&1 || true
-      sleep 1
       mount | grep -qi "wing controller" || break
-      [ "$attempt" -lt 3 ] && sleep 1
     done
     if mount | grep -qi "wing controller"; then
       hdiutil detach -force "$MOUNT_DEVICE" >/dev/null 2>&1 || true
-      sleep 1
     fi
     if mount | grep -qi "wing controller"; then
       fail "no volume left mounted" "a WING CONTROLLER volume is still mounted"

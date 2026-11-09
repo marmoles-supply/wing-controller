@@ -4,8 +4,10 @@ An independent macOS workstation for controlling and automating **Behringer WING
 mixing consoles. Macros, triggers, meters, cues and timecode tools share one desktop
 interface, with a Rust backend handling console communications.
 
-**Apple Silicon Macs only for this desktop line.** This community source preview
-is published so others can study, improve and contribute to it.
+**Apple Silicon Macs only for this desktop line.** Download the
+[v0.3.0 community beta](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0)
+or study, improve and contribute to the source. **LTC has not been validated with
+real signal/interface hardware.** Read the limitations before using timecode.
 
 > **Unofficial software, used at your own risk.** This is not a Behringer or Music
 > Tribe product. Neither company approves, certifies, supports or endorses it.
@@ -35,13 +37,14 @@ network, integrations and features; see [known limitations](docs/KNOWN_LIMITATIO
 | Intel Macs, Windows, Linux | No supported installer or verified desktop support |
 | Consoles | WING-family protocols; feature/model/firmware dependent, not certified for every console |
 | Android/iOS | Original Expo source retained; mobile development is parked |
-| Installer for this snapshot | **Not published. This repository currently distributes source code.** |
+| Installer | [Apple Silicon v0.3.0 community beta](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0) |
 
-A public repository does not install an app on a computer. Developers can compile
-this source. A ready-to-install application needs a separately verified package
-in [GitHub Releases](https://github.com/marmoles-supply/wing-controller/releases).
-Historical local packages are not binaries of this newer source.
-See [installation and permissions](docs/INSTALLATION.md).
+To install the app, open the release above, expand **Assets** and download
+`WING_CONTROLLER_v0.3.0_AppleSilicon.dmg` and `SHA256SUMS.txt`. Copy the app into
+Applications and eject the image before launch. GitHub's **Source code** links
+contain developer source, not an installer. This release is self-signed and not
+notarised by Apple; follow [installation and permissions](docs/INSTALLATION.md)
+for checksums and macOS first-launch approval.
 
 ## Start here
 
@@ -49,6 +52,8 @@ See [installation and permissions](docs/INSTALLATION.md).
   [operator guide](docs/guide/README.md), [limitations](docs/KNOWN_LIMITATIONS.md).
 - **Contributor:** [development below](#development), [contribution guide](CONTRIBUTING.md),
   [issues](https://github.com/marmoles-supply/wing-controller/issues) and pull requests.
+- **Choose work:** [roadmap and to-do](docs/ROADMAP.md), [dated audit](docs/AUDIT_2026-11-09.md),
+  [architecture and protocol contract](docs/ARCHITECTURE.md).
 - **Security:** [private reporting](SECURITY.md). Never post credentials, private
   console details or customer/show data in an issue.
 

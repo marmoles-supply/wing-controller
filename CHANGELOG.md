@@ -11,6 +11,14 @@ ships.
 
 ## [Unreleased]
 
+## [Desktop 0.3.0] - 2026-11-09
+
+- Publish the first Apple Silicon community beta with installation instructions,
+  full legal/dependency notices, matching sources and a public audit/roadmap.
+- Patch Tokio to 1.53.3 for RUSTSEC-2026-0386; distinguish developer/mobile
+  dependency advisories from the shipped desktop closure.
+- Report recovery-helper failures accurately and verify arm64 package architecture.
+
 - Prepare the independent source-available community repository, with professional use allowed,
   sale of copies/derivatives prohibited, corresponding-source redistribution and an explicit unofficial,
   no-warranty live-use disclaimer. Add platform, installation, guide and contribution documentation.

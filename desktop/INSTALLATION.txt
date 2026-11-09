@@ -1,0 +1,48 @@
+WING CONTROLLER __WING_VERSION__ — Apple Silicon community beta
+======================================================================
+
+REQUIREMENTS
+Apple Silicon / arm64 Mac (M-series). Tested release environment: macOS
+26.6.2. Older macOS versions have not been verified. No Intel, Windows or
+Linux installer is provided. This is independent, unofficial software.
+
+DOWNLOAD AND VERIFY
+Use https://github.com/marmoles-supply/wing-controller/releases/tag/v__WING_VERSION__
+Download the AppleSilicon.dmg and SHA256SUMS.txt from the same release.
+GitHub's 'Source code' links contain developer source, not the app.
+In Terminal, change to the downloaded file's folder and run:
+
+  shasum -a 256 "WING_CONTROLLER_v__WING_VERSION___AppleSilicon.dmg"
+
+Compare the complete hash with that file's entry in SHA256SUMS.txt.
+
+INSTALL
+1. Quit any running WING CONTROLLER. Open the DMG and drag the app into
+   Applications, replacing the previous copy if updating.
+2. Eject the disk image. Launch the copy in Applications.
+3. This app uses a stable self-signed certificate; it is not signed with
+   Apple Developer ID and is not notarised by Apple. If macOS blocks it,
+   check the origin and checksum. If you choose to proceed, attempt to
+   launch, then open System Settings > Privacy & Security > Open Anyway
+   and confirm the app-specific exception. Do not disable Gatekeeper
+   globally or override a warning that malware was detected.
+4. Grant microphone access only for LTC audio input. Read the operator
+   guide and test your setup away from an active show before connecting.
+
+OPTIONAL EXACT-RELEASE RECOVERY HELPER
+Unblock WING CONTROLLER.command verifies the matching app's identity,
+version, signature and executable hash before clearing its quarantine
+attributes and restoring its icon. Use only with the trusted package
+whose checksum you checked. The helper may itself require macOS approval.
+
+GUIDE, SOURCE AND TERMS
+Guide: https://github.com/marmoles-supply/wing-controller/tree/main/docs/guide
+Install help: https://github.com/marmoles-supply/wing-controller/blob/main/docs/INSTALLATION.md
+Read Legal/DISCLAIMER.md before use. You are responsible for your system,
+backups, rehearsals, recovery and live operation. Prior successful show
+use is not certification. Real LTC/MTC and hardware acceptance remain
+explicit tasks; see the published audit and roadmap.
+Legal/LICENSE permits professional operation but prohibits selling copies
+or derivatives of the original software. Independent third-party terms
+remain unchanged. Legal/SOURCE.txt identifies the matching source.
+CHANGELOG.md and RELEASE NOTES __WING_VERSION__.md describe the release.
