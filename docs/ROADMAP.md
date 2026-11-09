@@ -95,8 +95,10 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
 
 - [ ] **UI-04 / GUIDE-01 — Correct typed summaries and guide drift.** Make the
   rich WHEN detail respect toggle/text kinds; correct the OSC-gate expiry and
-  Level/Dwell/current-value-fade explanations identified in the audit. Verify
-  source and generated operator content together.
+  Level/Dwell/current-value-fade explanations identified in the audit, plus the
+  fully empty cue-only trigger, Learn filtering and out-of-range meter-ID text.
+  Explain where macro IF gates run and where external bindings use their own
+  conditions. Verify source and generated operator content together.
 
 ## P3 — maintainability
 

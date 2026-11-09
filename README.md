@@ -5,9 +5,11 @@
 **Macros, meters, and more for Behringer WING.** An independent community project
 for Apple Silicon Macs, with a classic desktop interface.
 
-Build macros from audio thresholds, console state, inter-app MIDI/OSC or LTC/MTC
-timecode cues. Add conditions and timed actions, keep meters in their own window, and display
-messages for the operator. Keep mixing with your console or preferred control app.
+Turn audio levels and console state into conditional, timed action sequences.
+Watch Sources as well as channels, use their meters as triggers or IF conditions,
+and combine console actions with MIDI/OSC messages and operator HUDs. Incoming
+MIDI/OSC bindings and LTC/MTC cues provide additional ways to launch sequences.
+Keep mixing with your console or preferred control app.
 
 [![Download for Apple Silicon — v0.3.0 beta](assets/product/download-mac.svg)](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg)
 
@@ -35,6 +37,26 @@ and help with [community testing](docs/COMMUNITY_TESTING.md).
 No developer tools are needed. GitHub's **Source code** downloads contain the
 project's source, rather than an installable app.
 
+## What WING CONTROLLER adds
+
+| Capability | What it lets you do |
+| --- | --- |
+| **Programmable macros** | Combine WHEN / IF / THEN: up to 16 conditions with AND or OR and 32 ordered action steps, including waits, fades, toggles, HUDs and MIDI/OSC sends. Apply supported actions to several channel IDs or ranges. |
+| **Metering beyond channels** | Build mixed views of channels, buses, mains, matrices, Sources and outputs. Source families include local inputs, AES50, StageConnect, USB and Card/Dante, according to the console and fitted hardware. |
+| **Source levels as automation inputs** | Use Source meters as WHEN triggers or IF conditions, including meters that neither window displays. A macro subscribes to its own meter targets independently of the visible bank. |
+| **A customisable Meter Bridge** | Choose mixed named banks, aliases, ordering, size and zoom; use LED bars, analogue-style needles or history graphs, with peak hold and clip indication. The workstation and separate bridge can show different banks, including on a second display. |
+| **Parameter-aware fades** | Start at a chosen value or read the console's current value; move to an absolute value or by a relative amount, with linear or smooth curves and the supported parameter's units and limits. |
+| **Inter-application automation** | Learn incoming MIDI/OSC bindings, add binding conditions, and mix console operations with outgoing MIDI/OSC in one sequence. MIDI conditions can watch another MIDI message; OSC conditions filter an argument of the incoming message. |
+| **Timecode and cue tools** | Follow LTC or MTC, analyse LTC WAV files, edit cue lists and frame offsets, open a separate clock and forward the followed position as MTC. Cue history records execution outcomes. Physical LTC and external-receiver timing still need independent testing. |
+| **Trigger response and operator feedback** | Tune audio-trigger response and cooldown, choose Drop / Queue one / Restart on retrigger, add custom HUDs and notices, check syntax and targets, inspect action outcomes, and cancel pending work with PANIC STOP. |
+
+**Condition scope:** the macro's IF list is evaluated on meter and console-state
+triggers. MIDI/OSC bindings use their own conditions; bindings, timecode cues
+and manual firing run the action sequence without evaluating that IF list.
+IF is a flat AND or OR list. Rearm and dwell tune rising transients.
+MIDI/OSC sends report sending, not confirmation by the receiving application;
+PANIC STOP cancels pending work and cannot undo actions already applied.
+
 ## Macros
 
 A macro combines a **WHEN**, optional **IF** conditions, and an ordered **THEN**
@@ -47,7 +69,7 @@ HUD message.
 | Part | What you can configure |
 | --- | --- |
 | WHEN | Meter thresholds or typed console-state comparisons. MIDI/OSC bindings and timecode cues provide additional firing routes. |
-| IF | Up to 16 gates, joined with AND or OR, using supported meter or console values. These are checked when the meter or console-state trigger arrives. |
+| IF | Up to 16 gates, joined with AND or OR, using supported meter values (including Sources) or console state. These are checked when the meter or console-state trigger arrives. |
 | THEN | Up to 32 ordered steps: Set, Toggle, Wait, Wait then Set, Fade, Smooth Fade, HUD, Send MIDI or Send OSC. Available modes depend on the target. |
 | Fade | Start at a chosen value or the console's current value; aim at a value or a relative change, with the parameter's units and range. |
 | Retrigger | Drop another trigger, queue one follow-up run, or restart the sequence. |
@@ -97,9 +119,11 @@ supported. Action targets and meter lists can select several, where supported. T
 
 ## Meter Bridge
 
-Open meters in a separate window, organise them into named banks and choose a
-layout, size and visual style. Keep that window alongside the workstation or on
-another display.
+Open meters in a separate window, mix channel, Source and output meters in named
+banks, add aliases and arrange their order. Choose a layout, size and visual
+style. Each window can show a different bank; keep the bridge alongside the
+workstation or on another display. Macro meter subscriptions continue
+independently of the bank you are viewing.
 
 [![Meter Bridge with 40 example channels and no signal](assets/product/meters-detail.png)](assets/product/meter-bridge-light.png)
 
@@ -159,7 +183,10 @@ HUD defaults seed new steps. Existing steps keep their own settings.
 ## Inter-app MIDI, OSC and timecode
 
 Use incoming MIDI notes/controller messages or OSC to trigger macros between
-applications, and include outgoing MIDI/OSC messages in action sequences.
+applications, with Learn and optional binding conditions. A MIDI binding can
+check a tracked MIDI value with an expiry time; an OSC binding can compare an
+argument of the message that arrived. Include outgoing MIDI/OSC messages in the
+same action sequence as console operations and HUD messages.
 [Inter-app configuration guide](docs/guide/12-midi-and-other-applications.md).
 
 LTC (audio timecode), MTC (MIDI timecode) and cue tools are included in the beta:

@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "3b3ab7a2f87d7b93ead919315a7d4f7429ab36e9",
+  "sourceRevision": "6f2b0079d63fc50b35f3778fc760aff3e1629d31",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -3293,13 +3293,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 14641,
-      "sha256": "a22811c4fd1dd5d3ba41ae74f2f6d77d99801764c0030fdc16900d138366f60b"
+      "bytes": 17733,
+      "sha256": "d1640d6c67528b7c5c3ad78f429decd171d8b316b9df17343413a1d1459dfa9c"
     },
     {
       "path": "README.es.md",
-      "bytes": 10225,
-      "sha256": "0302ebc1ed7e34fa830d53ccf14edc63451a2f33334764476745613079603e34"
+      "bytes": 13683,
+      "sha256": "82915bccac20dcdbbd69f8ed60d3001b8e8f44f3d18b300d52f483a97d600932"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -3333,8 +3333,8 @@
     },
     {
       "path": "docs/SHARING.md",
-      "bytes": 3633,
-      "sha256": "f953d369f3d898b6640583ba86ca39558ef6179ee1f757544a53d82c8a833fa2"
+      "bytes": 7012,
+      "sha256": "a12ddde4d101460f3b4ce24aaa9bd1e16a6e810c01d504f2a426cbbfc75ff2f4"
     },
     {
       "path": "docs/COMMUNITY_TESTING.md",
@@ -3343,8 +3343,8 @@
     },
     {
       "path": "docs/index.html",
-      "bytes": 20417,
-      "sha256": "9af31fa0904b28a4d7b6137f44ca7c74c0ee1378c59f59f2bb1379ccaa922dd9"
+      "bytes": 25731,
+      "sha256": "b0b3346d066bf4159dfe1844fc763a394c173889a8458fe87d329e7ce1c19e5b"
     },
     {
       "path": "docs/site.css",
@@ -3383,13 +3383,13 @@
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 8299,
-      "sha256": "1288c0a88aa063486478473d779b76de2c37bed11db593af4d9b2886b0169be4"
+      "bytes": 8477,
+      "sha256": "f43823da48a8163c00f4d2b8010dc5bd6e922d4dbe85cfc23ce1297fc5193688"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
-      "bytes": 10681,
-      "sha256": "10195b55fcd388d4e1d3f3bd3b1896c09dcdd871928aa42b945637623c49f451"
+      "bytes": 11918,
+      "sha256": "2a48cb2c49c3a1fdf2d45df8d2a2745e0eca0873a2d588d8d32945b1b729ae68"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -3479,10 +3479,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "a28d4d9df26fee3347e9437adfcee4d09f3eb2019341f278545f52a20d897909"
+      "sha256": "8e2c32425880931e650773e090546146a59e4c08bc0c20a04f1c0207e665f268"
     }
   ],
-  "bytes": 24883086,
+  "bytes": 24899744,
   "excludedTrackedPaths": 1107,
   "potentialSecrets": 0,
   "reviewFindings": 283,
