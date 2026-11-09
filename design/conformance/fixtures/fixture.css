@@ -1,0 +1,61 @@
+/* The conforming baseline every fixture uses. Each known-bad fixture overrides exactly one thing in its own file, so
+ * the self-test proves that one defect is what made the suite go red.
+ *
+ * This file is a small conforming app: raised panels and cards, a sunken well, chips, a button, a refusal. It is
+ * plain CSS and plain HTML — no build step, which is the point (the roadmap's ITEM 3). */
+html,
+body {
+  margin: 0;
+  padding: var(--space-4);
+}
+
+body {
+  background: var(--face);
+  color: var(--ink);
+  font-family: var(--win-font);
+  font-size: var(--font-base);
+}
+
+/* raised: anything pressable or self-contained */
+.panel,
+.card,
+.chip,
+button {
+  background: var(--win-btn-face);
+  color: var(--win-text);
+  border: 1px solid;
+  border-color: var(--win-btn-highlight) var(--win-btn-dark-shadow) var(--win-btn-dark-shadow) var(--win-btn-highlight);
+}
+
+.panel {
+  margin: 0 0 var(--space-4) 0;
+  padding: var(--space-4);
+}
+
+.card {
+  margin: 0 0 var(--space-3) 0;
+  padding: var(--space-3);
+}
+
+.chip {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  margin-right: var(--space-2);
+}
+
+/* sunken: anything the instrument reports */
+.well {
+  display: inline-block;
+  background: var(--crt);
+  color: var(--crt-ink);
+  font-family: var(--mono);
+  border: 1px solid;
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  padding: var(--space-2);
+  margin-right: var(--space-2);
+}
+
+button {
+  font: inherit;
+  padding: var(--space-1) var(--space-3);
+}

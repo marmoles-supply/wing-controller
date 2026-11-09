@@ -1,0 +1,82 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Local credentials. Examples may be committed only with placeholder values.
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pfx
+*.keystore
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
+# Build artifacts: added 2026-09-21 so the rescue commit stays source-only.
+# The APKs stay on disk under releases/; they are not version-controlled.
+/target/
+*.apk
+
+# The distributable form of the design kit: a build output, exactly like `dist/` at the root. The committed
+# artefact is `design/package/`; the tarball is generated from it and is not tracked.
+/design/dist/
+
+# The per-crate build output: the root `/target/` rule does not cover a member crate, so 130 build
+# artefacts (objects, an rlib, dep-info files carrying absolute build paths) were tracked by accident.
+# They are outputs, not sources.
+crates/*/target/
+
+# Tauri rebuilds capability/configuration schemas from the tracked source.
+/desktop/src-tauri/gen/
+
+# Local agent/editor configuration. It enables a plugin for one tool and says nothing about this project.
+.claude/
+
+# Issued licences name a customer and their machine, and they are issued into whatever directory the owner
+# runs the tool from. They are never source.
+*.winglicence
+
+# Private working material stays on disk. Ignore rules do not remove existing
+# tracked files or clean Git history; public source is exported separately.
+/releases/
+/temp_build/
+/exports/
+/investigacion ltc/
+/scratch/
+__pycache__/
+*.py[cod]

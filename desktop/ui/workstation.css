@@ -1,0 +1,136 @@
+/* COPIED FILE — edit design/workstation.css; run node scripts/sync-design-components.mjs. */
+/* Canonical WING workstation chrome.
+ * Source: desktop/ui/index.html (.panel, .card-header, header.master-header,
+ * button). Unlike the legacy specimen, this preserves BOTH bevel steps.
+ * This opt-in layer follows local structural CSS. Domain selectors never live
+ * here: application adapters assign wc-* roles to existing elements.
+ * Fixed pixel geometry is deliberate: matching the app takes precedence over
+ * rounding its 10/20px margins to a different spacing scale.
+ */
+.wc-app {
+  --wc-inner: inset 1px 1px 0 var(--face-3), inset -1px -1px 0 var(--line-mid);
+  --wc-shadow: 2px 2px 0 var(--shadow, rgba(0, 0, 0, .46));
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--win-font);
+  font-size: var(--font-base);
+  line-height: var(--leading-base);
+}
+.wc-app.theme-dark {
+  --wc-inner: inset 1px 1px 0 rgba(255,255,255,.12), inset -1px -1px 0 rgba(0,0,0,.55);
+  --wc-shadow: 2px 2px 0 rgba(0,0,0,.65);
+}
+.wc-app .wc-frame {
+  box-sizing: border-box;
+  width: min(1500px, calc(100% - 20px));
+  margin: 0 auto;
+  padding: 10px 0 20px;
+  min-width: 0;
+}
+body.wc-app .wc-toolbar,
+.wc-app .wc-card,
+.wc-app .wc-heading,
+.wc-app .wc-status {
+  box-sizing: border-box;
+  border: 1px solid var(--line-dark);
+  border-top-color: var(--line-light);
+  border-left-color: var(--line-light);
+  background: var(--face);
+  color: var(--ink);
+  box-shadow: var(--wc-inner);
+  border-radius: 0;
+}
+.wc-app .wc-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  box-shadow: var(--wc-inner), var(--wc-shadow);
+  flex: 0 0 auto;
+}
+/* A link is text, not a control, so it carries the kit's accent rather than the browser's fixed navy: the
+ * default is unreadable on the dark desk (measured on the working template's dark toolbar). `:visited`
+ * is named because a page a consumer has opened before must not change the drawing. */
+.wc-app a,
+.wc-app a:visited { color: var(--accent); }
+.wc-app a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.wc-app a:hover { text-decoration-thickness: 2px; }
+.wc-app .wc-brand { font-weight: bold; white-space: nowrap; letter-spacing: .04em; }
+.wc-app .wc-title { font-weight: bold; font-size: var(--font-lg); margin: 0; }
+.wc-app .wc-spacer { flex: 1; }
+.wc-app .wc-card { padding: 8px; min-width: 0; box-shadow: var(--wc-inner), var(--wc-shadow); }
+.wc-app .wc-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+  margin: 0 0 8px;
+  padding: 2px 5px;
+  font-size: var(--font-base);
+  font-weight: bold;
+}
+.wc-app .wc-section {
+  padding: 8px;
+  background: var(--face-2);
+  border: 1px solid var(--line-mid);
+  min-width: 0;
+}
+.wc-app .wc-stack { display: grid; align-content: start; gap: 8px; min-width: 0; }
+.wc-app .wc-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, var(--ops-col-width));
+  gap: 8px;
+  align-items: start;
+  margin-top: 8px;
+}
+.wc-app .wc-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.wc-app .wc-well {
+  background: var(--field);
+  border: 1px solid var(--line-light);
+  border-top-color: var(--line-dark);
+  border-left-color: var(--line-dark);
+  box-shadow: inset 1px 1px 0 var(--line-mid);
+  padding: 4px 6px;
+  min-width: 0;
+}
+.wc-app .wc-instrument {
+  background: var(--crt);
+  color: var(--crt-ink);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.wc-app .wc-status { padding: 3px 6px; font-size: var(--font-sm); }
+.wc-app button:not(:where(.parameter-menu-button, .parameter-menu-row)) {
+  min-height: 24px;
+  padding: 2px 6px;
+  font-family: var(--win-font);
+  font-size: var(--font-xs);
+  font-weight: bold;
+  border-radius: 0;
+  box-shadow: var(--wc-inner);
+}
+.wc-app button:not(:where(.parameter-menu-button, .parameter-menu-row)):active,
+.wc-app button:not(:where(.parameter-menu-button, .parameter-menu-row))[aria-selected="true"],
+.wc-app button:not(:where(.parameter-menu-button, .parameter-menu-row))[aria-pressed="true"] {
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  box-shadow: inset 1px 1px 0 var(--line-mid);
+}
+.wc-app :is(input, select, textarea) { border-radius: 0; min-height: 24px; }
+.wc-app .wc-tabs { display: flex; gap: 4px; margin: 8px 0; }
+.wc-app [hidden] { display: none !important; }
+.wc-app dialog:not(.win95-dialog) {
+  max-width: min(480px, calc(100vw - 32px));
+  color: var(--ink);
+  background: var(--face);
+  border: 1px solid var(--line-dark);
+  box-shadow: var(--wc-inner), var(--wc-shadow);
+}
+.wc-app dialog::backdrop { background: rgba(0,0,0,.46); }
+@media (max-width: 820px) {
+  .wc-app .wc-workspace { grid-template-columns: minmax(0, 1fr); }
+  .wc-app .wc-toolbar { flex-wrap: wrap; }
+}
+@media print {
+  .wc-app { background: white; }
+}

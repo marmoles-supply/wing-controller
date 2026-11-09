@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · frozen to the light palette</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* The trap of UI_SYSTEM.md §3: an alias inside :root is resolved before the dark theme can reach the target. */
+  :root { --card-face: var(--win-btn-face); }
+</style>
+</head>
+<body>
+  <!-- RULE 4. In the dark theme this card is still the light face, because --card-face froze at the root. -->
+  <div class="card" id="frozen" style="background: var(--card-face)">A card frozen to the light face</div>
+</body>
+</html>

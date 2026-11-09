@@ -1,0 +1,319 @@
+#!/usr/bin/env bash
+# gate.sh.example — the smallest gate a consumer can copy, paste and run.
+#
+# Copy it beside the kit you took (step 1 of `adopt/README.md`) as `gate.sh`, fill in the block marked "WHAT YOU SUPPLY"
+# below and nothing else, then run it:
+#
+#   ./gate.sh              every check
+#   ./gate.sh --fast       the same, minus the kit's self-test (a deliberate decision to skip the proof that the suite
+#                          can fail: it is what you run while editing, and it is NOT what runs before you ship)
+#   ./gate.sh --help       this text
+#
+# WHAT IS THE KIT'S AND WHAT IS YOURS
+#
+# Two kinds of line live below and every one of them is marked, because a template that runs a command the kit does
+# not ship is the defect this file exists to fix.
+#
+#   [KIT]      `conformance/run.mjs` and `conformance/self-test.mjs`, both shipped inside the tarball / `design/package/`
+#              copy of the kit. Nothing else here is [KIT].
+#   [SETUP]    a shape the kit's own tools document, copied into your own script — no extra tool, just the port and the
+#              page list.
+#   [YOU]      your own commands (the pages, the allowance path, the screenshot lock). The kit cannot ship your CI;
+#              these are the lines you supply, and each carries what to do while you do not have one yet.
+#
+# EXIT CODES — the four `wire-your-gate.md` documents, and this script only ever ends on one of them
+#
+#   0  every check ran and passed
+#   1  a check failed (the judge found something undeclared, the self-test missed a defect it claims to catch, your own
+#      lock found movement, or a page you supplied does not exist)
+#   2  this script is misconfigured or misused (not run from where you copied it, a bad flag)
+#   3  COULD-NOT-RUN — a check measured NOTHING (no browser, no page, no kit beside the suite, no `kitVersion`, a check
+#      this run had no command for, or a check you asked to skip with `--fast`)
+#
+# **Never treat 3 as a pass.** A green light nobody earned is the failure mode the kit was built against; in CI, make
+# sure a non-zero exit fails the job rather than being retried until it looks green.
+#
+# **And a check that did not run is 3, not 0 — the screenshot lock you have not wired yet included.** The last line
+# names what ran and what did not and never claims a check that was skipped; a run with a skip ends 3. That is the
+# honest code for it: nothing was found wrong, so it is not 1, and the thing the skip would have measured was never
+# looked at, so it is not the unqualified 0 either. A 0 from this gate means every check it names actually ran.
+#
+# WHAT IT WRITES, AND WHAT IT NEVER WRITES
+#
+# Exactly one file, and only the first time: `conformance/allow.mjs`, the allowance step 3 tells you to create.
+# **Since kit 1.4.2 the kit ships that file itself** (`conformance/allow.mjs`, composed at pack time, declaring the
+# kit's own reference window), so this seeding step is a **no-op on a fresh unpack** and remains only for a consumer
+# who deleted the file — which is why the guard stays even though it does not fire here. Until 1.4.2 the tarball
+# carried `adopt/allow.mjs.example` (the shape, with `<placeholders>`) and not the declaration the judge reads, and a
+# fresh unpack ran its own judge to exit 3 (measured 2026-10-08: `the app allowance file does not exist`, nothing
+# measured). When it does write, it takes the version from `VERSION` and points at the reference window. If a file is
+# already there, the template never touches it. Everything else it writes goes under the system's temporary directory.
+#
+# WHERE TO PUT IT, AND WHAT NOT TO RUN IT BESIDE
+#
+# Run it from the folder the kit's `design/` contents were unpacked into — the folder holding `VERSION`, `tokens.css`,
+# `conformance/` and your own `<your folder>/design/`. The suite reads the kit **it stands in**
+# (`conformance/collect.mjs` resolves `dirname(conformance)/..`): sheets or allowance files placed anywhere else leave
+# it with nothing to read, which is exit 3, nothing measured.
+#
+# It takes a Chrome debug port and uses it for every check, starting its own browser when the port is silent and
+# reusing one that answers (that is `ensureBrowser`, in the kit's own `collect.mjs`). **The default, 9333, is a shared
+# number and not a private one**: every consumer on a machine with more than one session picks it, so this gate may
+# well measure in a browser it did not start. That is harmless to the rules now, and the reason is a measurement
+# written out in the [SETUP] block below: the suite declares its own viewport and forces it on every tab before a page
+# is loaded, so the window a reused browser was started with cannot reach a measurement. What is still true is the
+# rule this kit already carries: **never drive this repository's 9223 beside a gate** - that gate SIGKILLs whatever
+# holds it - and do not expect two gates on one port to keep their *browsers* apart; they share one.
+#
+# `conformance/self-test.mjs` is the check that proves the suite can fail, so a full run takes a couple of minutes: it
+# renders the conforming fixture plus one fixture per defect the suite claims to catch.
+
+set -o pipefail
+
+# ===================================================================================================================
+# WHAT YOU SUPPLY (the only lines in this file you edit)
+# ===================================================================================================================
+
+# [YOU] Your pages, one entry per window you ship — the SAME file you serve, not a copy of it (`wire-your-gate.md`
+# rule 2: judging a copy of a copy measures nothing). Paths are quoted, so a path with a space is fine.
+#
+# The default below is the kit's own reference window, so this file runs as it ships. **Replace it with your pages.**
+# [KIT] — `reference-window/index.html` travels inside the kit and is the complete window step 1 tells you to fork.
+PAGES=(
+  "reference-window/index.html"
+)
+
+# [YOU] Where your allowance file is (step 3 of `adopt/README.md`, copied from `allow.mjs.example`). It must declare
+# `kitVersion` equal to the version of the kit copy beside it, or the judge stops with exit 3 — the drift check working
+# exactly as intended, and `self-test.mjs` proves that case too.
+# [KIT] — `conformance/run.mjs --allow <file>` is the option that points the judge at it.
+#
+# **This is the one file a consumer deliberately changes, so it is the one file `MANIFEST.sha256` will report once you
+# have declared your own deviations.** The manifest verifies the kit **as it shipped**: `shasum -a 256 -c MANIFEST.sha256`
+# is clean on a fresh unpack, and after step 3 it names `conformance/allow.mjs` and only that file — that `FAILED` line
+# is the declaration you made, not a corrupt artefact. **A second name is a real difference** between your copy and the
+# kit and is worth reading. So run the manifest check before you replace this file, which is when it answers "did the
+# kit arrive whole?"; `adopt/README.md` step 3 carries the same sentence in the contract's own words.
+ALLOW="conformance/allow.mjs"
+
+# ===================================================================================================================
+# [SETUP] the port, taken from the environment the way the kit's own tools take it
+# ===================================================================================================================
+# `run.mjs` does `Number(options.port || process.env.WING_CHROME_PORT || 9223)` and `collect.mjs` does
+# `Number(process.env.WING_CHROME_PORT || 9223)`: the flag wins, then `$WING_CHROME_PORT`, then 9223 as the fallback.
+# **9223 is the one port this kit tells every consumer never to drive**: it is this repository's own gate port, and
+# that gate SIGKILLs whatever holds it (`wire-your-gate.md` rule 1, `CONSUMING.md` §4.5). A template that inherited
+# that fallback would hand every consumer the collision it warns about, so this gate supplies **9333** instead — the
+# number `CONSUMING.md` and `conformance/README.md` already use for a hand run beside a gate — and that is still
+# overridable: `WING_CHROME_PORT` set in the environment wins here, and `--port` wins inside the tools. Exporting it is
+# what makes the kit's self-test (which takes no `--port`) follow the same port.
+#
+# **WHAT THIS GATE DECIDED ABOUT THAT NUMBER, AND WHY (2026-10-08).** 9333 is not a *private* port, and this template
+# no longer calls it one: it is the number every consumer on a shared machine picks, and in this repository's normal
+# state (more than one session) somebody else's browser is already on it before the gate starts. `ensureBrowser`
+# reuses whatever answers, so the gate measured in a browser it had not started.
+#
+# Measured, and it is why the suite changed rather than this default: another session's Chrome held the port at
+# `--window-size=1280,900`, and `conformance/self-test.mjs` reported `bad-overflow.html → MISSED (no rule 11
+# overflows-viewport naming "section#wider-than-the-window")` — the fixture built to prove rule 11 has teeth was laid
+# out in a 1280px window, its 900px card fitted, and it passed. The repair is at the root and it is inside the suite:
+# `collect.mjs` declares `VIEWPORT` (756x469) and forces it on every tab with `Emulation.setDeviceMetricsOverride`
+# before a page is loaded. Re-measured after that change, with the same foreign 1280x900 browser on the port, the
+# fixture fails as designed and the self-test is green on both a quiet and a shared port.
+#
+# **So the default stays 9333, and the sharing is reported rather than refused.** *Rejected alternative:* make this
+# template exit 3 when the port it chose is already held. It lost because the harm that was measured is gone — the
+# collision now changes no verdict — so refusing would end a gate run for a condition that measures nothing wrong, and
+# it would break the shape `ensureBrowser` documents (reuse a browser that answers) and the legitimate CI where one
+# browser is started on a fixed port and passed to every check. *The cost of leaving it*, stated rather than hidden:
+# on a shared machine this run may be measured in a browser this gate did not start. *What would overturn this:* a
+# measurement showing a foreign browser changing a verdict by some route other than its window size.
+: "${WING_CHROME_PORT:=9333}"
+export WING_CHROME_PORT
+PORT="$WING_CHROME_PORT"
+
+# Which browser this run will measure in, said before the checks rather than inferred from them. Read-only: it asks the
+# port's own http endpoint, exactly as `ensureBrowser` does, and starts or kills nothing.
+if command -v curl >/dev/null 2>&1; then
+  if curl -fsS --max-time 2 "http://127.0.0.1:$PORT/json/version" >/dev/null 2>&1; then
+    PORT_STATE="already held — this gate will REUSE that browser (the suite forces its own viewport, so the window it was started with reaches no rule; set WING_CHROME_PORT for a browser of your own)"
+  else
+    PORT_STATE="free — this gate starts its own browser and kills only that one"
+  fi
+else
+  PORT_STATE="unknown — curl is not on PATH, so this gate cannot tell whether a browser is already there (the suite still reports which browser it used)"
+fi
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 2
+cd "$HERE" || exit 2
+
+FAST=0
+for argument in "$@"; do
+  case "$argument" in
+    --fast) FAST=1 ;;
+    --help|-h) sed -n '2,/^#$/p' "$0" | sed -n 's/^# \{0,1\}//p'; exit 0 ;;
+    *) echo "gate: unknown argument: $argument (try --fast or --help)" >&2; exit 2 ;;
+  esac
+done
+
+RUN_LOG_DIR="$(mktemp -d "${TMPDIR:-/tmp}/wing-gate.XXXXXX")"
+
+# [KIT] The files every check below needs, asserted before anything runs: a missing suite is a gate that cannot measure,
+# and the honest exit for that is 3 rather than a pass.
+for required in "conformance/run.mjs" "conformance/self-test.mjs" "VERSION"; do
+  if [ ! -f "$required" ]; then
+    echo "gate: COULD-NOT-RUN — $required is not beside this script."
+    echo "      Unpack the kit's tarball here (its root is the design/ directory's contents, flat), or fix the paths."
+    exit 3
+  fi
+done
+KIT_VERSION="$(cat VERSION)"
+
+# [YOU] Create your allowance if it is not there yet, so this file runs as it ships. **Kit 1.4.2 ships
+# `conformance/allow.mjs` itself** — the declaration the judge reads, composed at pack time and pointing at the kit's
+# own reference window — so on a fresh unpack this whole block does nothing (`[ ! -f "$ALLOW" ]` is false) and the
+# gate's first `run.mjs` measures your page instead of exiting 3. It is kept, rather than deleted, for the consumer
+# who deleted that file and for one who unpacked an older kit: until 1.4.2 the tarball carried
+# `adopt/allow.mjs.example` (the shape, with `<placeholders>`) and **not** the file the judge reads, and a run without
+# it was exit 3 — nothing measured. When it does write, it seeds the allowance once with the version from `VERSION`
+# beside it, which is the one field that has to agree for the drift check to pass, and points it at the kit's own
+# reference window: measured, that page reports `CONFORMANCE OK · 0 failures` against exactly this minimal
+# declaration. Replace `allowApp` with your page, add your deviations with their reasons, and never overwrite a file
+# that is already there.
+if [ ! -f "$ALLOW" ]; then
+  mkdir -p "$(dirname "$ALLOW")"
+  cat > "$ALLOW" <<ALLOWANCE
+// Created once by gate.sh, from the template shipped in \`adopt/gate.sh.example\`.
+//
+// The shape is \`adopt/allow.mjs.example\`'s; this file exists because the kit ships the example and not the
+// declaration the judge reads, so an unseeded gate is exit 3 — nothing measured.
+export default {
+  // What the drift dashboard calls this row.
+  app: '$(basename "$HERE")',
+  // The window this declaration is about, relative to THIS FILE (the folder holding it) — which is how
+  // `report.mjs` resolves it: `resolve(dirname(allowPath), allowApp)`. Replace with your page.
+  allowApp: '../reference-window/index.html',
+  // The version of the kit this repository copied — read from the VERSION beside this file by gate.sh.
+  kitVersion: '$KIT_VERSION',
+  deviations: [],
+};
+ALLOWANCE
+  # This echo prints only when the block above actually wrote a file. On a fresh kit 1.4.2 unpack it never runs: the
+  # kit already ships `conformance/allow.mjs`, the guard is false, and the whole block — echo included — is a no-op.
+  # It is kept for the consumer who deleted that file, or who unpacked an older kit, which is the one case it serves.
+  echo "gate: wrote $ALLOW once (kit $KIT_VERSION declared, reference window; replace allowApp with your page and add"
+  echo "      your deviations with their reasons — a deviation is a decision with a reason, never a mute button)"
+fi
+
+# What this run actually measured, as two lists, so the last line cannot claim a check that never ran. `check` records
+# a PASS itself; a branch that skips records the skip. Both are printed by the final line below, and `SKIPPED` being
+# non-empty is what makes the run end 3 rather than 0.
+RAN=""
+SKIPPED=""
+ran() { RAN="${RAN:+$RAN · }$1"; }
+skipped() { SKIPPED="${SKIPPED:+$SKIPPED · }$1"; }
+
+# One check: `check <label> <command> [args…]`. Prints one line, keeps the tool's whole output in a log, and shows the
+# tail of that log when the check failed. The exit code is the tool's own, so 3 (nothing measured) stays 3 and is never
+# read as a pass. Arguments are taken as separate words, so a command with a space in a path needs its own call site.
+check() {
+  local name="$1"; shift
+  local log="$RUN_LOG_DIR/$(echo "$name" | tr -c 'a-zA-Z0-9-_' '-').log"
+  "$@" > "$log" 2>&1
+  local status=$?
+  if [ "$status" -eq 0 ]; then
+    echo "PASS  $name"
+    ran "$name"
+    return 0
+  fi
+  echo "FAIL  $name — exit $status (the tool's own words follow; its whole output is in $log)"
+  tail -n 6 "$log" | sed 's/^/      | /'
+  return "$status"
+}
+
+echo "gate: kit $(cat VERSION 2>/dev/null || echo '(VERSION unreadable)') · debug port $PORT · logs in $RUN_LOG_DIR"
+echo "gate: port $PORT is $PORT_STATE"
+if [ "$FAST" -eq 1 ]; then
+  echo "gate: --fast — the kit's self-test is SKIPPED. Do not ship on this run: the self-test is the proof the suite can fail."
+  echo "      This run ends 3 for that reason: a skipped check measured nothing, and 3 is not a pass."
+fi
+
+# ===================================================================================================================
+# 1 · [KIT] the kit's self-test — the thing that proves the suite can fail
+# ===================================================================================================================
+# `conformance/self-test.mjs` runs the suite against the conforming fixture and against one fixture per defect the suite
+# claims to catch, and fails itself when one that must go red goes green. Without it, a suite whose rules had all been
+# broken would still report CONFORMANCE OK. It takes the port from `$WING_CHROME_PORT` (exported above) and prints
+# `WING_CONFORMANCE_SELF_TEST_OK` as its last line. It exits 1 when a defect goes unnoticed and 3 when nothing was
+# measured.
+if [ "$FAST" -eq 1 ]; then
+  echo "SKIP  kit self-test (--fast)"
+  skipped "kit self-test (--fast)"
+else
+  check "kit self-test" node conformance/self-test.mjs || exit $?
+fi
+
+# ===================================================================================================================
+# 2 · [KIT] + [YOU] the judge on YOUR pages, one run per page
+# ===================================================================================================================
+# [KIT]  `conformance/run.mjs --app <page> --port <port> --allow <file>` — the suite, already inside the kit.
+# [YOU]  the entries in `PAGES` above, which are your windows.
+#
+# Exit codes of one run, so a red line is readable without opening the log: 0 nothing found that is not declared ·
+# 1 findings that are not declared (fix them, or declare each with a reason) · 2 a bad command line (this script's
+# fault, not the page's) · 3 COULD-NOT-RUN — no browser, no page, no kit beside the suite, or no `kitVersion`.
+#
+# The first failure ends the script, with that run's own exit code, so the last line you read is the page that failed
+# rather than a pile of them — and a page this script cannot find is exit 1, because running the judge on a path that
+# is not there would measure Chrome's own error page (the suite refuses that case itself, with exit 3).
+for page in "${PAGES[@]}"; do
+  if [ ! -f "$page" ]; then
+    echo "FAIL  judge $page — no such page: put the file you actually serve in PAGES"
+    exit 1
+  fi
+  check "judge $page" node conformance/run.mjs --app "$page" --port "$PORT" --allow "$ALLOW" || exit $?
+done
+
+# ===================================================================================================================
+# 3 · [YOU] YOUR screenshot lock, in its checking mode
+# ===================================================================================================================
+# **The kit does not ship a screenshot lock.** It ships the *rule* — step 5 of `adopt/README.md`: commit one image per
+# window per theme, and make a test that re-renders and compares fail when a window moves without its picture. That
+# test drives a browser through a package the kit deliberately does not depend on, so it is yours to supply, exactly as
+# `scripts/test-design-screens.mjs` is this repository's (measured 2026-10-08: that file imports `ws` and resolves this
+# repository's root, which is why it is not in the artefact).
+#
+# **When you do not have one yet:** the honest state of your visual record is "declared, not verified", and the way out
+# is in `adopt/README.md` step 5 — commit `<your folder>/design/screens/`, copy the *shape* of the lock (re-render into
+# a scratch directory under `/tmp`, never into the folder being checked, then compare) and wire it here. Until then
+# leave this check skipped, and **this gate ends 3 rather than 0 for exactly that reason**: the pictures were never
+# measured, so the last line says the check did not run instead of implying a lock that does not exist. Say the same in
+# your own README — a green gate must not imply a check nobody wired.
+#
+# The convention this template expects of a lock, so yours can be swapped in: it **checks** by default (a `--write`
+# style flag is the deliberate refresh and is never what a gate runs), it names the window, the theme and how much
+# moved, and it exits 0 when the record matches, 1 when a screen moved, 3 when nothing could be measured. Only 0 is a
+# pass. In this kit's own lock, **any movement is a failure** and the pixel count is for the reader rather than a
+# threshold (`design/screens/README.md`).
+#
+# [KIT] — this repository's own lock, for a consumer who has cloned this repository and has `scripts/`:
+#   check "screenshot lock" node scripts/test-design-screens.mjs
+if [ -f "scripts/test-design-screens.mjs" ]; then
+  check "screenshot lock" node scripts/test-design-screens.mjs || exit $?
+else
+  echo "SKIP  screenshot lock — none is wired here yet: see this file's step 3 comment and adopt/README.md step 5"
+  skipped "screenshot lock (no scripts/test-design-screens.mjs here)"
+fi
+
+# The last line is built from what `check` and the skip branches recorded, never from the checks this file mentions: a
+# final line assembled from the command names would say "screenshot lock" whether or not one exists, which is the
+# defect this line replaces. Every check that did not run is named as not run, and the run ends 3 rather than claiming
+# a green light it did not earn (`wire-your-gate.md`: "a green light nobody earned").
+if [ -z "$SKIPPED" ]; then
+  echo "gate: OK — every check ran and passed: $RAN — on port $PORT"
+  exit 0
+fi
+echo "gate: INCOMPLETE — ran and passed: ${RAN:-nothing}; did NOT run (nothing measured): $SKIPPED — on port $PORT"
+echo "gate: exit 3 — a skipped check is not a failure and it is not an OK either: $SKIPPED measured nothing, so this run"
+echo "      earned no green light. Wire the check, or say in your own README which pictures nothing watches."
+exit 3

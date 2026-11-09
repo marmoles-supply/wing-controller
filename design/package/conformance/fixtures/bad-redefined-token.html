@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · a palette the app took for itself</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* §10: take the file and the document; do not take a copy of a palette. This one is a token colour, so rule 3
+     cannot see it — only the comparison with the kit copy can. */
+  :root { --face: var(--crt); }
+</style>
+</head>
+<body>
+  <div class="card" id="redefined">A palette the app took for itself</div>
+</body>
+</html>

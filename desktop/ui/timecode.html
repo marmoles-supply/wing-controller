@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WING CONTROLLER · Timecode [MÁRMOLES SUPPLY CO.]</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <script src="version.js"></script>
+  <!-- One row, one order comparator and one set of marks, shared with the Settings page (`index.html`), which
+       loads the same file. Without it the row exists twice and the two copies drift. -->
+  <script src="cue-list.js"></script>
+  <!-- The caret rule every field obeys: the first click selects the value so typing overwrites it, the
+       second puts the caret at its end. One module for every window, so the same gesture cannot behave
+       differently per screen; the rule and the WebKit workaround behind it live there and nowhere else. -->
+  <script src="field-editing.js"></script>
+  <link rel="stylesheet" href="design-tokens.css" />
+  <!-- The kit's drawings, from the values above. The contract's order is values, then components, then this window's
+       own sheet, so a deliberate override still wins. -->
+  <link rel="stylesheet" href="components.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <style>
+    /* The window's palette is the kit's, linked above (`design-tokens.css`), not a copy of it. This block used to
+       restate fourteen colours — `--face`, the four `--line-*` steps, `--ink`, `--muted`, `--accent`, `--maroon`,
+       `--amber`, `--crt`, `--crt-ink` — with the values `index.html` declares, which is the one thing the design kit
+       forbids: a window that re-declares what the kit already supplies is a second answer to a question that has one.
+       Measured against `desktop/ui/design-tokens.css` token by token, every one of the fourteen equalled the kit's
+       own light value, and every one of the thirteen the dark block carried equalled the kit's dark value, so the
+       names still resolve from the kit and not a pixel moves — the screens lock renders this window exactly as it
+       did. The dark block went with them: the kit's own `body.theme-dark` is the dark palette, and the class this
+       window's `applyTheme` toggles is the same class the kit reads.
+
+       Two colour literals are left in the rules below, on purpose. `#000000` in `#position`'s inset shadow is a role
+       the value alone cannot name — in the light palette it is `--ink`, `--line-dark`, `--win-btn-dark-shadow`,
+       `--win-text` or `--win-window-frame`, and in the dark palette only the last of those — so choosing one is a
+       decision and not a rename. `#4a6b5c`, the dim ink `#position.is-nothing` takes in the dark theme, is not a kit
+       value at all. The two font families stay because they are not colours: this pass is about colours. */
+    :root {
+      --win-font: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Segoe UI", Geneva, sans-serif;
+      --mono: "Lucida Console", "Courier New", Consolas, monospace;
+    }
+    * { box-sizing: border-box; border-radius: 0 !important; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--face);
+      color: var(--ink);
+      font-family: var(--win-font);
+      /* The interface base is the kit's `--font-base`, not the window's own 11px: §11 point 8 asks every text size to be
+         one of the kit's steps and `--meter-scale` to be the only thing that moves them, so the sizes that were
+         written here by hand are replaced by the kit's names. Judgement, not arithmetic: 11px was this window's body
+         size, and in the specimen `--font-base` is "the base size of the interface" (the five interface steps at
+         `--meter-scale` 1 are 8 · 8.5 · 9.5 · 10.5 · 11.5 px; the four instrument steps above them start at 22px). */
+      font-size: var(--font-base);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px 8px;
+      min-height: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
+    }
+    /* The window's own name in its title bar is the one heading the kit has a step for: `--font-lg`, "a window heading". */
+    header { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: var(--font-lg); }
+    header #source { color: var(--accent); }
+    header .spacer { flex: 1; }
+    /* The version is a value the operator reads, so §11 point 2 asks it be set in the kit number type and sit in a
+       well. It is a chip in the title bar rather than a column, so the well is `--crt` — the instrument ground the
+       position below already reads on; a `--field` well has no visible light step on the light face, because there the
+       same value is both its ground and its highlight. The element is left with no text of its own until
+       `version.js` answers: an empty well is not a number, and a stand-in version would be a report that lies. */
+    #version-well {
+      display: inline-flex;
+      padding: 0 4px;
+      background: var(--crt);
+      color: var(--crt-ink);
+      border: 1px solid var(--line-dark);
+      border-top-color: var(--line-light);
+      border-left-color: var(--line-light);
+    }
+    #version-well > #version { font: normal var(--font-sm) var(--mono); color: inherit; }
+    /* The kit draws the button now (`components.css`, linked above): its raised pair, `--win-btn-face`, `--win-text`,
+       the window font, the interface size, the cursor, and the pressed shape — `button:active` and `button.is-on`
+       both sink the edge pair, which is what this rule used to say by hand. What is left is only what the layer does
+       not draw: this window's 24 px control height, its bold label, its own second step inside the bevel (the inset
+       `--win-btn-shadow` the suite reads as a raised thing carrying a sunk second shape, declared with its reach in
+       `design/conformance/allow.mjs`), and the text selection a transport button never allows. */
+    button {
+      min-height: 24px;
+      height: 24px;
+      font-weight: bold;
+      box-shadow: inset 1px 1px 0 var(--face-3), inset -1px -1px 0 var(--line-mid);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    button:hover { background: var(--face-2); }
+    /* Pressed is an inset bevel, which is how this application's own toggles say "on". The sunk edge pair is the
+       kit's (`button.is-on`), so only the second step moves here. */
+    button.is-on {
+      box-shadow: inset 1px 1px 0 var(--line-mid);
+    }
+    /* The readout itself: the application's sunken CRT panel, with phosphor digits. */
+    #position {
+      font-family: var(--mono);
+      /* Sized to the window it actually opens in (420 x 200): a timecode is eleven monospace characters, so 7vw keeps
+         the whole position inside it with room for the padding, and the operator enlarging the window grows it back up
+         to the cap. At 92 px it overflowed and pushed everything below it out of sight.
+
+         Both ends of that clamp are now **the kit's own instrument steps** (`DESIGN-SYSTEM-ROADMAP.md` §4l, D-TYPE-4):
+         `--font-clock` (30px at `--meter-scale` 1) is the window's own size and ltc.html's clock face, and
+         `--font-clock-lg` (52px) is the wide-window reading. The floor is 30 and not 22 on purpose: 30 is exactly the
+         size this window shows in the 420 x 200 frame it opens in (7vw of 420 is 29.4px), and it still fits the
+         260 x 140 minimum the window declares — measured, a fixed 52px there overflows (`body` scrollWidth 372 on a
+         260px body), which is why the cap has to stay a clamp and not a fixed step.
+         The value **between** the two steps is `7vw`, and that middle is a size the scale cannot name; it stays a
+         declared deviation in `design/conformance/allow.mjs`, whose reason now says exactly that. */
+      font-size: clamp(var(--font-clock), 7vw, var(--font-clock-lg));
+      white-space: nowrap;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+      text-align: center;
+      color: var(--crt-ink);
+      background: var(--crt);
+      border: 1px solid var(--line-light);
+      border-top-color: var(--line-dark);
+      border-left-color: var(--line-dark);
+      box-shadow: inset 1px 1px 0 #000000, inset -1px -1px 0 var(--line-mid);
+      padding: 6px 8px;
+      margin: 2px 0 0 0;
+      flex: 0 0 auto;
+    }
+    #position.is-stale { color: var(--amber); }
+    /* Waiting: the same dashes at the same size, in the dim colour — a clock with nothing to show yet, rather than a
+       black well that looks broken or a confident 00:00:00:00 that would be a lie. */
+    #position.is-nothing { color: var(--muted); }
+    body.theme-dark #position.is-nothing { color: #4a6b5c; }
+    #state { text-align: center; color: var(--muted); flex: 0 0 auto; }
+    #state.is-stale { color: var(--maroon); font-weight: bold; }
+    #state.is-nothing { color: var(--muted); }
+    #cue {
+      margin-top: auto;
+      flex: 0 0 auto;
+      border-top: 1px solid var(--line-mid);
+      border-bottom: 1px solid var(--line-light);
+      padding: 4px 0;
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+    }
+    #cue strong { color: var(--accent); }
+    #counters { color: var(--muted); font-size: var(--font-sm); flex: 0 0 auto; }
+    /* What the cue engine fired and what the window has confirmed. It is on screen whenever timecode has arrived —
+       with zeros before anything has fired, because a zero answers "was anything lost?" and proves the counter is
+       alive. Only the initial `nothing` state, where there is nothing to count, keeps it out of the window. When a
+       cue is unconfirmed — or was lost — it is coloured like the other warnings, because that is the one number that
+       says a macro may not have run; with zeros it stays in the dim colour. */
+    #delivery { color: var(--muted); font-size: var(--font-sm); flex: 0 0 auto; text-align: center; }
+    #delivery.is-cue-trouble { color: var(--maroon); font-weight: bold; }
+
+    /* ---- The cue panel -------------------------------------------------------------------------------------
+       The window does not grow a hole: 420 x 200 holds the clock and two or three cue rows at most, so unfolding
+       asks the desktop frame for a taller window (the geometry pattern index.html and meters.html already use) and
+       the list scrolls inside whatever height the window ends up with. If the frame refuses to grow — a plain browser
+       tab, a window already at its maximum — the panel is still scrollable, because the growth is comfort and not a
+       requirement. The panel sits between the state line and the "next cue" line so that `margin-top: auto` on the
+       latter keeps the clock's own readings pinned to the bottom exactly as they were when it is folded away. */
+    #cue-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border: 1px solid var(--line-light);
+      border-top-color: var(--line-dark);
+      border-left-color: var(--line-dark);
+      box-shadow: inset 1px 1px 0 var(--line-mid);
+      background: var(--face-2);
+      padding: 4px;
+    }
+    /* `hidden` has to win over the `display: flex` above, or the folded panel would still be laid out. */
+    #cue-panel[hidden] { display: none; }
+
+    /* With the list open in a box the frame refused to grow, the panel's one-row floor and the clock's own readings
+       cannot both fit on the body's four-pixel rhythm. The rhythm yields, and nothing else does: the clock keeps its
+       size, the panel keeps a whole row, and the readings stay in the window.
+       Measured at 420 x 200. With fourteen cues and the panel open the floor is 32px (a 22px row plus the panel's 10px
+       of padding and borders) and the delivery line ended at 204.5px of the 200px box, 4.5px past the edge. In the
+       window's fullest state — the last-cue line, the countdown notice and the search box all present — the box's
+       content came to 209px, so 9px had to come out of the spacing and nothing else: one pixel between the clock's
+       blocks instead of four, and the panel's own padding at two instead of four, which is 12px and leaves the
+       readings 3px inside. The class is only on the body while the list is open (`setPanelOpen`), so the folded
+       clock — the shape this window opens in, and the one the recorded screens show — is untouched. */
+    @media (max-height: 240px) {
+      body.cue-open { gap: 1px; }
+      /* The panel's own padding is part of that arithmetic: its floor is measured from the row plus the padding and
+         borders it really has (`fitCuePanelFloor`), so tightening the padding here tightens the floor with it — 28px
+         instead of 32 — rather than leaving a floor built for a padding that is no longer there. */
+      body.cue-open #cue-panel { padding: 2px 4px; }
+    }
+    .cue-bar { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex: 0 0 auto; }
+    .cue-heading { font-weight: bold; }
+    .cue-field { display: flex; align-items: center; gap: 3px; }
+    /* The cue bar's own controls: the kit draws all three (`select` with its arrow, `button`, `input[type="search"]`),
+       so what is written here is the compact size the folded panel gives them and nothing else. The selects used to
+       carry `--face-3` as their ground; the kit's field is `--field`, which is the surface a chosen value sits on. */
+    .cue-bar select { height: 20px; }
+    .cue-bar button { height: 20px; min-height: 20px; }
+    /* The unsaved notice is the one line that must not be missable: it is what stands between an operator and a show
+       that was re-armed without them knowing. */
+    #cue-status { font-size: var(--font-base); color: var(--muted); flex: 0 0 auto; }
+    #cue-armed { font-size: var(--font-base); color: var(--muted); flex: 0 0 auto; }
+    #cue-armed[hidden] { display: none; }
+    /* A window that asked the frame to grow and did not get it says which of the real answers it is, in the
+       warning colour: "the frame refused" with no reason is the answer this application never gives. */
+    #cue-fit { font-size: var(--font-base); color: var(--maroon); flex: 0 0 auto; }
+    #cue-fit[hidden] { display: none; }
+    #cue-status.is-dirty { color: var(--maroon); font-weight: bold; }
+    #cue-status.is-error { color: var(--maroon); }
+    #cue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+    /* The row's own look lives in "cue-list.js", beside the elements it creates. It was written here by hand and in
+       the settings page by hand, the two copies had already drifted, and the LTC window had none of it at all. Only
+       this window's own frame is styled below: the list container, the search box, the filter count and the
+       last-fired line. */
+    /* Looking for one cue among a show's worth of them: the box searches names, positions and the states a
+       row can be in, and the count says how much of the list is on screen. */
+    .cue-bar input[type="search"] { width: 72px; height: 20px; }
+    #cue-filter-count { font-size: var(--font-sm); color: var(--muted); }
+    #cue-filter-count[hidden] { display: none; }
+    /* What just happened: the last cue the engine announced, with the show's position and the wall-clock time
+       it arrived. It is its own line rather than something in the log, because a clock that only says what is
+       about to happen never answers "did that fire?". */
+    #last-cue { font-family: var(--mono); font-size: var(--font-sm); color: var(--muted); flex: 0 0 auto; text-align: center;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #last-cue[hidden] { display: none; }
+    /* The countdown states a playout system publishes — within ten seconds, within five, reached. The words are
+       on screen; the colour is the second signal, for a clock read from across a room. */
+    #next-warning { font-size: var(--font-sm); font-weight: bold; padding: 0 3px; border: 1px solid currentColor; flex: 0 0 auto; }
+    #next-warning[hidden] { display: none; }
+    #next-warning.is-last10 { color: var(--accent); }
+    #next-warning.is-last5, #next-warning.is-now { color: var(--maroon); }
+  </style>
+  <link rel="stylesheet" href="workstation.css" />
+  <link rel="stylesheet" href="secondary-chrome.css" />
+  <script src="dither.js"></script>
+  <script src="secondary-chrome.js" defer></script>
+</head>
+<body class="wc-app wc-clock">
+  <header class="wc-toolbar">
+    <span>Timecode</span>
+    <span id="source" style="color: var(--accent)">MTC</span>
+    <span id="version-well"><span id="version"></span></span>
+    <span class="spacer"></span>
+    <button id="cue-panel-toggle" aria-expanded="false" aria-controls="cue-panel"
+      title="Show the cue list: every cue with its time, its name, whether it is active and whether it has fired or been skipped. The window grows to make room for it and goes back to its compact size when it is folded away.">▸ Cues</button>
+    <button id="pin" title="Keep this clock above every other window: what a stage wants from a clock on a second screen.">Pin</button>
+  </header>
+
+  <div id="position" title="The position the timecode says we are at. A semicolon before the frames means drop-frame numbering."></div>
+  <div id="state" class="is-nothing" title="Whether the timecode is still arriving. A position that stopped arriving keeps being shown, and says so: a frozen position that still claimed to be running is how a show looks like it is following something it is not.">Nothing has arrived yet.</div>
+
+  <!-- What just happened: the last cue the engine announced on this window, its position and the wall-clock
+       time the announcement arrived. Empty until something fires, and its own line rather than a line in the
+       log, because the clock's job is to answer "did that fire?" as well as "what is next?". -->
+  <div id="last-cue" hidden
+    title="The last cue the engine announced here: the position it fires at, its name when the list has one, and the wall-clock time the announcement arrived. A cue recovered from the engine's ledger when this window opened has no wall-clock time to show, and says so. The full run is in the log."></div>
+
+  <!-- The cue list. It is the same list the Settings page edits: one file, one engine, and this is a view of it. -->
+  <section id="cue-panel" class="wc-card" hidden>
+    <div class="cue-bar wc-heading">
+      <span class="cue-heading">Cues</span>
+      <label class="cue-field">order
+        <select id="cue-sort"
+          title="How this list is laid out. SMPTE sorts by the position the cue fires at, which is what a show reads like; Manual keeps the list's own order and is the only mode that offers the up and down arrows; Added is the order the cues were created in. The engine always fires by time and by id, so this changes nothing about what fires — but it is part of the show, so choosing one writes it into the cue list: saving re-arms every cue.">
+          <option value="smpte">SMPTE (time)</option>
+          <option value="manual">Manual</option>
+          <option value="created">Added</option>
+        </select>
+      </label>
+      <!-- A show's list is dozens of cues, and finding one by eye in a list ordered by time is not a plan.
+           It searches a cue's name, its number when the list carries one, its position and the states a row
+           can be in — "off" for a parked cue, "locked" for one this Mac is protecting, "clash" for a frame
+           that holds two. The live marks are deliberately not searched: a row that vanished the moment it
+           fired would be a list moving under the operator's hand. -->
+      <label class="cue-field">find
+        <input id="cue-filter" type="search" autocomplete="off" spellcheck="false"
+          title="Shows only the cues that match: part of a cue's name, its number, its position (01:00:20), or one of the states a row can be in — “off” for a parked cue, “locked” for one this Mac is protecting, “clash” for a frame that holds more than one. Empty it to see the whole list." />
+      </label>
+      <span id="cue-filter-count" hidden></span>
+      <button id="cue-add-here"
+        title="Adds a cue at the position this clock is reading right now, and saves the list — saving re-arms the cue engine. It refuses before any timecode has arrived, and it is refused while Live Safe Mode is on: where a cue goes is part of what the show will do.">Add here</button>
+      <!-- Only while there is a local change to take back: a control that cannot do its job does not go on
+           screen. It takes back what has not been saved, and stops at the last save. -->
+      <button id="cue-undo" hidden
+        title="Takes back the last change made on this screen — a time nudged, a row moved, copied or removed, a macro chosen — one step at a time, and stops at the last save: only Save writes the list to the engine. Local: nothing is saved until you press Save (re-arms).">Undo</button>
+      <button id="cue-save"
+        title="Writes the list and hands it to the engine. Saving re-arms every cue: the cues behind the current position become armed again and will fire when the show plays into them. Nothing is written until you press this.">Save (re-arms)</button>
+    </div>
+    <div id="cue-status" aria-live="polite">No cues yet. Let the show run to the moment, then press “Add here”.</div>
+    <!-- The position the engine last armed the list from: a rewind, or a save. The engine already knows it; without a
+         line for it, "the list was re-armed and everything behind us is live again" was only ever in the log. -->
+    <div id="cue-armed" hidden
+      title="The position the cue engine last armed the list from. A rewind arms the cues after that position again, and so does saving the list — this is where the show went back to."></div>
+    <!-- The frame's own answer when the window asked to grow and did not get it. A request is not a result: the
+         frame can be maximised, fill the display, or have a work area that is the ceiling, and each has a
+         different cure. Hidden while the panel is folded, because then nothing needs the height. -->
+    <div id="cue-fit" aria-live="polite" hidden
+      title="Why this window is not as tall as the cue panel asked for. A frame can refuse a size it will not take — because it is maximised, because it is filling the display, or because the display's work area is the ceiling — and the list scrolls inside whatever height the window really has."></div>
+    <ol id="cue-list"></ol>
+  </section>
+
+  <div id="cue" class="wc-status" title="The next cue in the list, and how far the timecode still has to run to reach it.">
+    <span>Next cue</span><strong id="next-cue">— none yet</strong>
+    <!-- The countdown states a playout system publishes: within ten seconds, within five, reached. -->
+    <span id="next-warning" hidden></span>
+    <span id="next-distance"></span>
+  </div>
+  <div id="counters">No timecode messages read.</div>
+  <div id="delivery" hidden></div>
+
+  <script>
+    // The clock window. It is a **view**: closing it never stops the timecode, never loses a position and never
+    // disarms a cue, because all of that lives in the backend — the same rule the meter bridge follows.
+    // The version, in the form the other windows show it.
+    try {
+      const info = window.APP_VERSION_INFO;
+      if (info?.version) {
+        document.getElementById("version").textContent = `v${info.version}`;
+      }
+    } catch (_) { /* a clock without its version is still a clock */ }
+
+    // The application's theme, from the key both its other windows write and read, and a `storage` event lands here
+    // the same way a change made in the other window does.
+    const THEME_KEY = "wing_theme";
+    function applyTheme(theme) {
+      document.body.classList.toggle("theme-dark", theme === "dark");
+    }
+    try {
+      applyTheme(localStorage.getItem(THEME_KEY) || "light");
+    } catch (_) { /* a window that cannot read the theme is still a clock */ }
+    window.addEventListener("storage", (event) => {
+      if (event.key === THEME_KEY) applyTheme(event.newValue || "light");
+    });
+
+    const hasTauri = Boolean(window.__TAURI__?.core?.invoke);
+    const invoke = hasTauri ? window.__TAURI__.core.invoke : async () => ({});
+
+    /// Where a stored preference is read and written, and never a reason to fail: a window opened from `file://` has
+    /// no localStorage at all, and a clock that would not paint because of it is a worse clock.
+    function readStored(key) {
+      try { return localStorage.getItem(key); } catch (_) { return null; }
+    }
+    function writeStored(key, value) {
+      try { localStorage.setItem(key, value); } catch (_) { /* nothing to remember is not a failure */ }
+    }
+
+    // ---- The cue list, as this window sees it ---------------------------------------------------------------
+    //
+    // The window owns no cue state: everything below is either what `get_timecode_cues` answered or what the engine
+    // announced, and the only way any of it changes is a command to the backend. Editing is local — a press of a
+    // nudge must not write the list, because writing the list re-arms the engine (`configure_cues` → `set_cues` +
+    // `reset`) and holding an arrow key would be a storm of re-armings — and saving is explicit, through the one
+    // button that says so.
+    //
+    // The **row, the order comparator and the marks are not written here**: they live in `cue-list.js`, which this
+    // window loads with `<script src>` and the Settings page loads too. That is what makes "the same row" a fact
+    // rather than a promise, and it is why a change to the row cannot reach one window and miss the other.
+
+    const CUE = window.WingCueList;
+    if (!CUE) throw new Error("cue-list.js did not load: the cue panel cannot be drawn without it");
+
+    /// How the list is laid out is **the show's setting, not this window's**: it travels in the cue file
+    /// (`TimecodeCuesDto::sort`), which is what makes an order chosen on one Mac follow the show to the next one.
+    /// `localStorage` is only the fallback for a window with no backend behind it, and the channel the other window
+    /// hears the change through — once the file has answered, it is never the truth.
+    const CUE_SORT_KEY = "wing_timecode_cue_sort";
+    const CUE_SORT_MODES = CUE.SORT_MODES;
+    let cueSort = null; // what the file says; null until the cue list has been read
+
+    // The drive mode is **not this window's to choose** — the LTC window owns that control — but it has to travel back
+    // with every write, or this window's Save would silently change how the show runs. The backend's field has a
+    // default (`timecode`), so a payload that forgot it would not fail: it would put a **sequential** show back on the
+    // clock, and installing a list re-arms the engine as well. So it is read from the file and handed straight back.
+    let cueDrive = null;
+
+    function cueSortMode() {
+      if (CUE_SORT_MODES.includes(cueSort)) return cueSort;
+      const stored = readStored(CUE_SORT_KEY);
+      return CUE_SORT_MODES.includes(stored) ? stored : "smpte";
+    }
+
+    // The arithmetic the clock's own interpolation needs, from the shared file: the position painted between
+    // snapshots is the same arithmetic a cue's nudge uses, drop-frame included.
+    const cueFramesPerSecond = CUE.framesPerSecond;
+    const cuePositionText = CUE.positionText;
+    const cueToFrames = CUE.toFrames;
+    const cueFromFrames = CUE.fromFrames;
+    const parsePositionText = CUE.parsePositionText;
+
+    // `savedCues` is what the backend last answered; `draftCues` is what is on screen, edits included. The difference
+    // between them is the whole of "you have changes that are not saved".
+    let savedCues = [];
+    let draftCues = [];
+    let offsetFrames = 0;
+    let lastSaveFailed = "";
+    // Set when another window published a list this one could not take, because the operator has unsaved edits here.
+    // It is a message rather than a mode: taking the foreign list would throw away what he is typing, and saying
+    // nothing would let the two windows disagree without either of them mentioning it.
+    let cueListChangedElsewhere = "";
+    // The order the file last answered with: what is on screen is "unsaved" when it differs, the same as an edited
+    // time. It only differs after a refused sort save (Live Safe Mode), which is exactly when it must be visible.
+    let savedSort = "smpte";
+
+    function copyCues(cues) {
+      return JSON.parse(JSON.stringify(Array.isArray(cues) ? cues : []));
+    }
+    function cueDirty() {
+      return JSON.stringify(draftCues) !== JSON.stringify(savedCues) || cueSortMode() !== savedSort;
+    }
+
+    /// The list's row, order and marks are the shared panel's. This window supplies what is its own: where the
+    /// rows go, how it words a row's name, what "Now" copies, and what it does when a local change is made.
+    const cuePanel = CUE.createPanel({
+      container: () => document.getElementById("cue-list"),
+      cues: () => draftCues,
+      mode: cueSortMode,
+      rowTag: "li",
+      atTitle: "The position this cue fires at.",
+      nameTitle: (name) => name.from === "label"
+        ? "This cue's name, as the operator typed it on the Settings page."
+        : name.from === "note"
+          ? "This cue's name, the note the cue list carries."
+          : "This cue has no name yet. The note is written when a cue is created from the macro editor.",
+      currentPositionText: () => lastPositionText,
+      rateHint: () => draftCues[0]?.at?.rate || "fps25",
+      armedId: "cue-armed",
+      filterCountId: "cue-filter-count",
+      // The Save control's unsaved state is **this window's own answer** to "is the list on screen the list the engine
+      // has" — the same predicate that paints the "● Unsaved changes" line below it. The button reads it instead of
+      // keeping a flag of its own, so the two can never disagree about whether anything is waiting to be saved.
+      isDirty: () => cueDirty(),
+      local: () => { lastSaveFailed = ""; renderCueStatus(); },
+      fail: (message) => { lastSaveFailed = String(message); renderCueStatus(); },
+      rendered: () => renderCueStatus(),
+    });
+
+    /// What just happened: the events this window heard, with the show's position and the wall-clock time they
+    /// arrived. A clock that only says what is about to happen never answers "did that fire?".
+    const cueHistory = CUE.createHistory(8);
+    function renderCueHistory() {
+      const line = document.getElementById("last-cue");
+      if (!line) return;
+      const text = cueHistory.line();
+      if (line.textContent !== text) line.textContent = text;
+      line.hidden = !text;
+    }
+    function cueNameOf(id) {
+      const cue = draftCues.find((entry) => String(entry?.id ?? "") === String(id ?? ""));
+      if (!cue) return "";
+      const name = CUE.cueName(cue);
+      return name.from ? name.text : "";
+    }
+    /// An announcement recovered from the engine's ledger when this window opened has **no** wall-clock time: the
+    /// ledger carries the receipt and the event, not when it happened. `wall` is empty for those, and the line says
+    /// so rather than borrowing the moment it was read.
+    /// The engine decides WHY a skip happened and this window only carries it to the line: see
+    /// `CUE.createHistory`. A cue crossed while the timecode was gone and one crossed by a seek are different
+    /// events, and the operator has to be able to tell which one he is looking at.
+    function rememberCueEvent(kind, id, at, wall, why = {}) {
+      cueHistory.record({ kind, id, at, name: cueNameOf(id), wall, ...why });
+      renderCueHistory();
+    }
+
+    function renderCueStatus() {
+      const status = document.getElementById("cue-status");
+      if (!status) return;
+      const clash = CUE.clashMap(draftCues);
+      const parts = [];
+      if (draftCues.length === 0) {
+        parts.push("No cues yet. Let the show run to the moment, then press “Add here”.");
+      } else {
+        parts.push(`${draftCues.length} cue(s).`);
+      }
+      const filter = cuePanel.filterText().trim();
+      if (filter) parts.push(`Showing ${cuePanel.visibleCount()} of ${draftCues.length} (filter “${filter}”).`);
+      if (clash.size > 0) {
+        const first = [...clash.keys()][0];
+        const at = draftCues.find((cue) => CUE.positionKey(cue.at) === first);
+        parts.push(`${clash.size} position(s) hold more than one cue (${at ? cuePositionText(at.at) : first}): both are kept, and they fire in the list's own order.`);
+      }
+      if (cueListChangedElsewhere) {
+        // Said **before** the unsaved line and in its own words: "you have unsaved changes" and "somebody else changed
+        // the list" are two different facts, and an operator who reads only the first will not know why saving is now
+        // the thing that loses work.
+        parts.push(cueListChangedElsewhere);
+      }
+      if (cueDirty()) {
+        // The refusal is never hidden by the unsaved notice: "it was not saved" without "because the padlock is on"
+        // is a line an operator can do nothing with.
+        parts.push("● Unsaved changes — the list on screen is not the list the engine has. Saving re-arms every cue.");
+      }
+      if (lastSaveFailed) {
+        parts.push(lastSaveFailed);
+      } else if (!cueDirty() && draftCues.length > 0) {
+        parts.push("Saved. The engine has this list.");
+      }
+      status.textContent = parts.join(" ");
+      status.classList.toggle("is-dirty", cueDirty());
+      status.classList.toggle("is-error", Boolean(lastSaveFailed));
+    }
+
+    function renderCueList() {
+      const sort = document.getElementById("cue-sort");
+      const mode = cueSortMode();
+      if (sort && sort.value !== mode) sort.value = mode;
+      cuePanel.render();
+      // The rows have just been rebuilt (a cue added, removed, re-sorted): the floor follows the row it is made of.
+      fitCuePanelFloor();
+    }
+
+    // The snapshot and the event stream both reach the shared marks; these are the names this window's own code
+    // reads, and they are the same marks the Settings page paints.
+    function applySnapshotMarks(snapshot) { cuePanel.applySnapshot(snapshot); }
+    function markCue(id, mark) { cuePanel.mark(id, mark); }
+
+    async function loadCueList() {
+      if (!hasTauri) return;
+      try {
+        adoptCueList(await invoke("get_timecode_cues"));
+        return;
+      } catch (error) {
+        lastSaveFailed = `The cue list could not be read: ${String(error)}`;
+      }
+      renderCueList();
+    }
+
+    /// Take what the backend answered as the truth on both sides of the save line: the cues, the offset, and the order
+    /// they are laid out in. The order comes **from the file**, because that is what makes it the show's setting — a
+    /// window that only remembered it would open the same list in a different order tomorrow.
+    ///
+    /// The undo history goes with it: it holds changes against a list the backend has just replaced, and taking one
+    /// back would restore a cue that no longer exists.
+    function adoptCueList(dto) {
+      savedCues = copyCues(dto?.cues);
+      draftCues = copyCues(savedCues);
+      offsetFrames = Number(dto?.offset_frames ?? offsetFrames);
+      if (CUE_SORT_MODES.includes(dto?.sort)) {
+        cueSort = dto.sort;
+        savedSort = dto.sort;
+      }
+      // Carried back out untouched, for the reason above. It is not compared against a saved copy the way `sort` is:
+      // this window has no control that can change it, so it can never be the thing that is unsaved.
+      if (CUE.DRIVE_MODES.includes(dto?.drive)) cueDrive = dto.drive;
+      lastSaveFailed = "";
+      // What this window now holds **is** the list the engine has, so a warning that another window changed it is no
+      // longer true of anything.
+      cueListChangedElsewhere = "";
+      cuePanel.resetUndo();
+      cuePanel.syncUndo();
+      renderCueList();
+    }
+
+    /// The one that writes. It says out loud what saving does — the engine is re-armed — and it never runs from a
+    /// keystroke: only from the Save button, the Add button and a save the Add button needs first.
+    async function saveCueList() {
+      if (!hasTauri) {
+        lastSaveFailed = "Nothing was saved: this window is not running with the backend.";
+        renderCueStatus();
+        return false;
+      }
+      try {
+        const saved = await invoke("set_timecode_cues", {
+          // The payload is the **shared** rule's, from cue-list.js, and not built here. Both `sort` and `drive` live in
+          // this file and both have defaults in the backend, so a payload that forgot either would not fail — it would
+          // quietly replace the operator's order with `smpte` or put a sequential show back on the clock. This window
+          // owns neither control, which is exactly why it must hand both back exactly as the file gave them.
+          cues: CUE.cueListPayload(draftCues, offsetFrames, cueSortMode(), cueDrive),
+        });
+        adoptCueList(Array.isArray(saved?.cues) ? saved
+          : { cues: draftCues, offset_frames: offsetFrames, sort: cueSortMode(), drive: cueDrive });
+        return true;
+      } catch (error) {
+        // The backend refused a position that cannot exist, or Live Safe Mode is on. What it said is what the
+        // operator reads, and nothing they typed is thrown away.
+        lastSaveFailed = String(error);
+        renderCueStatus();
+        return false;
+      }
+    }
+
+    /// Add here: the cue goes where the show is now, which is the only way to make one (the backend takes the
+    /// position itself). It is a save, so it re-arms — and any unsaved edit is saved first, because the backend reads
+    /// the file and would otherwise answer with a list that has forgotten what is on screen.
+    async function addCueHere() {
+      if (!hasTauri) {
+        lastSaveFailed = "Nothing was added: this window is not running with the backend.";
+        renderCueStatus();
+        return;
+      }
+      if (cueDirty() && !(await saveCueList())) return;
+      try {
+        adoptCueList(await invoke("add_timecode_cue_from_position"));
+        return;
+      } catch (error) {
+        lastSaveFailed = String(error);
+      }
+      renderCueList();
+    }
+
+    // The controls the row cannot wire for itself: the search box, undo — which is drawn only while there is a local
+    // change to take back — and the Save button, whose unsaved state the panel paints from `isDirty` above.
+    cuePanel.attach({
+      filterInput: document.getElementById("cue-filter"),
+      undoButton: document.getElementById("cue-undo"),
+      saveButton: document.getElementById("cue-save"),
+    });
+
+    // ---- What the snapshot paints ---------------------------------------------------------------------------
+
+    // The clock's own motion. The snapshot arrives every 250 ms and painting it as it arrives makes the frames step
+    // four times a second. There is no position stream to this window (`set_position_sink` feeds the MTC forwarding,
+    // not a window), so the position is interpolated between snapshots: the last position and the moment it arrived
+    // are kept, and an animation frame paints where the timecode has got to since.
+    //
+    // The interpolation never invents a number. Drop-frame stays inside the second it was given, because carrying it
+    // would paint the `;00` and `;01` frame numbers that drop-frame numbering skips; everything else carries into
+    // the second normally, and a poll that never comes leaves the clock at most one second ahead of the last
+    // snapshot rather than running away.
+    let clockBase = null;      // { at, fps, total, receivedAt }
+    let lastState = "nothing";
+    let lastSource = "";
+    let lastPositionText = "";
+
+    function setClockBase(positionText, state, source, dropFrame) {
+      const parsed = parsePositionText(positionText);
+      if (state === "nothing") {
+        // Nothing has ever arrived: there is no position to hold on to, and the readout shows its placeholders.
+        clockBase = null;
+      } else if (parsed) {
+        // Running or stale, the position itself is kept: a stopped clock still has to show where the show *was*, so
+        // the interpolation is frozen rather than thrown away. The rate and the drop-frame flag come from the
+        // snapshot, because the notation itself carries only the numbers.
+        const rate = { rate: snapshotRate, drop_frame: Boolean(dropFrame) };
+        const fps = cueFramesPerSecond(rate);
+        clockBase = { at: { ...parsed, ...rate }, fps, total: cueToFrames(parsed, fps), receivedAt: performance.now() };
+      }
+      if (state === "nothing" || (source && source !== lastSource && lastSource !== "")) {
+        // A source change re-arms the engine (`reset_cues` is called when the ports open and when LTC starts), so the
+        // marks this window is holding are marks about a list the engine no longer has.
+        cuePanel.clearMarks();
+      }
+      lastState = state;
+      lastSource = source || lastSource;
+    }
+
+    /// Where the timecode is now, according to the last snapshot plus what has elapsed since it arrived. A stopped
+    /// position is returned exactly as it arrived: it is the last place the show was, not a guess about where it went.
+    function interpolatedPosition() {
+      if (!clockBase) return null;
+      if (lastState !== "running") return clockBase.at;
+      const elapsed = Math.max(0, (performance.now() - clockBase.receivedAt) / 1000);
+      const advance = Math.min(Math.floor(elapsed * clockBase.fps), clockBase.fps);
+      if (advance <= 0) return clockBase.at;
+      if (clockBase.at.drop_frame) {
+        // Stay inside this second: the numbers drop-frame skips must never be painted.
+        return { ...clockBase.at, frames: Math.min(Number(clockBase.at.frames) + advance, clockBase.fps - 1) };
+      }
+      return { ...clockBase.at, ...cueFromFrames(clockBase.total + advance, clockBase.fps, false) };
+    }
+
+    function advanceSinceSnapshot() {
+      if (!clockBase || lastState !== "running") return 0;
+      const elapsed = Math.max(0, (performance.now() - clockBase.receivedAt) / 1000);
+      return Math.min(Math.floor(elapsed * clockBase.fps), clockBase.fps);
+    }
+
+    let snapshotRate = "25";
+    let snapshotNextFrames = null;
+
+    /// Write text only when it actually changed: this runs on every animation frame, and a frame that rewrites
+    /// identical text is a mutation storm the application measures elsewhere.
+    function setText(node, text) {
+      if (!node) return;
+      const value = String(text ?? "");
+      if (node.textContent !== value) node.textContent = value;
+    }
+
+    function paintClock() {
+      const position = document.getElementById("position");
+      const current = interpolatedPosition();
+      if (position) {
+        if (!current) {
+          setText(position, "--:--:--:--");
+        } else {
+          setText(position, cuePositionText(current));
+        }
+      }
+      // The distance to the next cue counts down with the same interpolation: "in 7.8 s" that only moves four times a
+      // second is the same stutter in the number that matters most before a cue. The countdown states ride on the same
+      // number, because "10 s" and "5 s" are the same arithmetic read against a threshold.
+      if (snapshotNextFrames !== null && clockBase && lastState === "running") {
+        const remaining = Math.max(0, Number(snapshotNextFrames) - advanceSinceSnapshot());
+        const seconds = remaining / clockBase.fps;
+        setText(document.getElementById("next-distance"), `in ${seconds.toFixed(1)} s`);
+        paintCountdown(seconds);
+      } else {
+        paintCountdown(null);
+      }
+    }
+
+    /// The countdown states a playout system publishes — within ten seconds, within five, reached. The words are on
+    /// screen and the colour is the second signal, so a clock read from across a room does not depend on the colour.
+    function paintCountdown(seconds) {
+      const node = document.getElementById("next-warning");
+      if (!node) return;
+      const state = CUE.countdownState(seconds);
+      const label = CUE.countdownLabel(state);
+      if (node.textContent !== label) node.textContent = label;
+      node.hidden = !state;
+      node.classList.toggle("is-last10", state === "last10");
+      node.classList.toggle("is-last5", state === "last5");
+      node.classList.toggle("is-now", state === "now");
+      const title = state === "last10"
+        ? "The next cue is within ten seconds."
+        : state === "last5"
+          ? "The next cue is within five seconds."
+          : state === "now"
+            ? "The next cue's position has been reached: the engine fires it as it crosses."
+            : "";
+      if (node.title !== title) node.title = title;
+    }
+
+    let animationFrame = null;
+    function animate() {
+      paintClock();
+      animationFrame = requestAnimationFrame(animate);
+    }
+
+    function render(snapshot) {
+      const position = document.getElementById("position");
+      const state = document.getElementById("state");
+      const counters = document.getElementById("counters");
+      const source = document.getElementById("source");
+      const stateName = !snapshot || snapshot.state === "nothing" ? "nothing" : snapshot.state === "stale" ? "stale" : "running";
+      lastPositionText = snapshot?.position || "";
+      snapshotRate = snapshot?.rate || snapshotRate;
+      snapshotNextFrames = typeof snapshot?.next_cue_frames === "number" ? snapshot.next_cue_frames : null;
+      position.textContent = snapshot?.position || "--:--:--:--";
+      source.textContent = snapshot?.source || "MTC";
+      state.className = stateName === "nothing" ? "is-nothing" : stateName === "stale" ? "is-stale" : "";
+      // The digits say it too, in the same three states as the page's readout: phosphor, amber when stale, dim when
+      // nothing has ever arrived. Colour is not the only signal — the sentence below says it in words — but a clock
+      // read from across a room has to be legible before the sentence is.
+      position.classList.toggle("is-stale", stateName === "stale");
+      position.classList.toggle("is-nothing", stateName === "nothing");
+      // The sentence lives in `cue-list.js`, which both windows load — it was written by hand in both once already, and
+      // the two copies had drifted apart. `compact` is this window's shape: 420 x 200, read from across a room.
+      state.textContent = CUE.timecodeStateText(snapshot, { compact: true });
+      counters.textContent = `Timecode messages read: ${snapshot?.pieces ?? 0} · complete positions: ${snapshot?.positions ?? 0}`;
+      // The cue-delivery line is drawn from the same snapshot the page polls: a cue the engine fired and the window
+      // has not confirmed is visible here, on the surface an operator watches during the show — not only in the log.
+      // It answers "was anything lost?", and a counter that only appears once something has gone wrong cannot answer
+      // that: while timecode has arrived it is on, with zeros, and only the initial `nothing` state — where there is
+      // nothing to count — keeps it out of the window.
+      const delivery = document.getElementById("delivery");
+      if (delivery) {
+        const fired = Number(snapshot?.cues_fired || 0);
+        const confirmed = Number(snapshot?.cues_delivered || 0);
+        const unconfirmed = Number(snapshot?.fired_unconfirmed || 0);
+        const retried = Number(snapshot?.deliveries_deferred || 0);
+        const lost = Number(snapshot?.deliveries_lost || 0);
+        const live = stateName !== "nothing";
+        // A counted cue can never be hidden by a state that says "nothing": the line exists so that a lost order is
+        // not consumed in silence, so anything counted keeps it on even if the state disagrees.
+        const counted = fired > 0 || retried > 0 || lost > 0 || unconfirmed > 0;
+        delivery.hidden = !live && !counted;
+        delivery.textContent = delivery.hidden
+          ? ""
+          : `Cues fired ${fired} · confirmed ${confirmed} · unconfirmed ${unconfirmed}` +
+            (retried || lost ? ` · retried ${retried} · lost ${lost}` : "");
+        delivery.classList.toggle("is-cue-trouble", unconfirmed > 0 || lost > 0);
+      }
+      // What an operator reads before a cue is due: which one is next, and how long there is.
+      const nextCue = document.getElementById("next-cue");
+      if (snapshot?.next_cue) {
+        nextCue.textContent = snapshot.next_cue;
+        const seconds = snapshot.next_cue_seconds;
+        document.getElementById("next-distance").textContent = typeof seconds === "number" ? `in ${seconds.toFixed(1)} s` : "";
+      } else {
+        nextCue.textContent = "— none";
+        document.getElementById("next-distance").textContent = snapshot?.cues ? `${snapshot.cues} cue(s), none armed ahead` : "";
+      }
+      applySnapshotMarks(snapshot);
+      setClockBase(snapshot?.position || "", stateName, snapshot?.source || "", snapshot?.drop_frame);
+      paintClock();
+    }
+
+    async function poll() {
+      if (!hasTauri) {
+        document.getElementById("state").textContent = "This window is not running with the backend.";
+        return;
+      }
+      try {
+        render(await invoke("timecode_state"));
+      } catch (error) {
+        document.getElementById("state").textContent = `The timecode could not be read: ${String(error)}`;
+      }
+    }
+
+    // Nothing polls while the window is hidden: a clock nobody is looking at costs nothing. The animation frame is
+    // stopped with it, for the same reason.
+    let timer = null;
+    function syncTimer() {
+      const visible = document.visibilityState === "visible";
+      if (visible && timer === null) {
+        timer = setInterval(poll, 250);
+        if (animationFrame === null) animationFrame = requestAnimationFrame(animate);
+        poll();
+      } else if (!visible && timer !== null) {
+        clearInterval(timer);
+        timer = null;
+        if (animationFrame !== null) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
+      }
+    }
+    document.addEventListener("visibilitychange", syncTimer);
+    syncTimer();
+
+    // ---- The pin ---------------------------------------------------------------------------------------------
+    // The pin: the label moves **after** the awaited call succeeds, so the button never claims a state the window
+    // is not in.
+    let pinned = false;
+    document.getElementById("pin").addEventListener("click", async () => {
+      if (!hasTauri || !window.__TAURI__?.window?.getCurrentWindow) {
+        document.getElementById("state").textContent = "This window is not running with the backend.";
+        return;
+      }
+      const wanted = !pinned;
+      try {
+        await window.__TAURI__.window.getCurrentWindow().setAlwaysOnTop(wanted);
+      } catch (error) {
+        document.getElementById("state").textContent = `The pin could not be set: ${String(error)}`;
+        return;
+      }
+      pinned = wanted;
+      const button = document.getElementById("pin");
+      button.classList.toggle("is-on", pinned);
+      button.textContent = pinned ? "Pinned" : "Pin";
+      button.title = pinned
+        ? "This clock stays above every other window. Press again to let other windows cover it."
+        : "Keep this clock above every other window: what a stage wants from a clock on a second screen.";
+    });
+
+    // ---- The chevron: the window grows, and remembers its box ------------------------------------------------
+    //
+    // The pattern is the one index.html and meters.html already use for their own frames: the inner size is what is
+    // saved (`setSize` takes the inner size, so saving the outer one would grow the window by its titlebar on every
+    // launch), a saved size is only restored when it is a sane one, and a frame that cannot answer simply leaves the
+    // window as it is. Growing is comfort, not a requirement: folded, this window is the 420 x 200 clock it always
+    // was, and if the frame refuses to grow the panel is still scrollable inside the height the window has.
+    const CUE_PANEL_KEY = "wing_timecode_cue_panel";
+    const CUE_HEIGHT_KEY = "wing_timecode_cue_height";
+    const COLLAPSED_HEIGHT = 200;
+    const DEFAULT_EXPANDED_HEIGHT = 460;
+    const MIN_EXPANDED_HEIGHT = 300;
+    /// How long the window waits for the frame's own resize event before reading the box again. Bounded on purpose:
+    /// a frame that applies the size without ever announcing it must not leave the panel waiting for a measurement.
+    const RESIZE_SETTLE_MS = 500;
+
+    /// The height this window asks for when the panel unfolds, clamped to something that is a clock with a list
+    /// rather than a full-screen window or a strip.
+    function rememberedExpandedHeight() {
+      const stored = Number(readStored(CUE_HEIGHT_KEY));
+      if (!Number.isFinite(stored) || stored < MIN_EXPANDED_HEIGHT) return DEFAULT_EXPANDED_HEIGHT;
+      // Sane range only: a saved height comes from a window that was dragged, and one left over from a taller screen
+      // must not ask for a window this one cannot show. The frame refuses a size it will not take, so the ceiling is
+      // the operator's own display.
+      return Math.max(MIN_EXPANDED_HEIGHT, Math.min(Math.round(stored), 2000));
+    }
+
+    /// The frame's **own** answer about the window's size, or `null` when there is no frame that can answer.
+    ///
+    /// `read_window_box` returns the inner size in **logical points**, which is the unit `setSize` is given, so the
+    /// two numbers are directly comparable — that is the whole point of the command. A frame that is gone by the time
+    /// the window asks is not a failure of the panel: the panel keeps its scroll and the fit is simply not known.
+    async function frameBox() {
+      if (!hasTauri || typeof invoke !== "function") return null;
+      try {
+        const box = await invoke("read_window_box");
+        return box && Number.isFinite(Number(box.height)) ? box : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    /// A `resize` listener that answers once. `win.onResized` is the frame's own event; a frame that does not offer
+    /// one is simply waited out by the deadline in `requestHeight`.
+    function frameResizedOnce() {
+      const win = window.__TAURI__?.window?.getCurrentWindow?.();
+      if (!win || typeof win.onResized !== "function") return Promise.resolve();
+      return new Promise((resolve) => {
+        let unlisten = null;
+        const done = () => {
+          if (typeof unlisten === "function") unlisten();
+          resolve();
+        };
+        Promise.resolve(win.onResized(done)).then((stop) => { unlisten = stop; }).catch(done);
+      });
+    }
+
+    /// What came of the last size the window asked for. This is deliberately a measurement and not a sentence: the
+    /// row **says** what happened (a frame that is maximised, or a display whose work area is the ceiling, are the two
+    /// real answers a window that did not grow has). It is kept where it can be checked rather than only claimed.
+    let lastFit = null;
+
+    /// The one sentence a window that asked the frame to grow and did not get it owes the operator: **which** of
+    /// the real answers it is. A frame that is already maximised, a window filling the display, and a display whose
+    /// work area is the ceiling have three different cures, and "it did not grow" with no reason is the answer this
+    /// application never gives. The two heights are in the same unit the window asked in, so the operator can
+    /// compare them without converting anything.
+    function fitSentence(fit) {
+      if (!fit || fit.grew !== false) return "";
+      const asked = Math.round(fit.requested) + " pt";
+      const ceiling = Number.isFinite(fit.monitorWorkHeight)
+        ? ` This display offers ${Math.round(fit.monitorWorkHeight)} pt of height.`
+        : "";
+      const scrolls = " The cue list scrolls inside the height it has.";
+      if (fit.maximized) {
+        return `The window asked for ${asked} of height and did not grow: it is already maximised.${ceiling}${scrolls}`;
+      }
+      if (fit.fullscreen) {
+        return `The window asked for ${asked} of height and did not grow: it is filling the display.${ceiling}${scrolls}`;
+      }
+      if (fit.measured) {
+        return `The window asked for ${asked} of height and has ${Math.round(fit.actual)}: this frame would not grow it.${ceiling}${scrolls}`;
+      }
+      return `The window asked for ${asked} of height and the frame gave no measurement, so this window cannot say how tall it is.${scrolls}`;
+    }
+
+    /// The sentence lives in the panel it is about: folded, nothing needs the height, and a line about a window
+    /// that did not grow would be noise on a clock that is exactly the size it wants to be.
+    function renderFitLine(fit) {
+      const line = document.getElementById("cue-fit");
+      if (!line) return;
+      const text = fit ? fitSentence(fit) : "";
+      if (line.textContent !== text) line.textContent = text;
+      line.hidden = !text;
+    }
+
+    function recordFit(fit) {
+      lastFit = fit;
+      try { window.__CUE_FIT = fit; } catch (_) { /* a window with no global is still a window */ }
+      renderFitLine(panelIsOpen() ? fit : null);
+    }
+
+    async function requestHeight(height) {
+      const api = window.__TAURI__?.window;
+      const win = api?.getCurrentWindow?.();
+      if (!hasTauri || !win || typeof win.setSize !== "function" || typeof api?.LogicalSize !== "function") {
+        // No frame to ask, or a frame that cannot be resized: the panel keeps its scroll and nothing claims a size.
+        recordFit({ requested: Math.round(height), actual: null, grew: false, measured: false });
+        return false;
+      }
+      const wanted = Math.round(height);
+      try {
+        await win.setSize(new api.LogicalSize(Math.max(260, Math.round(window.innerWidth) || 420), wanted));
+      } catch (_) {
+        // A refused size leaves the window where it is; the panel is still usable with scroll.
+        recordFit({ requested: wanted, actual: null, grew: false, measured: false });
+        return false;
+      }
+      // A request is not an outcome. `setSize` resolving means the frame accepted the call, not that the window has
+      // that size: it can clamp to the display, apply it on a later turn, or already be maximised and do nothing.
+      let box = await frameBox();
+      if (box && Math.abs(Number(box.height) - wanted) > 1) {
+        // Give the frame its moment: wait for its own resize event, with a deadline so a frame that never speaks
+        // cannot leave the panel waiting on a measurement that is not coming.
+        await Promise.race([frameResizedOnce(), new Promise((resolve) => setTimeout(resolve, RESIZE_SETTLE_MS))]);
+        box = (await frameBox()) || box;
+      }
+      const actual = box ? Number(box.height) : null;
+      const fit = {
+        requested: wanted,
+        actual,
+        // The comparison is only ever made against the frame's own report. With no report there is nothing to claim,
+        // which is why `measured` is its own field rather than being folded into a `false`.
+        grew: actual !== null && Math.abs(actual - wanted) <= 1,
+        measured: box !== null,
+        maximized: Boolean(box?.maximized),
+        fullscreen: Boolean(box?.fullscreen),
+        monitorWorkHeight: Number.isFinite(Number(box?.monitorWorkHeight)) ? Number(box.monitorWorkHeight) : null,
+      };
+      recordFit(fit);
+      return fit.grew;
+    }
+
+    function panelIsOpen() {
+      const panel = document.getElementById("cue-panel");
+      return Boolean(panel) && !panel.hidden;
+    }
+
+    /// The panel is never shorter than one cue row.
+    ///
+    /// It is a scroll box, and a scroll box smaller than its own item cannot show that item however far it is
+    /// scrolled: measured at 420 x 200 — the box a frame that refuses to grow leaves — the panel was 21.5px tall
+    /// against a 23px row, so scrolling to the end left the last cue hanging 6px out of the top of the box, and the
+    /// operator's question ("is the last cue reachable?") was answered "no" by a window that claimed to scroll.
+    ///
+    /// The floor is **measured from the row itself** rather than written here as a number: the row's look lives in
+    /// `cue-list.js`, so a copy of its height in this file would drift the first time that file changes (the project
+    /// has paid for that lesson more than once). Measured chrome is the panel's own padding and borders, which are
+    /// this file's.
+    function fitCuePanelFloor() {
+      const panel = document.getElementById("cue-panel");
+      const row = panel?.querySelector(".cue-row");
+      if (!panel || !row) return;
+      const style = getComputedStyle(panel);
+      const chrome = ["paddingTop", "paddingBottom", "borderTopWidth", "borderBottomWidth"]
+        .map((name) => Number.parseFloat(style[name]) || 0)
+        .reduce((total, value) => total + value, 0);
+      panel.style.minHeight = `${Math.ceil(row.getBoundingClientRect().height + chrome)}px`;
+    }
+
+    /// Show or hide the panel, and ask the frame for the size the panel needs **after** the layout it belongs to —
+    /// a control never announces a state the window is not in, and the size is only ever asked for, never assumed.
+    /// `askFrame` is false in exactly one case: a window that opens already folded. There is nothing to restore — it
+    /// is the size it opened at — and asking for 200 would shrink a window the operator had deliberately made taller.
+    async function setPanelOpen(open, askFrame = true) {
+      const panel = document.getElementById("cue-panel");
+      const toggle = document.getElementById("cue-panel-toggle");
+      if (!panel || !toggle) return;
+      panel.hidden = !open;
+      // The open box is a different shape from the folded clock, and the stylesheet is told so before the frame is
+      // asked for a height: at 420 x 200 the rhythm between the clock's blocks is what gives the panel its row.
+      document.body.classList.toggle("cue-open", open);
+      if (open) fitCuePanelFloor();
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.textContent = open ? "▾ Cues" : "▸ Cues";
+      toggle.classList.toggle("is-on", open);
+      writeStored(CUE_PANEL_KEY, open ? "open" : "closed");
+      if (!askFrame) {
+        // A window that opens already folded (or already unfolded) is not asking for anything: it shows the state
+        // it is in and nothing else.
+        renderFitLine(open ? lastFit : null);
+        return;
+      }
+      if (open) {
+        await requestHeight(rememberedExpandedHeight());
+      } else {
+        await requestHeight(COLLAPSED_HEIGHT);
+      }
+      // Folded, the sentence goes away with the panel it was about.
+      renderFitLine(open ? lastFit : null);
+    }
+
+    document.getElementById("cue-panel-toggle").addEventListener("click", () => {
+      setPanelOpen(!panelIsOpen());
+    });
+
+    // A window the operator resizes while the panel is open is the size they want it to come back at: the remembered
+    // height follows the frame, not the other way round. Below the minimum it is not an expanded box at all — that is
+    // the window being folded by its edge — and it is not remembered as one.
+    let heightTimer = null;
+    window.addEventListener("resize", () => {
+      if (!panelIsOpen()) return;
+      clearTimeout(heightTimer);
+      heightTimer = setTimeout(() => {
+        if (!panelIsOpen()) return;
+        const height = Math.round(window.innerHeight);
+        if (height >= MIN_EXPANDED_HEIGHT) writeStored(CUE_HEIGHT_KEY, String(height));
+      }, 400);
+    });
+
+    // ---- The panel's controls -------------------------------------------------------------------------------
+
+    document.getElementById("cue-sort").addEventListener("change", (event) => {
+      const wanted = String(event.target.value);
+      if (!CUE_SORT_MODES.includes(wanted)) return;
+      cueSort = wanted;
+      // The key is only what the other window hears about the change through. The show's own copy of the choice is
+      // written into the cue file by the save below — and writing the list **re-arms every cue**, which is why the
+      // save is not done in the background: the operator reads its answer in the status line.
+      writeStored(CUE_SORT_KEY, wanted);
+      renderCueList();
+      saveCueList();
+    });
+    window.addEventListener("storage", (event) => {
+      if (event.key === CUE_SORT_KEY && CUE_SORT_MODES.includes(event.newValue)) {
+        cueSort = event.newValue;
+        renderCueList();
+      }
+      if (event.key === CUE_PANEL_KEY) setPanelOpen(event.newValue === "open");
+    });
+
+    document.getElementById("cue-save").addEventListener("click", () => { saveCueList(); });
+    document.getElementById("cue-add-here").addEventListener("click", () => { addCueHere(); });
+
+    // The engine's announcements reach this window too (`main.rs` emits to whoever is listening), and they are what
+    // paints "fired" and "skipped". A skipped cue is not a fired one and is never painted as one: conflating the two
+    // is how a rehearsal is lost. The same announcement feeds the "what just happened" line, with the wall-clock time
+    // it arrived — a clock that only says what is about to happen never answers "did that fire?".
+    async function listenForCueEvents() {
+      if (!hasTauri || typeof window.__TAURI__?.event?.listen !== "function") return;
+      try {
+        await window.__TAURI__.event.listen("timecode-cue", (event) => {
+          const payload = event?.payload || {};
+          const kind = payload.event?.kind || payload.kind;
+          const id = payload.event?.id ?? payload.id;
+          const at = payload.event?.at ?? payload.at;
+          if (kind === "fired") {
+            markCue(id, "fired");
+            rememberCueEvent("fired", id, at, CUE.wallClock());
+          } else if (kind === "skipped") {
+            markCue(id, "skipped");
+            rememberCueEvent("skipped", id, at, CUE.wallClock(), {
+              // **`payload.event`, not `event`**: the listener's own parameter is the Tauri envelope, and the skip's
+              // facts are inside it. Reading the envelope here is how the why reaches the line as `undefined` and the
+              // two kinds of skip go back to looking the same — which is the defect this whole change removes.
+              across_silence: payload.event?.across_silence,
+              jumped_ms: payload.event?.jumped_ms,
+              arrival_gap_ms: payload.event?.arrival_gap_ms,
+            });
+          } else if (kind === "rearmed") {
+            cuePanel.clearMarksAfter(payload.event?.position ?? payload.position);
+          }
+        });
+      } catch (_) { /* a clock that cannot hear the engine still shows the position */ }
+      // Orders that fired while this window was not listening are recovered from the ledger, which `reads without
+      // removing`: confirming them is the other window's job, because running the macro is. This one only paints.
+      // The ledger carries no wall-clock time, so these entries are recorded without one and the line says so.
+      try {
+        const pending = await invoke("timecode_pending_cues");
+        for (const entry of Array.isArray(pending) ? pending : []) {
+          const kind = entry?.event?.kind;
+          if (kind === "fired") {
+            markCue(entry.event.id, "fired");
+            cueHistory.record({ kind: "fired", id: entry.event.id, at: entry.event.at, name: cueNameOf(entry.event.id), wall: "" });
+          }
+          if (kind === "skipped") {
+            markCue(entry.event.id, "skipped");
+            cueHistory.record({ kind: "skipped", id: entry.event.id, at: entry.event.at, name: cueNameOf(entry.event.id), wall: "",
+              across_silence: entry.event.across_silence, jumped_ms: entry.event.jumped_ms, arrival_gap_ms: entry.event.arrival_gap_ms });
+          }
+        }
+        renderCueHistory();
+      } catch (_) { /* no ledger to read is not a failure */ }
+    }
+
+    // A window left unfolded comes back unfolded, at the height it was left at — that is the whole point of
+    // remembering the box. A window left folded asks the frame for nothing on the way in: it is already the size it
+    // opened at, and asking for 200 could only shrink one the operator had made taller.
+    const rememberedOpen = readStored(CUE_PANEL_KEY) === "open";
+    setPanelOpen(rememberedOpen, rememberedOpen);
+    /// **The list changed somewhere else.** Every write — a save here, an add, an import, a station-backup restore —
+    /// goes through **one** backend door, which announces it with the list it installed. Carrying the list is what
+    /// makes this simple and honest: this window can ask *"is that what I have?"* by comparing, instead of holding a
+    /// flag across an `await` that a refusal or a throw could leave set. The event is emitted before the command
+    /// returns, so the window that made the change hears its own echo while its `invoke` is still in flight — with the
+    /// previous list on its saved side and its edits on the draft side — and without the payload that echo would be
+    /// indistinguishable from somebody else's change.
+    ///
+    /// Three cases, and the last is the one that matters:
+    ///   * the published list **is** the one this window has: nothing to do and nothing to say — it is our own echo;
+    ///   * it differs and there is **nothing unsaved** here: take it, which is what makes two editors of one file
+    ///     agree instead of drifting apart until somebody looks;
+    ///   * it differs and there **are** unsaved edits: keep them and **say so**, because a window that adopted a
+    ///     foreign list over the operator's typing would lose work, and one that said nothing would leave the two
+    ///     windows disagreeing in silence.
+    async function listenForCueListChanges() {
+      if (!hasTauri || typeof window.__TAURI__?.event?.listen !== "function") return;
+      try {
+        await window.__TAURI__.event.listen("timecode-cues-changed", (event) => {
+          const published = event?.payload;
+          if (!published || !Array.isArray(published.cues)) return;
+          // **What this window HOLDS, not just the cue array.** It carries the offset, the order and the drive mode
+          // even though it owns none of those controls, and a published list whose cues are byte-identical can still
+          // be a change to one of the other three. Comparing the array alone made an offset-only change reach nobody:
+          // this window returned early, and so did the other two, while the offsets quietly disagreed.
+          const sameHeld =
+            JSON.stringify(published.cues) === JSON.stringify(savedCues) &&
+            Math.trunc(Number(published.offset_frames ?? 0)) === Math.trunc(Number(offsetFrames ?? 0)) &&
+            String(published.sort ?? CUE.SORT_MODES[0]) === String(savedSort ?? CUE.SORT_MODES[0]) &&
+            String(published.drive ?? CUE.DRIVE_MODES[0]) === String(cueDrive ?? CUE.DRIVE_MODES[0]);
+          // Deliberately **not** `cueDirty()`: that rule answers "is anything unsaved here", and it ignores the offset
+          // and the drive because this window owns neither. Using it here would be wrong twice — missing an offset
+          // somebody else changed, and calling a foreign change our own.
+          if (sameHeld) return;
+          if (cueDirty()) {
+            cueListChangedElsewhere =
+              // Said without claiming anything that can stop being true. "Your unsaved changes are kept here" was
+              // false the moment the operator pressed Undo until the draft matched what is saved — the window is still
+              // showing an out-of-date list, and that part never stops being the case.
+              "The cue list was changed in another window, and this window is still showing the version it had. Saving here would replace that change.";
+            renderCueStatus();
+            return;
+          }
+          cueListChangedElsewhere = "";
+          adoptCueList(published);
+        });
+      } catch (_) { /* a window that cannot hear the other one still edits the list */ }
+    }
+
+    listenForCueEvents();
+    listenForCueListChanges();
+    loadCueList();
+  </script>
+</body>
+</html>

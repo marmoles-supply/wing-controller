@@ -1,0 +1,13 @@
+[package]
+name = "wing-runtime"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license-file = "../../LICENSE"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+wing-core = { path = "../wing-core" }
+

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · one frozen element among two same-path columns</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* RULE 4e. The trap of UI_SYSTEM.md §3, in the two-column shape: `--card-face` aliases the light face at `:root`,
+     so the light column's card keeps rgb(192,192,192) in both renderings, while the dark column's own
+     `--win-btn-face` follows the theme and changes. */
+  :root { --card-face: var(--win-btn-face); }
+  .columns { display: flex; gap: var(--space-4); }
+  /* Four wrappers deep on purpose. `collect.mjs`'s `chain` stops after five levels, so the light card and the dark
+     card report the **same** `path` (`div.w1 > div.w2 > div.w3 > div.w4 > div.card`): the two columns are identical
+     markup, and the `section` that tells them apart is the sixth ancestor, above the cap. Pairing the two renderings
+     by that truncated path collapses them onto one key, so the light card is judged against the dark column's card
+     (which changed) and its frozen background is never reported. Only a full structural key separates them. */
+  [data-theme="dark"] {
+    --win-btn-face: #222527;
+    --win-text: #e0e6ed;
+    --win-btn-highlight: #3a3f42;
+    --win-btn-dark-shadow: #08090a;
+    --line-light: #44504c;
+    --line-dark: #0d100f;
+    --crt: #030806;
+  }
+</style>
+</head>
+<body>
+  <div class="columns">
+    <section data-theme="light" aria-label="the light theme">
+      <div class="w1"><div class="w2"><div class="w3"><div class="w4">
+        <div class="card" style="background: var(--card-face)">frozen to the light face</div>
+      </div></div></div></div>
+    </section>
+    <section data-theme="dark" aria-label="the dark theme">
+      <div class="w1"><div class="w2"><div class="w3"><div class="w4">
+        <div class="card" style="background: var(--win-btn-face)">this one follows the theme</div>
+      </div></div></div></div>
+    </section>
+  </div>
+</body>
+</html>

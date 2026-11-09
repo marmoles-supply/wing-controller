@@ -1,0 +1,311 @@
+/* WING CONTROLLER — the kit's composition layer: the four rules a window is built on.
+ *
+ * WHAT THIS IS. `tokens.css` gives a page the kit's **values** and `components.css` gives it the kit's **drawings** —
+ * a button, a well, a card. Neither of them says how a *window* is put together, and that gap was measured rather than
+ * assumed. A consumer in a sibling repository adopted the kit, linked `components.css`, deleted every control rule of
+ * its own, passed the conformance suite in all five windows and both themes — and the owner still rejected its UI four
+ * times, because every consumer was composing the plan by guessing. Its own words: "con copiar cuatro reglas no es
+ * tener el plano: sigo sin saber QUÉ tarjeta va en qué columna, cuáles se pliegan, cuál es fija, y cómo se reparte el
+ * alto." The four rules it had copied by hand live inside this repository's `desktop/ui/index.html`, a 32,000-line file
+ * no consumer can search. This file is where they live now, named and documented, and `design/layout.html` is the
+ * composed mockup of them. It is the same move that turned the button into `components.css`.
+ *
+ * LOAD ORDER — the values, the drawings, the plan, then your own sheet:
+ *
+ *     <link rel="stylesheet" href="tokens.css">        <!-- 1. the kit's values -->
+ *     <link rel="stylesheet" href="components.css">    <!-- 2. the kit's drawings of them -->
+ *     <link rel="stylesheet" href="layout.css">        <!-- 3. the kit's plan, which this file is -->
+ *     <style>…</style>                                 <!-- 4. the window's own rules, last -->
+ *
+ * **THE FOUR RULES, AND WHERE THEY WERE MEASURED.** Every one of them is in `desktop/ui/index.html` today; the line
+ * numbers below are that file at v0.2.95.
+ *
+ *   1. **`main`** (`:108`) — the page's own width and margin. The window is `min(1500px, 100vw − 20px)`, centred, and
+ *      it never touches the edge of the desktop however wide the screen is.
+ *   2. **`header.master-header`** (`:2937`) — the window's title strip: one flex row, `space-between`, so the brand
+ *      sits left, the transport in the middle and the window's own buttons right. Its *drawing* (raised, `--face-2`) is
+ *      `components.css`'s `.c-panel-head`; this file only says it is a row. The chain is
+ *      `<main> -> <header class="master-header"> -> .layout -> .stack of cards`, and it is the whole skeleton.
+ *   3. **`.layout`** (`:170`) — the plan itself: two columns with a 6px seam between them, and nothing else.
+ *      `grid-template-columns: minmax(480px, 1fr) 6px minmax(260px, var(--ops-col-width))`. Three facts are in that one
+ *      line, and they are the three a consumer could not guess:
+ *        * the **left column is the work area** and it is the flexible one (`1fr`, floor 480px): it grows with the
+ *          window and holds the cards the operator is working in;
+ *        * the **right column is the operator column** (`--ops-col-width`, floor 260px): it is as wide as the operator
+ *          dragged it, and it does not grow;
+ *        * the **middle 6px is the seam** — the grab handle between them, which is why `column-gap` is **0**: with a
+ *          gap the seam would carry 8px of air on each side and the two blocks would stand 24px apart, twice as airy
+ *          as everything else (`index.html:173-175`, measured).
+ *   4. **`.stack` and `.builder-column`** (`:258`, `:270`) — `display: grid; gap: 8px` and the same plus `min-width: 0`.
+ *      **Everything in a window is a stack of cards with one 8px gap**, and `min-width: 0` is what lets a column shrink
+ *      below the width of its own content instead of pushing the plan off the screen.
+ *
+ * **THE FRAME, WHICH IS NOT ONE OF THE FOUR, AND WHY IT IS HERE.** `body` is the ground the window is placed on and the
+ * five things every drawing inherits from it: the desk, the ink, the interface family, the base size and the line box.
+ * It is a **frame** and not a **drawing** — `components.css` draws what a page puts inside a window, this file arranges
+ * the page and its window — which is the same reason `main` is here one level out. It is not a new idea: the
+ * application's own main window has carried it all along (`desktop/ui/index.html:81-90`), and both pages that compose a
+ * frame in this kit wrote it by hand until a stranger building a window from the kit reported the gap verbatim — "the
+ * kit has no `body` rule, and `1.35` is a literal in no token, repeated in two kit files" (`design/CANON_PLAN.md`, P1's
+ * third criterion, finding 4). The literal is now the kit's `--leading-base` (`design/tokens.json`), and both pages
+ * link this file and write none of the rule. `margin: 0` comes with the frame: both pages zeroed the body margin
+ * beside their own rule, and `main`'s width is `100vw`-based, so a page that inherits the platform's 8px overflows on a
+ * browser with a classic scrollbar. **A page that wants a different frame writes its own rule after this link** —
+ * `UI_SYSTEM.md` §10's cascade rule, and the reason this is a plan and not a lock.
+ *
+ * **WHICH CARD GOES WHERE, WHICH COLLAPSE, WHICH IS FIXED, AND HOW THE HEIGHT IS SHARED** — the four questions the
+ * consumer wrote down, answered here rather than left to be inferred from the rules:
+ *
+ *   * the **work area** (left) holds the window's own subject: the list, the editor, the detail. Its cards do not
+ *     collapse — the operator is working in them and folding one away would hide the work;
+ *   * the **operator column** (right) holds the window's standing instruments — what the operator checks rather than
+ *     edits. Its cards are the ones that fold (`.is-collapsed` below), because it is the column that has to fit a
+ *     screenful of readouts beside somebody else's work;
+ *   * the operator column is the **fixed** one: `position: sticky` with `top: var(--space-4)` and
+ *     `max-height: calc(100vh - var(--space-6))` plus `overflow: auto`, so it stays in view and scrolls **inside
+ *     itself** while the work area scrolls with the document;
+ *   * the **height is not shared**: `.layout` is `align-items: start`, so each column is as tall as its own content and
+ *     the shorter one does not stretch. The plan shares a *row*, not a height — which is why the operator column needs
+ *     the sticky rule above to stay useful;
+ *   * **a window whose bars are pinned must say so in its own rule**: the guide (`desktop/ui/guide.html`) is a document
+ *     window — `100vh` with `grid-template-rows: auto 1fr auto` and one scrolling pane — and it measured that this
+ *     `start` shrank its sidebar to its own content and grew the article to 1481px inside a 1000px window, where the
+ *     article painted over the status bar (`elementFromPoint(800, 990)` returned an article paragraph, the status line
+ *     was cut mid-word and the version and build number were not painted), so its own `.layout` rule carries
+ *     `align-items: stretch`;
+ *   * `.layout.sidebar-left` (`:181`) is the same plan mirrored: for a window whose instruments belong on the left, the
+ *     two column tracks swap and each block is placed by `grid-column`. The seam moves with them.
+ *
+ * **WHAT IS A TOKEN AND WHAT IS THE PLAN'S OWN NUMBER.** `--ops-col-width` is a kit token (`design/tokens.json`,
+ * measured from `index.html:172`'s `var(--ops-col-width, 420px)`) because it is the one part of the plan the operator
+ * resizes, and a consumer that guessed 420px was reading a default rather than a decision. The two **floors** (480px,
+ * 260px) are deliberately not tokens: they are the smallest widths at which the application's own cards still read, so
+ * they belong to this plan and not to the palette. `--desk` is the kit's token for the ground the windows stand on
+ * (`layout.html` paints it), and every gap and padding here is a `--space-*` step — the application's own 10px and 20px
+ * page padding became `--space-4` (8px) and `--space-6` (16px), the nearest steps on the kit's grid, because a
+ * composition layer that carries its own pixel values is the second answer this kit exists to remove.
+ *
+ * **THE BEVEL, SO NOBODY READS THIS FILE AS THE OTHER ONE.** The kit's bevel is **one pair** (`UI_SYSTEM.md` §4 rule 2,
+ * `components.css`). This application's own controls draw a **second inner step** (`index.html:1305-1318`, the light
+ * `--face-3` over the dark `--line-mid`) which the suite reports as rule 1 `two-shapes`; it is a **declared deviation**
+ * of that window (`design/conformance/allow.mjs`), not a second bevel the kit names. This file uses the kit's one pair,
+ * so a page built from it looks like the kit: if you want the application's heavier face, declare the deviation in your
+ * own allowance file with its reason — see `design/adopt/README.md` step 6 for the measurement and why the drawing was
+ * deliberately left alone.
+ *
+ * **A LAYOUT CLASS IS A PAGE-WIDE NAME, AND THAT IS A REAL COST.** These names are the application's own, kept as they
+ * are so that a window which already composes itself this way — and the consumer that copied the four rules — can link
+ * this file and delete its own copies with nothing renamed. The price is that `.stack`, `.layout` and `.column-resizer`
+ * are names a page may already use for something else, and a rule of yours that comes **after** this link does not
+ * override it, it **fights** it (`UI_SYSTEM.md` §10). If your page carries one of these names and means something
+ * different by it, rename yours or do not link this file: do not rely on the cascade to settle it.
+ *
+ * **NO JAVASCRIPT, AND NO NATIVE FORM.** There is nothing to run here: the collapse is a class and the seam is a grid
+ * track. The drag that `column-resizer` invites in the application belongs to the window that owns it — this file
+ * carries the seam's *width and place*, not its pointer handlers. `design/native/WingTheme.swift` is generated from
+ * `design/tokens.json` and carries **values**; a composition is CSS, and it has no member there on purpose.
+ *
+ * NOTE ON STALENESS. The four rules are quoted from `desktop/ui/index.html` at v0.2.95 and the file moves. When a
+ * window's own comments and this one disagree, **the window is the measurement and this file is the copy** — and the
+ * copy is stale, not the window.
+ */
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 0. `body` — the page's frame. The ground, the ink, the interface family, the base size and the line box: everything
+ *    inside the window inherits it, and `components.css` draws none of it because a drawing is what a page puts inside
+ *    a window. Both composed pages wrote this rule by hand (`design/layout.html` and `design/reference-window/index.html`
+ *    each carried the same five declarations and the literal `1.35`), and a page that keeps its own copy is the second
+ *    answer this kit exists to remove. The line box is the kit's `--leading-base`, measured from the application's own
+ *    window (`desktop/ui/index.html:81-90`), not invented here. `margin: 0` is part of the frame and not a preference:
+ *    `main`'s width is `100vw`-based, so a page that inherits the platform's 8px body margin overflows on a browser
+ *    that draws a classic scrollbar.
+ * --------------------------------------------------------------------------------------------------------------- */
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--win-font);
+  font-size: var(--font-base);
+  line-height: var(--leading-base);
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 1. `main` — the window's width on the desktop (§2 of `UI_SYSTEM.md` §1's "arrangement is the window's" is the rule
+ *    this file departs from, once, on purpose: the kit now offers the application's own plan as a starting point).
+ * --------------------------------------------------------------------------------------------------------------- */
+main {
+  position: relative;
+  width: min(1500px, calc(100vw - var(--space-6)));
+  margin: 0 auto;
+  /* The application measures 10px above and 20px below (`index.html:112`); the kit's grid has no 10 or 20, so the plan
+   * takes the nearest steps and says so rather than carrying the pixels. */
+  padding: var(--space-4) 0 var(--space-6);
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 2. The master header — the window's title strip. Its drawing is `components.css`'s `.c-panel-head` (raised,
+ *    `--face-2`); what this rule adds is only the arrangement: one row, brand left, transport middle, buttons right.
+ * --------------------------------------------------------------------------------------------------------------- */
+header.master-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 3. The plan: two columns and the seam between them.
+ * --------------------------------------------------------------------------------------------------------------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(480px, 1fr) var(--space-3) minmax(260px, var(--ops-col-width));
+  /* The seam is the grid's own third track: a `column-gap` would put 8px of air on each side of it and the two blocks
+   * would stand 24px apart, twice as airy as the rest of the window (`index.html:173-175`). */
+  column-gap: 0;
+  row-gap: var(--space-4);
+  /* A shell whose content STRETCHES: the work area and the operator column fill the window's height, and a
+     window that pins bars top and bottom does not want this. The guide is one - its own `.layout` rule sets
+     `align-items: stretch`, and that is the window declaring its shell rather than working around this sheet.
+     Without it, measured 2026-10-08: the sidebar and the content pane stop filling, the document grows to 1481px
+     inside a 1000px window, and the article paints over the status bar. Say which shell a window is, in the window. */
+  align-items: start;
+  position: relative;
+}
+
+/* The same plan mirrored, for a window whose instruments belong on the left. The tracks swap and each block is placed
+ * by `grid-column`, so the markup keeps its reading order. */
+.layout.sidebar-left {
+  grid-template-columns: minmax(260px, var(--ops-col-width)) var(--space-3) minmax(480px, 1fr);
+}
+.layout.sidebar-left .builder-column {
+  grid-column: 3;
+}
+.layout.sidebar-left .column-resizer {
+  grid-column: 2;
+}
+.layout.sidebar-left .ops-column {
+  grid-column: 1;
+}
+
+/* The seam: 6px of the grid, with a 2px grip drawn down its middle. It shows the desktop behind the window (it has no
+ * background of its own), which is what makes it read as a gap rather than as a third column. */
+.column-resizer {
+  width: var(--space-3);
+  align-self: stretch;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.resizer-handle {
+  width: 2px;
+  height: 42px;
+  background: var(--line);
+}
+
+/* THE OPERATOR COLUMN IS THE FIXED ONE. It stays in view and scrolls inside itself; the work area scrolls with the
+ * document. `--space-6` is the application's own 16px (`index.html:266`). */
+.ops-column {
+  position: sticky;
+  top: var(--space-4);
+  max-height: calc(100vh - var(--space-6));
+  overflow: auto;
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 4. The stacks: everything in a window is a stack of cards sharing one 8px gap.
+ * --------------------------------------------------------------------------------------------------------------- */
+.stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* `min-width: 0` is not decoration: without it a grid item refuses to shrink below its own content's width and the
+   plan is pushed wider than the window — the failure this one declaration exists to prevent. */
+.builder-column {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 5. The folded card — the operator column's answer to "how does a column of readouts fit a screenful".
+ *    The drawing is `components.css`'s `.c-card`; this is the state, and it is one class on the card:
+ *
+ *        <section class="c-card is-collapsed">
+ *          <div class="c-card-head">
+ *            <span>The region this card is for</span>
+ *            <span class="c-chip card-summary">what it reports while folded</span>
+ *          </div>
+ *          <div>…the body, which folding removes…</div>
+ *        </section>
+ *
+ *    The head stays, every other child goes, and the summary chip — hidden while the card is open — is what the
+ *    operator reads instead of the body. Nothing is animated: the state is information (§4 rule 3).
+ * --------------------------------------------------------------------------------------------------------------- */
+.card-summary {
+  display: none;
+}
+.c-card.is-collapsed > :not(.c-card-head) {
+  display: none;
+}
+.c-card.is-collapsed > .c-card-head {
+  margin-bottom: 0;
+}
+.c-card.is-collapsed > .c-card-head .card-summary {
+  display: inline-flex;
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 6. The plan is not one width, and leaving this out is how a consumer gets the bug the application already fixed:
+ *    "between ~1041px and ~1189px the grid did not fit (480 + 6 + the column) and the page overflowed horizontally:
+ *    the right column appeared cut off by the window edge" (`index.html:2830-2833`, and it was measured, not feared).
+ *    Two bands, both the application's own, and the reason each exists is inside it.
+ * --------------------------------------------------------------------------------------------------------------- */
+
+/* Below 1400px the operator column is limited to what is actually free. Without this the plan needs 480 + 6 + 420 =
+   906px of grid and pushes past the window between roughly 1041px and 1189px. */
+@media (max-width: 1400px) {
+  .layout,
+  .layout.sidebar-left {
+    grid-template-columns:
+      minmax(420px, 1fr)
+      var(--space-3)
+      minmax(260px, min(var(--ops-col-width), calc(100vw - 470px)));
+  }
+}
+
+/* Below 1180px the plan becomes one column: there is no seam to drag, nothing to keep sticky, and the master header
+   stacks instead of overflowing (the application measured 83px of overflow at 1041px of width, `index.html:2860-2862`).
+   **One deliberate difference from the application, and it is a correction rather than a preference:** the application
+   resets `.layout.sidebar-left`'s `grid-column` placements at 1040px, one band later, so between 1041px and 1180px the
+   mirrored plan places its blocks in tracks 3, 2 and 1 of a one-track grid. This file resets them in the same band as
+   the switch, because a placement that addresses a track that no longer exists is not a plan. */
+@media (max-width: 1180px) {
+  .layout,
+  .layout.sidebar-left {
+    grid-template-columns: 1fr;
+  }
+  .layout.sidebar-left .builder-column,
+  .layout.sidebar-left .ops-column,
+  .layout.sidebar-left .column-resizer {
+    grid-column: auto;
+  }
+  .column-resizer {
+    display: none;
+  }
+  .ops-column {
+    position: static;
+    max-height: none;
+  }
+  header.master-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+}

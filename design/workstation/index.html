@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WING workstation · working template</title>
+  <link rel="stylesheet" href="../tokens.css">
+  <link rel="stylesheet" href="../components.css">
+  <link rel="stylesheet" href="../workstation.css">
+  <link rel="stylesheet" href="../surfaces.css">
+  <style>
+    /* Subject layout only. Do not redraw the shared chrome here. */
+    #library { display: grid; gap: 4px; margin: 8px 0; }
+    #library button { text-align: left; }
+    #editor label { display: grid; gap: 4px; }
+    #editor { display: grid; gap: 8px; }
+    #activity { min-height: 80px; max-height: 200px; overflow: auto; }
+    #readout { font-size: var(--font-clock); }
+    .wc-section > p { margin: 4px 0; }
+  </style>
+  <script src="../runtime/dither.js" defer></script>
+  <script src="../workstation/interactions.js" defer></script>
+</head>
+<body class="wc-app">
+  <main class="wc-frame">
+    <header class="wc-toolbar">
+      <strong class="wc-brand">WORKSTATION</strong>
+      <span class="wc-title">Project workspace</span>
+      <span class="wc-spacer"></span>
+      <a href="../workstation/catalogue.html">Component catalogue</a>
+      <button type="button" data-wc-theme>Dark theme</button>
+      <button type="button" data-wc-dialog="about">About</button>
+    </header>
+    <div class="wc-workspace">
+      <div class="wc-stack">
+        <section class="wc-card" aria-labelledby="library-title">
+          <h1 class="wc-heading" id="library-title">Library</h1>
+          <label class="wc-row">Find <input id="search" type="search" placeholder="Search items"></label>
+          <div id="library" aria-label="Items"></div>
+          <div id="empty" class="wc-well" hidden>No matching items.</div>
+          <button type="button" id="add">Add item</button>
+        </section>
+        <section class="wc-card">
+          <h2 class="wc-heading">Item editor</h2>
+          <div class="wc-tabs" role="tablist" aria-label="Editor view">
+            <button id="details-tab" role="tab" aria-controls="details" aria-selected="true">Details</button>
+            <button id="history-tab" role="tab" aria-controls="history" aria-selected="false" tabindex="-1">History</button>
+          </div>
+          <div id="details" role="tabpanel" aria-labelledby="details-tab">
+            <form id="editor" class="wc-section">
+              <label>Name <input id="name" required maxlength="80"></label>
+              <label>Notes <textarea id="notes" rows="4"></textarea></label>
+              <div class="wc-row"><button type="submit">Save changes</button><span id="saved" role="status">Local example · nothing sent</span></div>
+            </form>
+          </div>
+          <div id="history" role="tabpanel" aria-labelledby="history-tab" hidden>
+            <div id="activity" class="wc-well">No changes in this session.</div>
+          </div>
+        </section>
+      </div>
+      <aside class="wc-stack" aria-label="Instruments">
+        <section class="wc-card">
+          <h2 class="wc-heading">Selection <button type="button" data-wc-collapse="selection" aria-expanded="true" aria-controls="selection">Collapse</button></h2>
+          <div id="selection" class="wc-stack">
+            <div class="wc-well wc-instrument"><div id="readout">01</div><div id="selection-name">Opening</div></div>
+            <div class="wc-well"><p>Changes stay in this tab. Replace the example data adapter with your application’s storage.</p></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <p class="wc-status" id="status" role="status">Ready · local demonstration</p>
+  </main>
+  <dialog id="about" aria-labelledby="about-title">
+    <h2 id="about-title" class="wc-heading">Working template</h2>
+    <p>Search, select, edit, add, switch tabs and fold the instrument panel. All controls work locally.</p>
+    <form method="dialog"><button autofocus>Close</button></form>
+  </dialog>
+  <script>
+    // Example data adapter, deliberately separate from reusable interaction code.
+    // Replace this block, not the CSS or the DOM roles above.
+    (() => {
+      const items = [{ name: 'Opening', notes: 'Prepare the workspace.' }, { name: 'Rehearsal', notes: 'Review the sequence.' }];
+      let selected = 0;
+      const drafts = new Map();
+      const get = id => document.getElementById(id);
+      function render() {
+        const query = get('search').value.toLowerCase();
+        get('library').replaceChildren();
+        items.forEach((item, index) => {
+          if (!item.name.toLowerCase().includes(query)) return;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = item.name;
+          button.setAttribute('aria-pressed', String(index === selected));
+          button.onclick = () => { selected = index; render(); };
+          get('library').append(button);
+        });
+        get('empty').hidden = get('library').childElementCount !== 0;
+        const draft = drafts.get(selected) || items[selected];
+        get('name').value = draft.name;
+        get('notes').value = draft.notes;
+        get('readout').textContent = String(selected + 1).padStart(2, '0');
+        get('selection-name').textContent = items[selected].name;
+      }
+      get('search').oninput = render;
+      get('add').onclick = () => {
+        items.push({ name: `Item ${items.length + 1}`, notes: '' });
+        selected = items.length - 1;
+        get('search').value = '';
+        render();
+        get('name').focus();
+        get('name').select();
+      };
+      get('editor').oninput = () => {
+        drafts.set(selected, { name: get('name').value, notes: get('notes').value });
+        get('saved').textContent = 'Unsaved changes in this tab';
+      };
+      get('editor').onsubmit = event => {
+        event.preventDefault();
+        items[selected] = { name: get('name').value.trim() || 'Untitled', notes: get('notes').value };
+        drafts.delete(selected);
+        const entry = document.createElement('p');
+        entry.textContent = `Saved “${items[selected].name}” locally.`;
+        if (!get('activity').childElementCount) get('activity').textContent = '';
+        get('activity').append(entry);
+        get('saved').textContent = 'Saved in this tab';
+        get('status').textContent = entry.textContent;
+        render();
+      };
+      render();
+    })();
+  </script>
+</body>
+</html>

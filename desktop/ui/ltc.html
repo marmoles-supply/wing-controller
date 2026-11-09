@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WING CONTROLLER · LTC [MÁRMOLES SUPPLY CO.]</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <script src="version.js"></script>
+  <!-- The row, the order comparator, the marks, the identity rules and the blocker chain are not written here: they
+       live in `cue-list.js`, which the settings page and the clock window load too. Three windows reading one module is
+       the whole reason it exists; a copy here would be the fourth answer to the same question. -->
+  <script src="cue-list.js"></script>
+  <!-- The caret rule every field obeys: the first click selects the value so typing overwrites it, the
+       second puts the caret at its end. One module for every window, so the same gesture cannot behave
+       differently per screen; the rule and the WebKit workaround behind it live there and nowhere else. -->
+  <script src="field-editing.js"></script>
+  <link rel="stylesheet" href="design-tokens.css" />
+  <!-- The kit's drawings and then its plan, from the values above. That is the kit's own order — values, drawings,
+       plan — and this window's own sheet still follows, so a deliberate override wins. All three are copies the
+       application ships beside this window (`scripts/sync-design-components.mjs`). -->
+  <link rel="stylesheet" href="components.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <style>
+    /* The window's palette is the kit's, linked above (`design-tokens.css`), not a copy of it. This block used to
+       restate sixteen declarations under the kit's own names — the face, the two ink weights, the four `--line-*`
+       steps, `--accent`, `--maroon`, `--amber`, the well and its phosphor, and the two font families — while the kit
+       was already linked on the line above, which is the one thing the design kit forbids: a window that re-declares
+       what the kit already supplies is a second answer to a question that has one. Measured against
+       `desktop/ui/design-tokens.css` declaration by declaration, every one of the sixteen equalled the kit's own
+       light value (0 mismatches), so writing `var(--same-name)` in its place would have been a custom-property
+       cycle — a name that blanks itself — and the fix is deletion, not substitution: the kit declares all sixteen
+       names, so no rule below changes what it resolves to and not a pixel moves.
+
+       The dark block went with it, for the same measured reason: its two declarations (`--face` #222726,
+       `--face-2` #2b3230) equalled the kit's `body.theme-dark` values, the kit's own `body.theme-dark` IS the dark
+       palette, and the class this window's `applyTheme` toggles is the class the kit reads.
+
+       Four colour literals remain in the rules below, and none of them is a kit value: `#4a6a58`, the dim phosphor
+       `#position.is-nothing` reads "nothing has arrived" in; `#4a2f0a` and `#ffd98a`, the Monitor banner's fixed
+       ground and ink; and `#2f7d4f`, the chain's "ok" mark. The kit names greens for other meanings
+       (`--green` #2ecc71, `--green-dim` #1b5e39), and none of the four equals any value in the kit, so choosing one
+       for them would be a decision about meaning rather than a rename. */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--face);
+      color: var(--ink);
+      /* The interface base is the kit's `--font-base`, not the 12px this window used to carry. It is a re-decision and
+         not a substitution: 12px was the only base of the five windows bigger than its neighbours' (index, meters and
+         timecode were all 11px), and the owner's instruction is that the windows look alike, so §11 point 8's five
+         steps are used at the role they name - `--font-base` is "the base size of the interface". The header readouts
+         below keep `--font-lg`, so the values the operator reads still stand out from their labels. */
+      font: var(--font-base) var(--win-font);
+      display: flex;
+      flex-direction: column;
+    }
+    /* ---- the health header: the one place the four questions are answered without opening anything ---- */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 8px 12px;
+      background: var(--face-2);
+      border-bottom: 2px solid var(--line);
+      flex: 0 0 auto;
+    }
+    /* **The clock is never squeezed.** `#position` is one unbreakable word (a SMPTE position), so a flex-shrink of
+       1 could narrow the column below its own text and clip the last frame digit — measured at 1180 px with the
+       readout at 241 px inside a 227 px well. `flex: 0 0 auto` lets the column take its content's width; the facts
+       beside it are the ones that wrap and give way. */
+    .clock { display: flex; flex-direction: column; gap: 2px; min-width: 220px; flex: 0 0 auto; }
+    #position {
+      font-family: var(--mono);
+      /* The LTC clock face, read from across a room, now named by the kit: `--font-clock` is the instrument step whose
+         floor is this window's own 30px (measured 2026-10-08), added by the kit beside timecode.html's clock, because
+         "the clock is special" written once per window is the drift the scale exists to prevent
+         (`DESIGN-SYSTEM-ROADMAP.md` §4l, D-TYPE-4). It is a kit step now, so it is no longer a declared deviation: it
+         follows `--meter-scale` like every other text in the window. */
+      font-size: var(--font-clock);
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      background: var(--crt);
+      color: var(--crt-ink);
+      border: 2px inset var(--line-light);
+    }
+    #position.is-nothing { color: #4a6a58; }
+    #position.is-stale { color: var(--amber); }
+    #state { font-size: var(--font-base); color: var(--muted); max-width: 460px; }
+    #state.is-stale { color: var(--maroon); font-weight: bold; }
+    .facts { display: flex; gap: 14px; flex-wrap: wrap; margin: 0; border-left: 1px solid var(--line); padding-left: 14px; }
+    .facts > div { display: flex; flex-direction: column; gap: 1px; }
+    .facts dt { font-size: var(--font-xs); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+    .facts dd { margin: 0; font-family: var(--mono); font-size: var(--font-lg); }
+    /* The facts are readouts, so they sit in a well: §11 point 2. The well is the instrument's own (`--crt`, the
+       ground `#position` already reads on) rather than the field, because a white well on the light face has no
+       visible light step at all — the same value is both its ground and its highlight, so it is not a bevel. The
+       phosphor is the same in both themes on purpose (§5: the instrument, not the furniture). */
+    .facts dd > span {
+      display: inline-block;
+      padding: 0 4px;
+      background: var(--crt);
+      color: var(--crt-ink);
+      border: 1px solid var(--line-dark);
+      border-top-color: var(--line-light);
+      border-left-color: var(--line-light);
+    }
+    .spacer { flex: 1 1 auto; }
+    /* The transport: how the list is driven and the operator's Go. It stays on screen in Live, because a Go is what an
+       operator presses during a rehearsal — Live takes away the tools that **change** the list, not the show controls. */
+    .transport { display: flex; align-items: center; gap: 8px; border-left: 1px solid var(--line); padding-left: 14px; }
+    .transport .drive { display: flex; align-items: center; gap: 4px; font-size: var(--font-sm); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .transport .drive select { text-transform: none; letter-spacing: 0; }
+    /* The offset is a small signed figure; without a width the browser's own default for a number input made it the
+       widest thing in the header and pushed Go away from the transport it belongs to. */
+    #offset { width: 72px; text-align: right; font-family: var(--mono); }
+    #go { font-weight: bold; min-width: 44px; }
+    .sequence { font-size: var(--font-base); color: var(--muted); min-width: 130px; }
+    .sequence.is-due { color: var(--amber); }
+    /* The kit draws the button now (`components.css`, linked above): the window font and interface size, the padding,
+       the `--win-btn-face` ground, the `--win-text` ink, the raised pair and the cursor — and `button:active` sinks
+       that pair, which is what this window's own `:active` rule used to say. `#go:disabled` and `#shift-apply:disabled`
+       are gone with it: `button:disabled` is the kit's, and its ink is the kit's own name for what is absent,
+       `--dim`, where both rules wrote `--muted`. What remains is one state the kit does not paint: a latched toggle
+       filled with `--accent`. */
+    button[aria-pressed="true"] { background: var(--accent); color: var(--win-title-text); }
+    /* The kit draws every field too — `--field`, `--ink`, the sunken pair, the interface font, and the `select`'s
+       drawn arrow (the `appearance` reset this rule used to write by hand is the layer's now). What is left is §11
+       point 2's number type, which the kit names by class — `.c-field.is-number` — rather than by element, so the
+       fields whose value the operator reads as a number keep `--mono`. The list search box is not one of them and
+       takes the kit's interface font. */
+    input[type="number"], .cue-dense input[type="text"], .cue-dense select, #add-position { font-family: var(--mono); }
+    /* ---- the body: the table takes the room, the inspector explains one cue ---- */
+    main { display: flex; flex: 1 1 auto; min-height: 0; }
+    #table { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+    /* ---- the list's tools: the list tools on one line, the bulk shift and its own preview on the next ----
+       Two lines rather than one crowded row: the preview is a whole sentence, and on one line it either wrapped the
+       bar (which is what it did) or pushed `Last run` off the end of it. */
+    .bar {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--face-2);
+      flex: 0 0 auto;
+    }
+    .bar-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .bar-row .grow { flex: 1 1 auto; }
+    .bar input[type="search"] { width: 200px; }
+    #renumber, #last-run-show { white-space: nowrap; }
+    /* The bulk shift: an edit of the list, so it lives with the rows rather than with the transport — and the whole bar
+       is hidden in Live, which is exactly right for a control that changes cue times. */
+    .shift-box { display: flex; align-items: center; gap: 4px; font-size: var(--font-sm); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .shift-box input { width: 62px; text-align: right; }
+    .shift-box .unit { text-transform: none; letter-spacing: 0; }
+    #shift-apply { text-transform: none; letter-spacing: 0; }
+    /* What the shift will do, before it does it: one line, ellipsised, with the whole sentence in the tooltip the
+       window writes (`renderShiftPreview`). A preview long enough to push Apply out of the bar is a control the
+       operator cannot reach, and a wrapped preview is a bar whose height changes with the selection. */
+    .shift-preview {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: var(--font-base);
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    /* **The last-run panel, and the two rules the kit asked for rather than a taste.** The lines are READOUTS, so
+       they sit in a WELL: `design/UI_SYSTEM.md` puts readouts in wells, and the bevel table gives a well as "the same
+       pair, reversed" - dark on the top-left, light on the bottom-right. Numbers the operator reads go in `--mono`,
+       which is kit rule 2. Nothing here is a literal colour, and the only token not named by the bevel table is the
+       well's own background, which is `--field` in both themes. */
+    #last-run-lines {
+      border-top: 1px solid var(--line-dark);
+      border-left: 1px solid var(--line-dark);
+      border-bottom: 1px solid var(--line-light);
+      border-right: 1px solid var(--line-light);
+      background: var(--field);
+      padding: 2px 4px;
+      max-height: 140px;
+      overflow: auto;
+    }
+    .last-run-line { font-family: var(--mono); font-size: var(--font-base); line-height: 1.5; white-space: nowrap; }
+    #last-run-note { font-family: var(--mono); font-size: var(--font-base); color: var(--muted); margin: 0 0 2px; }
+    #filter-count { font-size: var(--font-sm); color: var(--muted); }
+    /* The list scrolls and the column names stay at its top. The padding lives on the two blocks inside it, so the
+       header and every row share one left edge — a column name 4px off its own column is worse than no name at all. */
+    #rows { overflow: auto; flex: 1 1 auto; padding: 0; }
+    /* The Monitor banner: the operator must never have to wonder whether the show is firing. A band across the window,
+       not a tooltip, and it says the one thing that matters — nothing is being emitted. */
+    .monitor-banner {
+      padding: 5px 12px;
+      background: #4a2f0a;
+      color: #ffd98a;
+      border-bottom: 2px solid var(--line-dark);
+      font-size: var(--font-base);
+    }
+    .monitor-banner strong { letter-spacing: .08em; }
+    #rehearsal-label { display: flex; align-items: center; gap: 4px; font-size: var(--font-base); }
+    #plan { border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 10px; }
+    #plan table { width: 100%; border-collapse: collapse; font-size: var(--font-base); font-family: var(--mono); }
+    #plan th { text-align: left; font-family: var(--win-font); font-size: var(--font-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: normal; }
+    #plan td { padding: 1px 0; }
+    #plan td.delta { text-align: right; }
+    #plan .late { color: var(--maroon); }
+    #plan .skipped { color: var(--muted); }
+    #plan .note { font-size: var(--font-sm); color: var(--muted); font-family: var(--win-font); }
+    #inspector {
+      flex: 0 0 300px;
+      border-left: 2px solid var(--line);
+      padding: 10px 12px;
+      overflow: auto;
+      background: var(--face-2);
+    }
+    #inspector h2 { font-size: var(--font-base); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+    #inspector-body { display: flex; flex-direction: column; gap: 8px; }
+    .chain { display: flex; flex-direction: column; gap: 2px; font-size: var(--font-base); }
+    .chain-row { display: flex; gap: 6px; align-items: baseline; }
+    .chain-mark { font-family: var(--mono); width: 24px; flex: 0 0 auto; }
+    .chain-mark.ok { color: #2f7d4f; }
+    .chain-mark.no { color: var(--maroon); font-weight: bold; }
+    .chain-mark.unknown { color: var(--muted); }
+    #inspector .why { font-size: var(--font-base); color: var(--maroon); }
+    #inspector .unsure { font-size: var(--font-base); color: var(--muted); }
+    /* A note about a macro that changed: muted, with no failure colour and no mark, because nothing is broken. */
+    #inspector .drifted { font-size: var(--font-base); color: var(--muted); font-style: italic; }
+    #inspector .usage { font-size: var(--font-base); color: var(--muted); }
+    /* The shared-macro marker on a row: readable, quiet, and never a button. */
+    .cue-dense .shared-badge {
+      font-family: var(--mono);
+      font-size: var(--font-sm);
+      padding: 0 4px;
+      color: var(--amber);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+    }
+    #inspector .chain-row { flex-wrap: wrap; }
+    #inspector .offset { font-size: var(--font-base); color: var(--muted); }
+    footer {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 12px;
+      border-top: 2px solid var(--line);
+      background: var(--face-2);
+      flex: 0 0 auto;
+    }
+    /* The add tools are one group: they all exist to put a cue into the list, and grouping them says so without a
+       label. The wrapper carries no `edit-only` — see the note in the footer itself. */
+    .add-cluster { display: flex; align-items: center; gap: 8px; }
+    footer .hint { font-size: var(--font-sm); color: var(--muted); max-width: 460px; }
+    #status { padding: 6px 10px; font-size: var(--font-base); color: var(--muted); }
+    #status.is-failed { color: var(--maroon); font-weight: bold; }
+    /* ---- the cue table: one grid for the column names and for every row, so a column is a column ----
+       The owner's second screenshot is what this block answers: every field was an unlabelled box, the time and the
+       name were printed twice per cue, and the row's own controls sat in a cluster of 10px glyphs nobody could name.
+       The dense row was `display: flex; margin-left: auto`, which RIGHT-ALIGNED the group, so its starting x was the
+       row's right edge minus that row's own width and no two rows began in the same place. Section 26 of
+       `scripts/test-desktop-ltc-window-browser.mjs` measures that coordinate rather than reading the DOM, because a
+       layout that has stopped agreeing with itself is invisible to a test that reads strings.
+       Three decisions, each with its reason:
+         * one `--cue-cols` property, read by the head and by every row: two hand-kept lists of widths drift;
+         * the badge's track is a FIXED width, not `auto` — an auto track collapses to zero on a row with no badge
+           and moves every column after it (measured: 22px between rows with and without one);
+         * every cell names its own track, because a grid fills tracks in order and a row missing a cell would shift
+           every later cell one place left (measured: dense-duration sat at x=6 on the row with neither a macro nor a
+           duration). */
+    #rows {
+      --cue-cols: 40px minmax(100px, 1.2fr) 96px 100px minmax(140px, 2fr) 36px 80px 54px 30px;
+      --cue-gap: 6px;
+    }
+    .cue-head-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 0 8px;
+      background: var(--face-2);
+      border-bottom: 1px solid var(--line);
+    }
+    .cue-head {
+      display: grid;
+      grid-template-columns: var(--cue-cols);
+      gap: var(--cue-gap);
+      align-items: center;
+      padding: 3px 0;
+    }
+    .cue-head span {
+      font-size: var(--font-xs);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #cue-rows { padding: 4px 8px 8px; }
+    /* The row is the fields first, under the names, and the shared module's own line as the row's status strip below
+       them: the time it fires at, its health and its own controls. `order` is what puts the strip underneath without
+       touching the module that draws it — that line is one home shared with the two other windows. */
+    /* Tabbing into a field scrolls its row into view; without `scroll-margin-top` the sticky column names would
+       cover the row at the moment the operator lands on it. */
+    #rows .cue-row { padding: 3px 0; border-top: 1px solid var(--line-mid); scroll-margin-top: 26px; }
+    /* Named with the same id-scoped selector as the rule above, or it would not win: the shared module's own
+       `.cue-row:first-child { border-top: 0 }` is a class rule and this one carries an id — which is exactly the
+       shape section 17 measures ("the first row carries no separator above it, because the header already is one"). */
+    #rows .cue-row:first-child { border-top: 0; }
+    #rows .cue-row > .cue-dense { order: 1; }
+    #rows .cue-row > .cue-line { order: 2; gap: 8px; justify-content: space-between; padding: 2px 1px 0; }
+    #rows .cue-row > .cue-editor { order: 3; }
+    /* Edit mode prints nothing the fields above already print: the number and the name go first, and the time goes
+       with them — except while the ✎ editor is open, whose only live feedback is the position text in that very line
+       (`cue-list.js` writes it as the four boxes are typed, and it is what `+1f` moves). `:has()` is what asks that
+       question, and it is guarded by `@supports`: an engine that cannot ask it keeps today's line, time and all,
+       rather than losing the feedback the editor gives. Live keeps all three, because there the dense line is put
+       away and this strip is the row. */
+    body:not(.is-live) #rows .cue-line .cue-number,
+    body:not(.is-live) #rows .cue-line .cue-number-slot,
+    body:not(.is-live) #rows .cue-line .cue-name { display: none; }
+    @supports selector(:has(*)) {
+      body:not(.is-live) #rows .cue-line .cue-at { display: none; }
+      body:not(.is-live) #rows .cue-row:has(.cue-editor) .cue-at { display: inline; }
+    }
+    .cue-dense {
+      display: grid;
+      grid-template-columns: var(--cue-cols);
+      align-items: center;
+      gap: var(--cue-gap);
+    }
+    /* Every track holds its cell: an input carries the browser's own minimum width, and without this the fixed tracks
+       would be widened by their own contents and the columns would stop lining up with the names above them. */
+    .cue-dense > * { min-width: 0; }
+    .cue-dense .dense-number { grid-column: 1; text-align: center; }
+    .cue-dense .dense-label { grid-column: 2; }
+    .cue-dense .dense-section { grid-column: 3; }
+    .cue-dense .dense-time { grid-column: 4; }
+    .cue-dense select.cue-macro { grid-column: 5; }
+    /* The two children that used to have no track, and the reason the row wrapped: an auto-placed child takes the next
+       free track and pushes the named ones onto a second line (measured: 23px below their own row, the checkbox 49px). */
+    .cue-dense .shared-badge { grid-column: 6; justify-self: start; }
+    .cue-dense select.dense-repeat { grid-column: 7; }
+    .cue-dense .dense-duration { grid-column: 8; text-align: right; }
+    .cue-dense .dense-enabled { grid-column: 9; justify-self: start; }
+    /* A datalist is a child of the row for the section names it offers, and it must not take a track of its own. */
+    .cue-dense datalist { display: none; }
+    /* The dense fields are wells and their values are the kit's number type — section 27 measures both halves on the
+       COMPUTED style, in both themes, over every `input[type="text"]` the row draws (the number, the name, the
+       section, the time and the duration). The kit draws the well (`components.css`); the number type is the rule
+       beside the other fields above, and it wins over the `.dense-label` the file used to write in the window font:
+       that declaration had never applied — the attribute selector outweighs it — so the name has always been set in
+       the number type, and the dead rule went with this change rather than leaving a comment that says otherwise. */
+    /* ---- Live: the tools that change the list go away, and what is left is what an operator reads at a show ---- */
+    /* `edit-only` says what it MEANS — this control changes the list — so the rule is not scoped to the footer. It was,
+       and that scoping hid an older defect: the **drive** selector lives in the header, carried no `edit-only`, and
+       changing it SAVES AND RE-ARMS, so an operator could re-arm the engine from Live mode while the bar that holds the
+       order selector was hidden. A class named for what it means has to apply wherever the thing it names is.
+       The column names go with the fields they name: a header over a row of fields that Live has put away is a promise
+       about columns that are not there. */
+    body.is-live .edit-only,
+    body.is-live .bar,
+    body.is-live .cue-head-wrap,
+    body.is-live .cue-buttons,
+    body.is-live .cue-dense { display: none; }
+    body.is-live #inspector { flex-basis: 340px; }
+    /* **The last-fired fact belongs to Live and nowhere else.** `.facts > div` is `display: flex` and carries one
+       more class than a bare `.live-fact` rule, so `display: none` written at that specificity lost and the last
+       readout was on screen before the window was ever live. Both rules now carry the fact's full selector. */
+    .facts > .live-fact { display: none; }
+    body.is-live .facts > .live-fact { display: flex; }
+    /* **The header at a narrow window: it wraps instead of scrolling sideways.** Rule 11 of the kit's conformance
+       suite renders every window at 756x469 and found this page 71px too wide (measured 2026-10-08):
+       `documentElement.scrollWidth` 827 against the 756px viewport, with `div.transport` (444px) the widest thing
+       past the edge and `button#live` reaching x=827. The header above is ONE `nowrap` flex row whose own minimum
+       content is 827px — the clock 220 (its `min-width`), the facts 48 at their min-content, the transport 444,
+       Live 31, the four 18px gaps and the 12px left padding — so below 827px there is nowhere for the excess to go
+       and the page scrolls. **The overflow is pre-existing, not one rule 11 created**: HEAD's sheets report the same
+       827/756, so the rule only made it visible.
+
+       The fix is the rule's own first suggestion, `flex-wrap`, applied to the row that is too wide: at 756 the
+       header becomes two lines — the clock and its facts on the first, the transport and Live together on the second
+       — and neither line is wider than the window. The query is a narrow-width rule and not a base rule on purpose:
+       827px is this row's own minimum, so the wrap is scoped below that measurement (840, the round step above it)
+       and a window at 1600 — the width `design/screens/` photographs — is not reached by it. What it deliberately
+       does not do is hide the overflow: `overflow-x: hidden` was measured by the rule's author not to work (the same
+       934px is still reported), and a clipped control is a control the operator cannot reach. */
+    @media (max-width: 840px) {
+      header { flex-wrap: wrap; }
+      /* The spacer is on the first line now, so Live would be laid out immediately after the transport; this keeps
+         it at the right end of its own line, which is the corner the operator looks for it in at every other width. */
+      #live { margin-left: auto; }
+    }
+  </style>
+  <link rel="stylesheet" href="workstation.css" />
+  <link rel="stylesheet" href="secondary-chrome.css" />
+  <script src="dither.js"></script>
+  <script src="secondary-chrome.js" defer></script>
+</head>
+<body class="wc-app wc-cues">
+  <header class="wc-toolbar">
+    <div class="clock"><div class="wc-title clock-title">LTC · Cue list</div>
+      <div id="position">--:--:--:--</div>
+      <div id="state">Nothing has arrived yet.</div>
+    </div>
+    <dl class="facts">
+      <div><dt>rate</dt><dd><span id="rate">—</span></dd></div>
+      <div><dt>source</dt><dd><span id="source">—</span></dd></div>
+      <div><dt>window</dt><dd><span id="window">—</span></dd></div>
+      <div><dt>read</dt><dd><span id="counters">0</span></dd></div>
+      <div><dt id="next-label">next LTC</dt><dd><span id="next">—</span></dd></div>
+      <div class="live-fact"><dt>last</dt><dd><span id="last">—</span></dd></div>
+    </dl>
+    <span class="spacer"></span>
+    <div class="transport">
+      <label class="drive edit-only">
+        <span>drive</span>
+        <select id="drive" title="How this list is run. By timecode, each cue fires when the clock crosses the time it names; one by one, the cues fire in list order — you start the sequence with Go, and each cue's duration decides when the next is due on the show clock. It is saved with the list, so the show opens in the mode it was left in.">
+          <option value="timecode">by timecode</option>
+          <option value="sequential">one by one</option>
+        </select>
+      </label>
+      <!-- The offset, beside the drive, because they are the same kind of value: how this list is run, carried in the
+           file, controlling what fires — and not an edit to any row. It behaves the way the drive and the order do:
+           changing it SAVES and re-arms, which is why the tooltip says so. -->
+      <label class="offset-field edit-only">
+        <span>offset</span>
+        <input id="offset" type="number" step="1"
+          title="Frames added to every incoming position: a source that arrives a little behind or ahead of the picture. Positive moves the show forward, and it is applied to every source, so a cue is always compared in the show's own timecode. It travels in the file with the list, so changing it here SAVES and re-arms every cue — the same as the order and the drive." />
+        <span class="unit">frames</span>
+      </label>
+      <button id="go" type="button"
+        title="Fires the next cue in list order, whatever its duration. It is a show action, not an edit: the engine fires the list it holds, so a list with unsaved changes is refused rather than fired half-way.">Go</button>
+      <span id="sequence" class="sequence"></span>
+    </div>
+    <button id="live" type="button" aria-pressed="false"
+      title="Live hides the tools that change the list and keeps what an operator reads during a show: the clock, the next cue, the countdown and why a cue is not ready. It changes nothing in the file.">Live</button>
+  </header>
+  <div id="monitor-banner" class="monitor-banner" hidden>
+    <strong>MONITOR</strong> — this list is only being watched. Every cue is evaluated and reported, and <strong>nothing is emitted</strong>: no macro runs, nothing is sent to another application, and no order is confirmed.
+  </div>
+
+  <main>
+    <section id="table" class="wc-card">
+      <h1 class="wc-heading">Cue list</h1>
+      <div class="bar">
+        <div class="bar-row">
+          <input id="filter" type="search" autocomplete="off" spellcheck="false" placeholder="search the list" />
+          <span id="filter-count" hidden></span>
+          <select id="sort" title="The order this list is read and laid out in. It travels with the file, so the show opens in the order it was left in.">
+            <option value="smpte">by timecode</option>
+            <option value="manual">as arranged</option>
+            <option value="created">as created</option>
+          </select>
+          <!-- Renumbering is a list tool, so it sits with the order and the shift rather than with Save. It rewrites
+               numbers only: every cue's id and the list's own order stay exactly as they are, so a cue triggered from
+               outside keeps working while the numbers change. The rule itself lives in the shared module, which is where
+               the settings page calls it from too — this is a button and a call, not a second implementation. -->
+          <button id="renumber" type="button"
+            title="Numbers the cues 1, 2, 3 … in the list's own order, so they can be read out — “go to 12”. It rewrites numbers only: every cue's id and the list's own order stay exactly as they are, so a cue triggered from outside keeps working while the numbers change. Local: nothing is written until Save (re-arms).">Renumber</button>
+          <span class="grow"></span>
+          <button id="last-run-show" type="button"
+            title="Shows what the engine dealt with — the record that survives a restart, read as a record and not as the current state. It is asked for when you open it rather than watched, because it is up to 2 000 lines.">Last run</button>
+        </div>
+        <!-- The bulk shift gets its own line: its preview is a whole sentence, and beside the list tools it wrapped the
+             bar and left the Apply button somewhere else. -->
+        <div class="bar-row">
+          <span class="shift-box">
+            <label for="shift-frames">shift</label>
+            <input id="shift-frames" type="number" step="1" value="0"
+              title="How far to move the selected cues, in frames. Positive is later. Cmd/Ctrl-click adds a row to the selection and shift-click takes a range, exactly as in a file list." />
+            <span class="unit">frames</span>
+            <button id="shift-apply" type="button"
+              title="Moves every selected cue by the number of frames beside it, as one undo step. It refuses a shift of zero, and it refuses a shift that would take a cue before 00:00:00:00 rather than wrapping it round midnight.">Apply</button>
+          </span>
+          <span id="shift-preview" class="shift-preview"></span>
+        </div>
+      </div>
+      <div id="rows">
+        <!-- The column names are the header of the dense grid, and they sit inside the scrolling element so they stay
+             at the top of a long list and line up with the fields under them to the pixel. The rows themselves go into
+             `#cue-rows`: the shared module clears the element it is given on every paint, and it must not clear these. -->
+        <div class="cue-head-wrap" aria-hidden="true">
+          <div class="cue-head">
+            <span>no.</span>
+            <span>name</span>
+            <span>section</span>
+            <span>time</span>
+            <span>macro</span>
+            <span>×</span>
+            <span>repeat</span>
+            <span>dur.</span>
+            <span>arm</span>
+          </div>
+        </div>
+        <div id="cue-rows"></div>
+      </div>
+      <div id="status"></div>
+    </section>
+
+    <aside id="inspector" class="wc-card">
+      <section id="last-run" hidden>
+        <h2>Last run</h2>
+        <p id="last-run-note"></p>
+        <div id="last-run-lines"></div>
+      </section>
+      <section id="plan" hidden>
+        <h2>Rehearsal plan</h2>
+        <div id="plan-body"></div>
+      </section>
+      <h2 class="wc-heading">Inspector</h2>
+      <div id="inspector-body">
+        <p class="hint">Select a row to see where it fires, and the chain that decides whether it will.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="wc-toolbar">
+    <!-- **Add a cue**, which is the settings page's own control moved here: one button and one field, and a typed
+         position wins over the live one. A list built in a rehearsal before the signal exists is a real case, and
+         without this the window that edits the list could not make a cue at a position it was told. -->
+    <!-- `edit-only` stays on each control rather than on this wrapper: the Live contract reads the **computed
+         `display`** of the buttons themselves, and a hidden ancestor does not change a descendant's computed display. -->
+    <div class="add-cluster">
+      <label class="add-position edit-only">
+        <span>at</span>
+        <input id="add-position" type="text" autocomplete="off" spellcheck="false" placeholder="01:00:12:15"
+          title="Type a position to place a cue there exactly — 01:00:12:15, or 01:00:12;15 with a semicolon for 29.97 drop-frame numbering. The backend's own parser reads it, and its refusal is what you read if the position cannot exist. Leave it empty and Add cue takes the position the timecode is at right now." />
+      </label>
+      <button id="add-at" class="edit-only" type="button"
+        title="Adds a cue at the typed position, or where the timecode is now when the field is empty — a typed position wins, because a field that silently fell back to the live one would place the cue somewhere else without saying so. With an empty field and no timecode yet it refuses, and it is refused while Live Safe Mode is on: where a cue goes is part of what the show will do. It is a save, so it re-arms the list.">Add cue</button>
+      <button id="add-end" class="edit-only" type="button"
+        title="Adds a cue after the last one in the list — one frame past it — ready for its macro. It is a save, so it re-arms the list.">Add at the end</button>
+      <button id="capture" class="edit-only" type="button"
+        title="Adds a cue at the timecode arriving right now. It is a save, so it re-arms the list.">Capture the timecode</button>
+    </div>
+    <span class="spacer"></span>
+    <label id="rehearsal-label" class="edit-only"
+      title="Monitor evaluates every cue and reports what would have fired, with how late the timecode was at each crossing — and emits nothing at all: no macro, nothing to another application, no confirmation. It decides whether the show fires, which is why it is here with the editing tools and not in Live.">
+      <input type="checkbox" id="rehearsal" /> Monitor
+    </label>
+    <button id="clear-plan" class="edit-only" type="button" hidden
+      title="Forgets the rehearsal report and keeps the mode: what an operator clears between two passes through the same run.">Clear the report</button>
+    <button id="undo" type="button" hidden title="Takes back the last change made here. It does not touch the file until Save.">Undo</button>
+    <button id="save" class="edit-only" type="button" title="Writes the list and re-arms the engine: every cue is armed again from where the show is now.">Save (re-arms)</button>
+    <span class="hint">This window never fires a macro: the main window owns firing and confirmation.</span>
+  </footer>
+
+  <script>
+    // ---- the window's own plumbing ---------------------------------------------------------------------------------
+    // The shared module, bound once: the row, the order comparator, the marks, the identity rules and the blocker chain
+    // all come from it, and a window that drew its own would be the fourth answer to the same question.
+    const CUE = window.WingCueList;
+    if (!CUE) throw new Error("cue-list.js did not load: this window cannot draw the list without it");
+
+    const hasTauri = Boolean(window.__TAURI__?.core?.invoke);
+    const invoke = hasTauri ? window.__TAURI__.core.invoke : async () => ({});
+
+    /// A stored preference, and never a reason to fail: a window opened from `file://` has no localStorage at all.
+    function readStored(key) {
+      try { return localStorage.getItem(key); } catch (_) { return null; }
+    }
+    function writeStored(key, value) {
+      try { localStorage.setItem(key, value); } catch (_) { /* the window still works */ }
+    }
+
+    // The application's theme, from the key every window writes and reads, with the same `storage` event: a secondary
+    // window painted only in the light palette is a foreign window in a dark application.
+    const THEME_KEY = "wing_theme";
+    const applyTheme = (theme) => document.body.classList.toggle("theme-dark", theme === "dark");
+    applyTheme(readStored(THEME_KEY) || "light");
+    window.addEventListener("storage", (event) => {
+      if (event.key === THEME_KEY) applyTheme(event.newValue || "light");
+    });
+
+    // ---- the list's state -----------------------------------------------------------------------------------------
+    // The rules that decide what is written, what "unsaved" means and how a macro is named live in `cue-list.js`; this
+    // window holds the state those rules are applied to, and nothing else.
+    let cues = [];
+    let savedCues = [];
+    // Set when another window published a list this one could not take, because the operator has unsaved edits here.
+    // A message rather than a mode: taking the foreign list would throw away what he is typing, and saying nothing
+    // would let the two windows disagree without either of them mentioning it.
+    let cueListChangedElsewhere = "";
+    let offsetFrames = 0;
+    let savedOffsetFrames = 0;
+    let sortMode = CUE.SORT_MODES[0];
+    let sortFromFile = null;
+    /// How the list is driven. It is a property of the **list**, saved in the file with the order, and the engine is
+    /// told about it when the list is saved — which is why it is not a setting of this window.
+    let drive = CUE.DRIVE_MODES[0];
+    let savedDrive = null;
+    let saveFailed = "";
+    let snapshot = null;
+    let macroLibrary = [];
+    let selectedId = null;
+    let live = readStored("wing_ltc_live") === "true";
+    let lastFired = "";
+    /// **Monitor** versus **Armed**, as the engine reports it: in Monitor the list is evaluated and nothing is emitted,
+    /// which is why this window learns the plan by **reading** the snapshot and never by listening.
+    let rehearsing = false;
+
+    /// The rows go into `#cue-rows`, inside the scrolling `#rows`, because the shared module clears the element it is
+    /// handed on every paint — and the column names above the rows must survive a paint. `#rows` itself is what the
+    /// window's own click and Enter handlers watch: a click that lands on no row clears the selection, and the column
+    /// names count as no row.
+    const cueRowsBox = document.getElementById("cue-rows");
+    const statusLine = document.getElementById("status");
+
+    const dirty = () => CUE.cueListDirty({
+      cues,
+      savedCues,
+      offsetFrames,
+      savedOffsetFrames,
+      sort: sortMode,
+      savedSort: sortFromFile,
+      drive,
+      savedDrive,
+    });
+
+    function setStatus(text, failed = false) {
+      saveFailed = failed ? text : "";
+      if (!statusLine) return;
+      // The other window's change is said **before** our own unsaved line and in its own words: "you have unsaved
+      // changes" and "somebody else changed the list" are two different facts, and an operator who reads only the
+      // first will not know why saving is now the thing that loses work.
+      const message = failed ? text
+        : [cueListChangedElsewhere, text || (dirty() ? "Unsaved changes: Save writes them and re-arms the list." : "")]
+          .filter(Boolean).join(" ");
+      statusLine.textContent = message;
+      statusLine.classList.toggle("is-failed", Boolean(failed));
+    }
+
+    // ---- the rows, drawn by the shared module ---------------------------------------------------------------
+    const panel = CUE.createPanel({
+      container: () => cueRowsBox,
+      cues: () => cues,
+      mode: () => sortMode,
+      rowTag: "div",
+      filterCountId: "filter-count",
+      atTitle: "The timecode this cue fires at, read in the rate the show is running.",
+      currentPositionText: () => snapshot?.position || "",
+      rateHint: () => (snapshot?.rate ? `fps${snapshot.rate}` : "fps25"),
+      isDirty: dirty,
+      // Every paint refreshes the shift's preview, because a paint is exactly when the selection or what is on screen
+      // can have changed — including the paints this window did not ask for, such as a filter keystroke.
+      rendered: () => renderShiftPreview(),
+      local: () => setStatus(""),
+      fail: (message) => setStatus(message, true),
+      // The three links only a window can judge. `clockRunning` is null before the first snapshot, which the chain
+      // reports as unknown — a link nobody can judge must never read as broken.
+      blockerContext: (cue) => {
+        const macro = CUE.macroForReference(macroLibrary, cue);
+        const steps = macro
+          ? (Array.isArray(macro.actionSteps) ? macro.actionSteps : []).filter((step) => step.enabled !== false)
+          : null;
+        return {
+          clockRunning: snapshot ? snapshot.state === "running" : null,
+          // **Unknown, and said so.** Live Safe Mode is enforced where the macros are run — the main window's own guard
+          // — and this window cannot judge it: the padlock's backend copy can never be armed in a shipped build, and
+          // recomputing the main window's rule here would be a second copy of a rule with a reconnect clause in it.
+          // This used to be `true`, which reported "firing allowed · ok" in a state where a cue would have been refused.
+          firingAllowed: null,
+          macroReady: macro ? steps.length > 0 : null,
+        };
+      },
+      extras: denseExtras,
+    });
+
+    /// The dense row: what the operator changes while building a list, on one line.
+    ///
+    /// The settings page keeps its popover editor, where there is room for every field and a place to explain each
+    /// one; this window is the table, so it carries the four things a cue is — its name, its time, its macro and
+    /// whether it is armed — and the inspector carries the rest.
+    function denseExtras(cue, panelApi) {
+      const box = document.createElement("div");
+      box.className = "cue-dense";
+
+      // **The number**, which is what an operator says out loud — "go to 12", "5.5 next" — and the settings page had
+      // and this window did not. It is a `text` input and not a `number` one on purpose: a cue number is a **decimal**
+      // ("a cue inserted between 5 and 6 is 5.5") and `""` means "not numbered yet", which a number input cannot hold.
+      // It is a **name and not an address**: the id stays untouched, so numbering never moves what an outside trigger
+      // fires (`renumberCues` and this field both obey that).
+      const number = document.createElement("input");
+      number.type = "text";
+      number.className = "dense-number";
+      number.placeholder = "no.";
+      number.value = String(cue.number ?? "");
+      number.setAttribute("aria-label", "cue number");
+      number.title = "The number you say out loud — “go to 12”. It is a decimal, so a cue inserted between 5 and 6 is 5.5 and nothing else moves; leave it empty and the cue is simply unnumbered. It is not the cue's id, so numbering never breaks a cue fired from outside. Saved with the list by Save (re-arms).";
+      // The same shape the settings page's number field uses, and each part of it is there for a reason: `input` rather
+      // than `change` so the badge follows what is being typed, one undo step per edit rather than one per keystroke,
+      // and the badge patched **in place** rather than by re-rendering — a re-render would take the focus out of the box
+      // the operator is typing in. The first version of this field called `local()` on `change` and left the badge
+      // showing the previous number until something else repainted the row, which is two places disagreeing about one
+      // cue; the contract caught it.
+      let numberUndoPushed = false;
+      number.addEventListener("focus", () => { numberUndoPushed = false; });
+      number.addEventListener("input", () => {
+        if (!numberUndoPushed) { panelApi.pushUndo(); numberUndoPushed = true; }
+        cue.number = number.value;
+        const row = number.closest(".cue-row");
+        const badge = row?.querySelector(".cue-number");
+        const text = String(number.value || "").trim();
+        if (text) {
+          if (badge) badge.textContent = text;
+          else if (row) {
+            const made = document.createElement("span");
+            made.className = "cue-number";
+            made.textContent = text;
+            row.querySelector(".cue-line")?.prepend(made);
+          }
+        } else if (badge) {
+          badge.remove();
+        }
+        panelApi.local();
+      });
+      box.appendChild(number);
+
+      const label = document.createElement("input");
+      label.type = "text";
+      label.className = "dense-label";
+      label.placeholder = "(name)";
+      label.value = String(cue.label ?? "");
+      label.title = "This cue's own name. It is saved with the list by Save (re-arms).";
+      label.addEventListener("change", () => {
+        panelApi.pushUndo();
+        cue.label = label.value;
+        panelApi.local();
+      });
+      box.appendChild(label);
+
+      // **The section**, edited where the rest of a cue's fields are edited: its row. D14's rail was withdrawn by
+      // measurement — the owner's list is 8 cues with no sections and the field had no surface at all — and what is built
+      // instead is the fact itself: a name, offered from the names the list already carries so one section cannot acquire
+      // two spellings, and blank meaning ungrouped. Nothing about firing changes with it.
+      const section = document.createElement("input");
+      section.type = "text";
+      section.className = "dense-section";
+      section.placeholder = "(section)";
+      section.value = String(cue.group ?? "");
+      section.setAttribute("list", "cue-section-names");
+      section.title = "The section this cue belongs to — a free name like \"Act 1\". Nothing about firing changes: it is a label for the operator, and it is saved with the list by Save (re-arms).";
+      section.addEventListener("change", () => {
+        panelApi.pushUndo();
+        cue.group = section.value.trim();
+        panelApi.local();
+        // The names every row's field offers are painted with the rows, and the window's poll repaints marks rather than
+        // rows — so without this the section just typed would not be offered to the next cue until some unrelated event
+        // repainted the list. On `change`, not on every keystroke: the value is already committed, so the field the
+        // operator is typing in is recreated carrying what they typed.
+        panelApi.render();
+      });
+      box.appendChild(section);
+
+      const time = document.createElement("input");
+      time.type = "text";
+      time.className = "dense-time";
+      time.value = CUE.positionText(cue.at);
+      time.title = "The timecode this cue fires at, written HH:MM:SS:FF (a semicolon before the frames when the numbering is drop-frame).";
+      time.addEventListener("change", () => {
+        const parsed = CUE.parsePositionText(time.value);
+        if (!parsed) {
+          // The refusal is shown and the field is put back: a time this list cannot read is not stored, and leaving
+          // the text on screen would say it had been.
+          time.value = CUE.positionText(cue.at);
+          panelApi.fail(`"${time.value}" is not a time this list can read: write it as HH:MM:SS:FF.`);
+          return;
+        }
+        panelApi.pushUndo();
+        cue.at = { ...cue.at, ...parsed };
+        panelApi.local();
+      });
+      box.appendChild(time);
+
+      const picker = document.createElement("select");
+      picker.className = "cue-macro";
+      picker.title = "The macro this cue fires, by the macro's own key, so reordering the library cannot re-point it.";
+      fillMacroChoices(picker, cue);
+      picker.addEventListener("change", () => {
+        panelApi.pushUndo();
+        const reference = CUE.macroReferenceForToken(macroLibrary, picker.value);
+        cue.macro_id = reference.macro_id;
+        cue.macro_index = reference.macro_index;
+        // The macro's content **as it is now**, recorded with the reference. The same rule as the settings page's picker,
+        // because the record has to mean the same thing whichever window bound the cue.
+        cue.macro_hash = reference.macro_id ? CUE.macroHash(CUE.macroForReference(macroLibrary, reference)) : null;
+        panelApi.local();
+      });
+      box.appendChild(picker);
+
+      // The **persistent marker** the precedents ask for: a shared macro is marked where the operator already looks,
+      // rather than only in the inspector he has to open. It stays out of the way when nothing is shared — a badge on
+      // every row would be noise — and it is deliberately not a control: it says, it does not act.
+      const shared = CUE.cuesSharingMacro(cues, cue);
+      if (shared.length > 1) {
+        const badge = document.createElement("span");
+        badge.className = "shared-badge";
+        badge.textContent = `×${shared.length}`;
+        badge.title = `${shared.length} cues of this list name this macro: editing or deleting it touches all of them.`;
+        box.appendChild(badge);
+      }
+
+      // The names the list already carries, offered to every row's section field: a section cannot acquire a second
+      // spelling by accident, and `cueGroupNames` reads the list itself rather than a registry, so a name no cue carries
+      // any more disappears on its own.
+      const sectionNames = document.createElement("datalist");
+      sectionNames.id = "cue-section-names";
+      for (const name of CUE.cueGroupNames(cues)) {
+        const option = document.createElement("option");
+        option.value = name;
+        sectionNames.appendChild(option);
+      }
+      box.appendChild(sectionNames);
+
+      // Three answers where a checkbox had two: "once per pass" is armed again when the position goes back, "once in
+      // the show" is not, and "every crossing" fires every time. The rule behind the wording is the shared one
+      // (`CUE.cueRepeat`), which answers exactly what the engine's `repeat_policy` answers.
+      const policy = document.createElement("select");
+      policy.className = "dense-repeat";
+      policy.title = "What happens when the show reaches this cue again. \"Once per pass\" is armed again when the position goes back; \"once in the show\" is not, so rehearsing a section cannot repeat it; \"every crossing\" fires every time.";
+      for (const [value, text] of [["pass", "once"], ["show", "once/show"], ["every", "every"]]) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = text;
+        policy.appendChild(option);
+      }
+      policy.value = CUE.cueRepeat(cue);
+      policy.addEventListener("change", () => {
+        panelApi.pushUndo();
+        cue.repeat = policy.value;
+        cue.repeats = false;
+        panelApi.local();
+      });
+      box.appendChild(policy);
+
+      // The duration: how long after this cue the next one is due, in **one by one** drive. Empty means the sequence
+      // waits at this cue for the operator's Go, which is why the field is a text box with a dash rather than a zero:
+      // "no duration" and "no time at all" are different shows, and a zero would fire the next cue on the same frame.
+      const duration = document.createElement("input");
+      duration.type = "text";
+      duration.className = "dense-duration";
+      duration.value = CUE.durationText(cue);
+      duration.placeholder = "—";
+      duration.title = "How long after this cue the next one is due, in one-by-one drive, in seconds (decimals are fine). Empty means the sequence waits here for Go. It is measured on the show clock, so a paused timecode pauses the sequence.";
+      duration.addEventListener("change", () => {
+        const ms = CUE.parseDurationText(duration.value);
+        if (ms === null) {
+          duration.value = CUE.durationText(cue);
+          panelApi.fail(`"${duration.value}" is not a duration: write seconds, for example 2.5, or leave it empty to wait for Go.`);
+          return;
+        }
+        panelApi.pushUndo();
+        cue.duration_ms = ms;
+        panelApi.local();
+      });
+      box.appendChild(duration);
+
+      const enabled = document.createElement("input");
+      enabled.className = "dense-enabled";
+      enabled.type = "checkbox";
+      enabled.checked = cue.enabled !== false;
+      enabled.title = "Whether this cue is armed. A cue that is not armed is listed and crossed, and fires nothing.";
+      enabled.addEventListener("change", () => {
+        panelApi.pushUndo();
+        cue.enabled = enabled.checked;
+        panelApi.local();
+      });
+      box.appendChild(enabled);
+
+      return box;
+    }
+
+    // ---- the inspector: one cue, its numbers, and the chain that decides --------------------------------------
+    function renderInspector() {
+      const body = document.getElementById("inspector-body");
+      if (!body) return;
+      const cue = cues.find((entry) => String(entry?.id ?? "") === String(selectedId ?? "")) || null;
+      body.textContent = "";
+      if (!cue) {
+        const hint = document.createElement("p");
+        hint.className = "hint";
+        hint.textContent = "Select a row to see where it fires, and the chain that decides whether it will.";
+        body.appendChild(hint);
+        return;
+      }
+      const head = document.createElement("div");
+      head.style.fontFamily = "var(--mono)";
+      head.textContent = `${cue.number ? `${cue.number} · ` : ""}${CUE.positionText(cue.at)}`;
+      body.appendChild(head);
+
+      const named = document.createElement("div");
+      named.textContent = CUE.cueName(cue).text;
+      body.appendChild(named);
+
+      // The global offset this window will **write** on its next save. It used to say "(set in Settings)" and the
+      // window did not own the control — and the moment a field arrived in this window's header that parenthetical
+      // became a false sentence on screen. What a window writes, it shows **and** it says where it is set, and it is
+      // set here now.
+      const offset = document.createElement("div");
+      offset.className = "offset";
+      offset.textContent = offsetFrames === 0
+        ? "offset +0 frames · incoming positions are taken as they arrive (set in the header)"
+        : `offset ${offsetFrames > 0 ? "+" : ""}${offsetFrames} frames · added to every incoming position (set in the header)`;
+      body.appendChild(offset);
+
+      // **Used by N cues**, which is the one thing a shared macro needs said: editing or deleting it touches every cue
+      // that names it. The precedents put this where the operator already is — Eos prints counts and a list of the cues a
+      // preset is used in, grandMA3 marks the pool object and lists its references — and this inspector is per **cue**, so
+      // it says how many cues of *this list* name the same macro and which they are, rather than inventing a macro-centric
+      // panel that the rest of the window does not have. A cue that names nothing says nothing: there is no macro whose
+      // users could be counted, and a line about zero would be noise on every unconfigured row.
+      const shared = CUE.cuesSharingMacro(cues, cue);
+      if (shared.length > 0) {
+        const usage = document.createElement("div");
+        usage.className = "usage";
+        // Each cue named the way the row itself names it — the number, then the label — because "which cues" is only
+        // useful if the operator can find them in the list he is looking at. A cue with no number, or no name, falls back
+        // to whichever it has.
+        const describe = (entry) => {
+          const name = CUE.cueName(entry).text;
+          const number = String(entry?.number ?? "").trim();
+          if (number && name && name !== "(no name)") return `${number} ${name}`;
+          return number || name || String(entry?.id ?? "");
+        };
+        usage.textContent = shared.length === 1
+          ? "Used by 1 cue of this list: only this one."
+          : `Used by ${shared.length} cues of this list: ${shared.map(describe).join(", ")}.`;
+        body.appendChild(usage);
+      }
+
+
+      // One row per link of the chain the shared module defines, with the same marks its tooltip uses. The window
+      // supplies the three facts it alone knows; everything else comes from the cue and its health.
+      const health = (Array.isArray(snapshot?.cue_health) ? snapshot.cue_health : []).find((entry) => String(entry?.id) === String(cue.id)) || null;
+      const macro = CUE.macroForReference(macroLibrary, cue);
+      const steps = macro ? (Array.isArray(macro.actionSteps) ? macro.actionSteps : []).filter((step) => step.enabled !== false) : null;
+      const chain = CUE.blockerChain(cue, {
+        health,
+        libraryLen: typeof snapshot?.macro_library_len === "number" ? snapshot.macro_library_len : null,
+        clockRunning: snapshot ? snapshot.state === "running" : null,
+        // Unknown here for the reason the row's own context gives: the padlock is enforced by the window that fires.
+        firingAllowed: null,
+        macroReady: macro ? steps.length > 0 : null,
+      });
+      const list = document.createElement("div");
+      list.className = "chain";
+      for (const link of chain) {
+        const row = document.createElement("div");
+        row.className = "chain-row";
+        const mark = document.createElement("span");
+        mark.className = `chain-mark ${link.ok === true ? "ok" : link.ok === false ? "no" : "unknown"}`;
+        mark.textContent = link.ok === true ? "ok" : link.ok === false ? "NO" : "?";
+        const text = document.createElement("span");
+        text.textContent = link.label;
+        row.appendChild(mark);
+        row.appendChild(text);
+        // The reason sits **with the link it belongs to**, and the shared rule guarantees a `detail` exists only for a
+        // link that is broken or unknown — so painting every one of them is self-limiting: a link that is fine has
+        // nothing to say. It is also the fix for a cue with two failures, where a single leading sentence could only
+        // ever name one of them.
+        if (link.detail) {
+          const why = document.createElement("span");
+          why.className = link.ok === false ? "why" : "unsure";
+          why.textContent = link.detail;
+          row.appendChild(why);
+        }
+        list.appendChild(row);
+      }
+      body.appendChild(list);
+
+      // **A note, never a gate**, and after the links so it cannot be read as one of them. The macro this cue names has
+      // changed since the cue named it: nothing is wrong — the cue fires exactly what it names, which is what the
+      // operator asked for — and it carries no mark, no failure colour and no place in the chain.
+      if (health?.macro_changed === true) {
+        const drifted = document.createElement("div");
+        drifted.className = "drifted";
+        drifted.textContent =
+          "This macro has changed since this cue named it. The cue still fires the macro it names; the library's copy is " +
+          "not the one this cue was set up with.";
+        body.appendChild(drifted);
+      }
+    }
+
+    // ---- reading and writing the list --------------------------------------------------------------------------
+    function adopt(dto) {
+      // What this window now holds **is** the list the engine has, so a warning that another window changed it is no
+      // longer true of anything.
+      cueListChangedElsewhere = "";
+      const merged = CUE.mergeCueList(dto, { offsetFrames, sort: sortMode, drive });
+      cues = merged.cues;
+      savedCues = merged.savedCues;
+      offsetFrames = merged.offsetFrames;
+      savedOffsetFrames = merged.offsetFrames;
+      sortMode = merged.sort;
+      drive = merged.drive;
+      savedDrive = merged.drive;
+      if (CUE.SORT_MODES.includes(dto?.sort)) sortFromFile = dto.sort;
+      const sortSelect = document.getElementById("sort");
+      if (sortSelect) sortSelect.value = sortMode;
+      const driveSelect = document.getElementById("drive");
+      if (driveSelect) driveSelect.value = drive;
+      // The field shows what the file says, so it cannot disagree with the list it is part of.
+      const offsetInput = document.getElementById("offset");
+      if (offsetInput) offsetInput.value = String(offsetFrames);
+      panel.resetUndo();
+      panel.render();
+      renderInspector();
+      setStatus("");
+    }
+
+    async function save() {
+      if (!hasTauri) { setStatus("Nothing was saved: this window is not running with the backend.", true); return false; }
+      try {
+        const saved = await invoke("set_timecode_cues", { cues: CUE.cueListPayload(cues, offsetFrames, sortMode, drive) });
+        adopt(Array.isArray(saved?.cues) ? saved : { cues, offset_frames: offsetFrames, sort: sortMode, drive });
+        setStatus("Saved. The engine has this list, armed again from where the show is.");
+        return true;
+      } catch (error) {
+        // The refusal — the padlock, or a list the backend will not accept — is what the operator must read, and
+        // nothing typed is thrown away: the draft stays on screen.
+        setStatus(String(error), true);
+        return false;
+      }
+    }
+
+    async function load() {
+      if (!hasTauri) { setStatus("This window is not running with the backend: the list cannot be read.", true); return; }
+      try {
+        adopt(await invoke("get_timecode_cues"));
+      } catch (error) {
+        setStatus(`The cue list could not be read: ${String(error)}`, true);
+        return;
+      }
+      await refreshMacroLibrary();
+    }
+
+    function fillMacroChoices(picker, cue) {
+      picker.replaceChildren();
+      const none = document.createElement("option");
+      none.value = "";
+      none.textContent = "(no macro)";
+      picker.appendChild(none);
+      macroLibrary.forEach((macro, index) => {
+        const option = document.createElement("option");
+        option.value = CUE.macroTokenAt(macroLibrary, index);
+        option.textContent = String(macro?.name ?? "").trim() || `(macro ${index + 1})`;
+        picker.appendChild(option);
+      });
+      picker.value = CUE.macroTokenForReference(macroLibrary, cue);
+    }
+    function refreshMacroChoices() {
+      document.querySelectorAll("select.cue-macro").forEach((picker) => {
+        const cue = cues.find((cue) => String(cue.id) === picker.closest(".cue-row")?.dataset.cueId);
+        if (cue) fillMacroChoices(picker, cue);
+      });
+      renderInspector();
+    }
+    let libraryReadGeneration = 0;
+    async function refreshMacroLibrary() {
+      if (!hasTauri) return;
+      const generation = ++libraryReadGeneration;
+      try {
+        const library = await invoke("load_macro_library");
+        if (generation !== libraryReadGeneration) return;
+        macroLibrary = Array.isArray(library?.macros) ? library.macros : [];
+        // Only choices/health change: never adopt the cue list or its saved baseline.
+        // Existing bindings keep their saved hash until explicitly rebound.
+        refreshMacroChoices();
+      } catch (error) {
+        if (generation === libraryReadGeneration) setStatus(`Macro choices could not be refreshed: ${String(error)}. Focus this window to retry.`, true);
+      }
+    }
+    async function listenForMacroLibraryChanges() {
+      if (!hasTauri) return;
+      try {
+        await window.__TAURI__.event.listen("macro-library-changed", () => refreshMacroLibrary());
+      } catch (error) { setStatus(`Library updates are unavailable: ${String(error)}. Focus this window to refresh.`, true); }
+    }
+    window.addEventListener("focus", () => refreshMacroLibrary());
+
+    /// **Add a cue at a typed position**, which is the door for a list built before the show runs and the same command
+    /// the settings page's own field reaches. **One button does both**, exactly as it does there, and the rules it
+    /// carries are the settings page's, kept rather than re-invented:
+    ///
+    ///   * an unsaved edit is saved **first**, because the backend reads the *file* and a file that had forgotten the
+    ///     screen would answer with a list that had;
+    ///   * a typed position **wins** over the live one, deliberately — an operator who typed one means that one, and a
+    ///     field that silently fell back to the position the clock happens to be showing would place the cue somewhere
+    ///     else without saying so;
+    ///   * the refusal is the backend parser's own sentence, shown unchanged.
+    async function addAtPosition() {
+      if (!hasTauri) { setStatus("Nothing was added: this window is not running with the backend.", true); return; }
+      if (dirty() && !(await save())) return;
+      const field = document.getElementById("add-position");
+      const typed = String(field?.value || "").trim();
+      try {
+        if (typed) {
+          adopt(await invoke("add_timecode_cue_at_position", { position: typed }));
+          if (field) field.value = "";
+          setStatus(`Added a cue at ${typed} — choose the macro it should fire.`);
+          return;
+        }
+        adopt(await invoke("add_timecode_cue_from_position"));
+        setStatus("Added where the show is now — choose the macro it should fire.");
+      } catch (error) {
+        setStatus(String(error), true);
+      }
+    }
+
+    async function addAtEnd() {
+      if (!hasTauri) { setStatus("Nothing was added: this window is not running with the backend.", true); return; }
+      if (dirty() && !(await save())) return;
+      try {
+        adopt(await invoke("add_timecode_cue_at_end"));
+        setStatus("Added at the end of the list — choose the macro it should fire, then its time.");
+      } catch (error) {
+        setStatus(String(error), true);
+      }
+    }
+
+    /// Capture the time arriving **now**: the same command the settings page's "Add cue here" reaches, so the position
+    /// is the backend's own reading and not a number this window copied out of a readout that may be a moment old.
+    async function capture() {
+      if (!hasTauri) { setStatus("Nothing was captured: this window is not running with the backend.", true); return; }
+      if (dirty() && !(await save())) return;
+      try {
+        adopt(await invoke("add_timecode_cue_from_position"));
+        setStatus("Added at the timecode arriving now — choose the macro it should fire.");
+      } catch (error) {
+        setStatus(String(error), true);
+      }
+    }
+
+    // ---- the clock, and what the engine has already done --------------------------------------------------------
+    function renderSnapshot(next) {
+      snapshot = next;
+      // Monitor versus Armed, and the band that says which: read from the engine, never from what this window asked
+      // for, because a banner that showed the request would be the one thing an operator must be able to trust.
+      rehearsing = Boolean(next?.rehearsing);
+      const banner = document.getElementById("monitor-banner");
+      if (banner) banner.hidden = !rehearsing;
+      const box = document.getElementById("rehearsal");
+      if (box) { box.disabled = false; box.removeAttribute("aria-description"); if (box.checked !== rehearsing) box.checked = rehearsing; }
+      const position = document.getElementById("position");
+      if (position) {
+        position.textContent = next?.position || "--:--:--:--";
+        position.classList.toggle("is-nothing", !next || next.state === "nothing");
+        position.classList.toggle("is-stale", Boolean(next) && next.state === "stale");
+      }
+      const state = document.getElementById("state");
+      if (state) {
+        // The sentence both other surfaces show, from the shared module: the freewheel window, the reason and what a
+        // returning signal does are one rule, not three.
+        state.textContent = CUE.timecodeStateText(next);
+        state.classList.toggle("is-stale", Boolean(next) && next.state === "stale");
+      }
+      const put = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+      put("rate", next?.rate ? `${next.rate} fps${next.drop_frame ? " · DF" : ""}` : "—");
+      put("source", next?.source || "—");
+      put("window", Number.isFinite(Number(next?.freewheel_ms)) ? `${(Number(next.freewheel_ms) / 1000).toFixed(2)} s` : "—");
+      put("counters", next ? `${next.pieces ?? 0} / ${next.positions ?? 0}` : "0");
+      const seconds = Number(next?.next_cue_seconds);
+      // **What the next cue is waiting for.** Which of the two it is belongs to the list's **drive** and not to this
+      // window: on the clock the incoming position crosses it, and on the manual drive the operator's Go is what fires
+      // it. The readout used to say "next LTC" whatever the drive was, which is a report that lies on a sequential show —
+      // and the countdown belongs to the clock alone, because nothing is counting down to a cue that waits for a person.
+      const sequential = (next?.drive || CUE.DRIVE_MODES[0]) === "sequential";
+      const nextLabel = document.getElementById("next-label");
+      if (nextLabel) {
+        nextLabel.textContent = sequential ? "next on Go" : "next LTC";
+        nextLabel.title = sequential
+          ? "The next cue of this list, waiting for the operator's Go: this list is on the manual drive, so the incoming timecode does not fire it."
+          : "The next cue the incoming timecode will cross, and how long is left before it does.";
+      }
+      put("next", next?.next_cue
+        ? `${next.next_cue}${!sequential && Number.isFinite(seconds) ? ` in ${seconds.toFixed(1)} s` : ""}`
+        : "—");
+      // The **sequence**, as the engine reports it rather than as this window remembers it: the engine is what fires, and
+      // a window opened halfway through a rehearsal has to be able to say where the sequence is.
+      const sequence = document.getElementById("sequence");
+      const goButton = document.getElementById("go");
+      if (sequence && goButton) {
+        goButton.disabled = !sequential;
+        goButton.title = sequential
+          ? GO_TITLE
+          : "Go is for a list driven one by one. Choose that drive to use it — by timecode, the clock fires the cues.";
+        if (!sequential) {
+          sequence.textContent = "";
+          sequence.classList.remove("is-due");
+        } else if (next?.sequential_at_end) {
+          sequence.textContent = "the sequence is at the end of the list";
+          sequence.classList.remove("is-due");
+        } else if (!next?.sequential_started) {
+          sequence.textContent = "waiting for a Go";
+          sequence.classList.remove("is-due");
+        } else {
+          sequence.textContent = next?.sequential_due
+            ? `running · next due ${next.sequential_due}`
+            : "running · waiting here for a Go";
+          sequence.classList.toggle("is-due", Boolean(next?.sequential_due));
+        }
+      }
+      // The engine's marks, painted from the snapshot: a window that opened after a crossing still shows what ran.
+      panel.applySnapshot(next);
+      renderInspector();
+      renderPlan();
+    }
+
+    let clockReadPending = false;
+    function showClockUnavailable(error) {
+      // Clear live claims; a failed backend read is different from a silent source.
+      snapshot = null;
+      const position = document.getElementById("position");
+      if (position) { position.textContent = "--:--:--:--"; position.classList.add("is-stale"); }
+      const monitor = document.getElementById("rehearsal");
+      if (monitor) { monitor.disabled = true; monitor.setAttribute("aria-description", "The current mode is unknown until the backend answers"); }
+      const sequence = document.getElementById("sequence");
+      if (sequence) sequence.textContent = "Live sequence state unavailable";
+      // Historical marks and the last known Monitor choice remain; neither is
+      // converted into a false assertion that the show is Armed/unspent.
+      const state = document.getElementById("state");
+      if (state) { state.textContent = `Clock state unavailable: ${String(error)}. If this persists, reopen this window.`; state.classList.add("is-stale"); }
+    }
+    async function poll() {
+      if (!hasTauri || clockReadPending) return;
+      clockReadPending = true;
+      let timedOut = false;
+      const timer = setTimeout(() => { timedOut = true; showClockUnavailable("the backend did not answer"); }, 1500);
+      try {
+        const next = await invoke("timecode_state");
+        if (!timedOut) renderSnapshot(next);
+      } catch (error) { showClockUnavailable(error); }
+      finally { clearTimeout(timer); clockReadPending = false; }
+    }
+
+    /// The engine's orders, **painted only**.
+    ///
+    /// Running a macro and answering for it belong to the main window: it is the one that fires and the one that
+    /// confirms, and a second window doing either would fire every cue twice. This one paints the marks and nothing
+    /// else — the same division `timecode.html` keeps, and the reason `timecode_pending_cues` is read-only.
+    async function paintFromEngine() {
+      if (!hasTauri) return;
+      try {
+        await window.__TAURI__.event.listen("timecode-cue", (event) => {
+          const payload = event?.payload || {};
+          const kind = payload.event?.kind || payload.kind;
+          const id = payload.event?.id ?? payload.id;
+          if (id && (kind === "fired" || kind === "skipped")) {
+            panel.mark(String(id), kind === "fired" ? "fired" : "skipped");
+            if (kind === "fired") lastFired = String(payload.event?.at ?? payload.at ?? "");
+            const put = document.getElementById("last");
+            if (put && kind === "fired") put.textContent = lastFired || "—";
+          }
+          if (kind === "rearmed") panel.clearMarksAfter(payload.event?.position ?? payload.position);
+        });
+      } catch (_) { /* a window that cannot hear the engine still shows the list */ }
+      try {
+        const pending = await invoke("timecode_pending_cues");
+        for (const entry of Array.isArray(pending) ? pending : []) {
+          const kind = entry?.event?.kind;
+          const id = entry?.event?.id;
+          if (id && kind === "fired") {
+            panel.mark(String(id), "fired");
+            lastFired = String(entry.event.at ?? "");
+          }
+          if (id && kind === "skipped") panel.mark(String(id), "skipped");
+        }
+        const put = document.getElementById("last");
+        if (put) put.textContent = lastFired || "—";
+      } catch (_) { /* no ledger to read is not a failure */ }
+    }
+
+    // ---- the controls -------------------------------------------------------------------------------------------
+    panel.attach({
+      filterInput: document.getElementById("filter"),
+      undoButton: document.getElementById("undo"),
+      saveButton: document.getElementById("save"),
+    });
+    document.getElementById("rows")?.addEventListener("click", (event) => {
+      const row = event.target instanceof Element ? event.target.closest(".cue-row") : null;
+      if (!row) {
+        // A click that lands on no row clears the selection, which is what a file list does and what an operator will
+        // try first — a selection with no way to drop it is a trap, because the next shift would move cues he had
+        // forgotten he picked.
+        panel.clearSelection();
+        panel.render();
+        selectedId = null;
+        renderInspector();
+        return;
+      }
+      const id = row.dataset.cueId || null;
+      if (!id) return;
+      // Click, shift-click for a range over **what is on screen**, and cmd/ctrl-click to add or remove one — the
+      // gestures of a file list, which is what an operator already knows. The **panel** owns the set and re-applies it
+      // as it paints; this handler reads the gesture, which is the part that belongs to a window.
+      panel.select(id, { range: event.shiftKey, toggle: event.metaKey || event.ctrlKey });
+      // The inspector describes the cue that was **clicked**, not the whole selection: it is one cue's chain, and a
+      // range of forty has no single chain to show.
+      selectedId = id;
+      renderInspector();
+    });
+    // Escape drops the selection too, for the operator who never thinks to click the empty space. It is bound to the
+    // list, not the document, so it cannot swallow the key from a dialog or a field somewhere else in the window.
+    // The list's own keys. Escape drops the selection — for the operator who never thinks to click the empty space — and
+    // Enter on a **row** appends a cue at the end, the keyboard path to the same action as the button, because building
+    // a long list is the one job this window exists for and it should not need the mouse.
+    //
+    // It is bound to the list rather than the document, so it cannot swallow the key from a dialog or a field elsewhere;
+    // and both keys are **guarded against a field**: Enter inside the time box belongs to the time box (the browser
+    // commits the value there), and stealing it would make typing a position and pressing Enter add a cue instead of
+    // setting the one being typed.
+    document.getElementById("rows")?.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" && event.key !== "Enter") return;
+      const target = event.target;
+      if (target instanceof Element && target.closest("input, select, textarea, button")) return;
+      if (event.key === "Escape") {
+        panel.clearSelection();
+        panel.render();
+        selectedId = null;
+        renderInspector();
+        return;
+      }
+      const row = target instanceof Element ? target.closest(".cue-row") : null;
+      if (!row) return;
+      event.preventDefault();
+      addAtEnd();
+    });
+    // ---- the bulk signed shift over the selection ---------------------------------------------------------------
+    //
+    // D5's other half, and the one the research settled: a **signed frame delta over the cues currently selected**,
+    // modelled on Hog 4 (select a range of Wait cells, edit one, and every selected value adjusts by the same amount).
+    // It is deliberately *not* a second way to offset the show: the global offset stays the one live authority at the
+    // single door, and this control never touches it.
+    const shiftBox = document.getElementById("shift-frames");
+    const shiftApply = document.getElementById("shift-apply");
+    /// **The last run, as a record and not as the current state.** Asked for when the operator opens it, never on the
+    /// poll: the snapshot is a DTO of 37 top-level fields every window requests four times a second, and this is up to 2 000 lines.
+    ///
+    /// It is deliberately a **separate, labelled** thing and it **never touches the row marks** — a mark says what THIS
+    /// session has fired, and a mark that said "fired" about a cue this session has not reached would be a lie about the
+    /// show in front of the operator. The wording of why a skip happened is not repeated here either: it comes from
+    /// `WingCueList.skipReason`, which is the one home for that sentence.
+    const lastRunShow = document.getElementById("last-run-show");
+    const lastRunPanel = document.getElementById("last-run");
+    const lastRunLines = document.getElementById("last-run-lines");
+    const lastRunNote = document.getElementById("last-run-note");
+
+    function renderLastRun(lines) {
+      if (!lastRunPanel || !lastRunLines) return;
+      lastRunLines.replaceChildren();
+      if (!lines || lines.length === 0) {
+        if (lastRunNote) lastRunNote.textContent = "Nothing has run yet: the record is empty, which is what a fresh installation shows.";
+        return;
+      }
+      if (lastRunNote) {
+        lastRunNote.textContent = `${lines.length} line${lines.length === 1 ? "" : "s"}: what the engine dealt with, oldest first.`;
+      }
+      for (const line of lines) {
+        const row = document.createElement("div");
+        row.className = "last-run-line";
+        const verb = line.spent === "skipped" ? "skipped" : "fired";
+        const name = line.number ? `${line.number} · ` : "";
+        // **No label: an AsRunLine has no such field.** The first version read `line.label`, which the record
+        // never carries, so the branch was dead in production and alive only because the stub fabricated one.
+        row.textContent = `${verb} ${name}${line.at}${WingCueList.skipReason(line)}${line.spent === "skipped" ? "" : ` · ${WingCueList.outcomeLabel(line.outcome)}`}`;
+        row.dataset.cueId = line.id;
+        lastRunLines.appendChild(row);
+      }
+    }
+
+    async function showLastRun() {
+      if (!lastRunPanel) return;
+      const opening = lastRunPanel.hidden;
+      lastRunPanel.hidden = !opening;
+      if (!opening) return;
+      try {
+        renderLastRun(await invoke("timecode_as_run"));
+      } catch (error) {
+        renderLastRun([]);
+        if (lastRunNote) lastRunNote.textContent = `The record could not be read: ${error}`;
+      }
+    }
+
+    lastRunShow?.addEventListener("click", showLastRun);
+    const shiftPreview = document.getElementById("shift-preview");
+    const shiftDelta = () => Math.trunc(Number(shiftBox?.value || 0)) || 0;
+
+    /// The frame rate the whole shift is counted in: the **source's**, which is the format every position is read in and
+    /// the one the rows are drawn with, falling back to the list's first cue and then to 25 — the same choice the
+    /// backend's add path makes, so a position typed into a row and a row moved by a shift cannot end up counted in two
+    /// different formats.
+    function shiftFps() {
+      if (snapshot?.rate) return CUE.framesPerSecond({ rate: `fps${String(snapshot.rate).replace(".", "_")}` });
+      if (cues[0]?.at) return CUE.framesPerSecond(cues[0].at);
+      return 25;
+    }
+
+    /// Where a cue would land, without moving it: one home for the arithmetic the preview and the shift both use, so
+    /// what the operator is shown cannot differ from what happens.
+    function shiftedAt(cue, delta, fps) {
+      return { ...cue.at, ...CUE.fromFrames(CUE.toFrames(cue.at, fps) + delta, fps, Boolean(cue.at.drop_frame)) };
+    }
+
+    /// What the shift will do, before it does it: the count, the first and last time it moves, and how many of the
+    /// selected cues the search is hiding. Hog 4 shows this by letting the operator edit the first cell and watching the
+    /// rest follow; ours cannot show a live edit, so it says it in words and waits for Apply.
+    function renderShiftPreview() {
+      if (!shiftBox || !shiftPreview || !shiftApply) return;
+      const chosen = panel.selection();
+      // An empty selection **disables** the control, because an unscoped shift is the global offset's job: two controls
+      // doing one thing is how a show moves twice.
+      shiftApply.disabled = chosen.length === 0;
+      if (chosen.length === 0) {
+        shiftPreview.textContent = "select the cues to move: click, shift-click for a range, cmd/ctrl-click to add one";
+        // The preview is one ellipsised line, so the whole sentence lives in the tooltip: a readout the operator
+        // cannot finish reading is a readout that lies by omission.
+        shiftPreview.title = shiftPreview.textContent;
+        return;
+      }
+      const delta = shiftDelta();
+      const fps = shiftFps();
+      const moved = chosen.map((id) => cues.find((cue) => cue.id === id)).filter(Boolean);
+      // **Earliest and latest**, not first and last in the array: what the operator is reading is the span the edit
+      // covers, and a list whose rows were arranged by hand can hold a later time above an earlier one.
+      const byTime = [...moved].sort((left, right) => CUE.toFrames(left.at, fps) - CUE.toFrames(right.at, fps));
+      const first = byTime[0];
+      const last = byTime[byTime.length - 1];
+      const visible = new Set(panel.visibleIds());
+      const hidden = moved.filter((cue) => !visible.has(String(cue.id))).length;
+      shiftPreview.textContent = `${moved.length} cue(s) · first ${CUE.positionText(first.at)} → ${CUE.positionText(shiftedAt(first, delta, fps))}`
+        + ` · last ${CUE.positionText(last.at)} → ${CUE.positionText(shiftedAt(last, delta, fps))}`
+        + (hidden ? ` · ${hidden} hidden by the search` : "")
+        + (delta === 0 ? " · a shift of 0 changes nothing" : "");
+      shiftPreview.title = shiftPreview.textContent;
+    }
+
+    /// Move the selected cues by the frame delta the operator typed.
+    ///
+    /// One **undo step** for the whole range — the panel's stack, opened once — and it refuses two things rather than
+    /// doing them quietly: a delta of zero, which would look like a control that does nothing, and a delta that would
+    /// take a selected cue below `00:00:00:00`, because a timecode wrapped round midnight would move that cue to the end
+    /// of the show rather than back by a few frames.
+    function applyShift() {
+      const chosen = panel.selection();
+      if (chosen.length === 0) return;
+      const delta = shiftDelta();
+      if (delta === 0) {
+        setStatus("Nothing moved: a shift of 0 frames would change nothing.", true);
+        return;
+      }
+      const fps = shiftFps();
+      const moved = chosen.map((id) => cues.find((cue) => cue.id === id)).filter(Boolean);
+      const below = moved.find((cue) => CUE.toFrames(cue.at, fps) + delta < 0);
+      if (below) {
+        setStatus(
+          `Nothing moved: ${CUE.cueName(below).text} would land before 00:00:00:00. Shift the selection later, or by fewer frames.`,
+          true,
+        );
+        return;
+      }
+      panel.pushUndo();
+      for (const cue of moved) cue.at = shiftedAt(cue, delta, fps);
+      panel.render();
+      panel.syncUndo();
+      setStatus(`${moved.length} cue(s) moved by ${delta > 0 ? "+" : ""}${delta} frames. It is local until Save (re-arms).`);
+      renderShiftPreview();
+    }
+    shiftBox?.addEventListener("input", renderShiftPreview);
+    shiftApply?.addEventListener("click", applyShift);
+
+    document.getElementById("sort")?.addEventListener("change", (event) => {
+      if (!CUE.SORT_MODES.includes(event.target.value)) return;
+      sortMode = event.target.value;
+      panel.render();
+      // Both list-level selectors **write the file at once**, unlike a row's fields: the order decides which cue is
+      // "next" when two share a position and the drive decides whether a Go exists at all, so a screen showing one the
+      // engine is not running is worse than a write nobody asked for. A row stays local until Save; these do not.
+      save();
+    });
+    document.getElementById("save")?.addEventListener("click", () => { save(); });
+    // The settings page's own handler is three lines, and it says what an empty list deserves to be told rather than
+    // leaving the button apparently dead: the panel's `renumberCues()` answers false when there is nothing to number.
+    document.getElementById("renumber")?.addEventListener("click", () => {
+      if (!panel.renumberCues()) {
+        setStatus("There is nothing to number: the cue list is empty.", true);
+      }
+    });
+    document.getElementById("add-end")?.addEventListener("click", () => { addAtEnd(); });
+    document.getElementById("add-at")?.addEventListener("click", () => { addAtPosition(); });
+    document.getElementById("capture")?.addEventListener("click", () => { capture(); });
+    function applyLive(next) {
+      live = Boolean(next);
+      document.body.classList.toggle("is-live", live);
+      const button = document.getElementById("live");
+      if (button) button.setAttribute("aria-pressed", live ? "true" : "false");
+      writeStored("wing_ltc_live", live ? "true" : "false");
+    }
+    document.getElementById("live")?.addEventListener("click", () => applyLive(!live));
+
+    // ---- the rehearsal plan: what a watched list would have fired ----------------------------------------------
+    /// The plan, newest last, with how late each crossing was.
+    ///
+    /// It is read from the **snapshot** rather than heard, and that is the whole design: in Monitor the engine emits
+    /// nothing at all, so there is no event to listen for. Reading it is also why this window cannot fire a macro while
+    /// Monitor is on — the only thing that ever makes it fire is an event, and none arrives.
+    function renderPlan() {
+      const section = document.getElementById("plan");
+      const body = document.getElementById("plan-body");
+      const clear = document.getElementById("clear-plan");
+      if (!section || !body) return;
+      const plan = Array.isArray(snapshot?.rehearsal_plan) ? snapshot.rehearsal_plan : [];
+      section.hidden = !rehearsing;
+      if (clear) clear.hidden = !rehearsing || plan.length === 0;
+      if (!rehearsing) return;
+      body.textContent = "";
+      if (plan.length === 0) {
+        const hint = document.createElement("p");
+        hint.className = "note";
+        hint.textContent = "Nothing yet: the list is being watched, and this fills in as the timecode runs through it.";
+        body.appendChild(hint);
+        return;
+      }
+      // The last twelve, because a plan is read at a glance — and the count below says how many are not shown, rather
+      // than a report that silently stops.
+      const shown = plan.slice(-12);
+      const table = document.createElement("table");
+      const head = document.createElement("tr");
+      for (const label of ["position", "what", "cue", "late"]) {
+        const th = document.createElement("th");
+        th.textContent = label;
+        head.appendChild(th);
+      }
+      table.appendChild(head);
+      for (const line of shown) {
+        const row = document.createElement("tr");
+        if (line.kind === "skipped") row.className = "skipped";
+        const late = line.delta_frames === null || line.delta_frames === undefined
+          ? ""
+          : `${Number(line.delta_frames) >= 0 ? "+" : ""}${line.delta_frames} f`;
+        const cells = [
+          String(line.position || "—"),
+          line.kind === "fired" ? "fires" : line.kind === "skipped" ? "skipped" : "re-armed",
+          line.at || "—",
+          late,
+        ];
+        cells.forEach((text, index) => {
+          const td = document.createElement("td");
+          td.textContent = text;
+          if (index === 3) td.className = `delta${Number(line.delta_frames) > 0 ? " late" : ""}`;
+          row.appendChild(td);
+        });
+        table.appendChild(row);
+      }
+      body.appendChild(table);
+      if (plan.length > shown.length) {
+        const more = document.createElement("p");
+        more.className = "note";
+        more.textContent = `${plan.length - shown.length} earlier line(s) not shown, of ${plan.length}.`;
+        body.appendChild(more);
+      }
+    }
+
+    // ---- the transport: the drive mode and the operator's Go ---------------------------------------------------
+    // The mode is a **property of the list**, so changing it saves the list — which also re-arms the engine, and that is
+    // what a mode change should do: a sequence started under the other mode must not carry into this one. Anything else
+    // would leave the selector saying one thing while the engine ran the other, which is the defect this project keeps
+    // removing.
+    const goButton = document.getElementById("go");
+    const GO_TITLE = goButton?.title || "";
+    document.getElementById("drive")?.addEventListener("change", (event) => {
+      if (!CUE.DRIVE_MODES.includes(event.target.value)) return;
+      drive = event.target.value;
+      panel.render();
+      save();
+    });
+
+    // The offset is the same kind of value as the drive and the order — how this list is run, carried in the file, and
+    // not an edit to any row — so it behaves the same way: it is normalised, the inspector is repainted (it prints the
+    // offset this window will write), and it **saves and re-arms**. A value that appeared to apply and did not would
+    // be the defect this repository keeps finding, and the field's tooltip says it re-arms before it is used.
+    document.getElementById("offset")?.addEventListener("change", (event) => {
+      const frames = Math.trunc(Number(event.target.value || 0)) || 0;
+      offsetFrames = frames;
+      event.target.value = String(frames);
+      renderInspector();
+      save();
+    });
+
+    /// The Go: fire the next cue in a sequential list.
+    ///
+    /// It is a **show** action, not an edit, so unsaved changes are refused rather than saved quietly: the engine fires
+    /// the list it holds, and a Go that fired a list the operator cannot see would be the worst kind of surprise.
+    async function go() {
+      if (!hasTauri) { setStatus("Nothing was fired: this window is not running with the backend.", true); return; }
+      if (dirty()) {
+        setStatus("Nothing was fired: save first. The engine fires the list it holds, and this one has unsaved changes.", true);
+        return;
+      }
+      try {
+        const fired = Number(await invoke("timecode_sequential_go"));
+        setStatus(fired > 0
+          ? "Fired the next cue."
+          : "The sequence is at the end of the list: there is nothing left to fire.");
+      } catch (error) {
+        setStatus(String(error), true);
+      }
+    }
+    goButton?.addEventListener("click", () => { go(); });
+
+    // ---- Monitor: the switch that decides whether the show fires -----------------------------------------------
+    //
+    // It is in the footer with the editing tools and not in Live, because it governs: an operator who switched it on
+    // during a show would stop the show firing. What makes that safe to offer at all is the band across the window and
+    // the fact that the engine, not this window, is where "nothing is emitted" is enforced.
+    const rehearsalBox = document.getElementById("rehearsal");
+    rehearsalBox?.addEventListener("change", async () => {
+      if (!hasTauri) {
+        rehearsalBox.checked = rehearsing;
+        setStatus("Nothing changed: this window is not running with the backend.", true);
+        return;
+      }
+      try {
+        // The answer is the **engine's** state, not the request: it is what the band and the box are then set from.
+        const on = Boolean(await invoke("set_timecode_rehearsal", { rehearsing: rehearsalBox.checked }));
+        rehearsing = on;
+        rehearsalBox.checked = on;
+        setStatus(on
+          ? "Monitor is on: the list is evaluated and reported, and nothing is emitted — no macro runs until it is switched off."
+          : "Armed: the list governs again, and the next crossing fires.");
+        poll();
+      } catch (error) {
+        rehearsalBox.checked = rehearsing;
+        setStatus(String(error), true);
+      }
+    });
+    document.getElementById("clear-plan")?.addEventListener("click", async () => {
+      if (!hasTauri) return;
+      try {
+        await invoke("set_timecode_rehearsal", { rehearsing, clearPlan: true });
+        poll();
+      } catch (error) {
+        setStatus(String(error), true);
+      }
+    });
+
+    /// **The list changed somewhere else.** Every write — a save here, an add, an import, a station-backup restore —
+    /// goes through **one** backend door, which announces it with the list it installed. Carrying the list is what
+    /// makes this honest and simple: the window asks *"is that what I have?"* by comparing, instead of holding a flag
+    /// across an `await` that a refusal or a throw could leave set. The event is emitted before the command returns, so
+    /// the window that made the change hears its own echo while its `invoke` is still in flight — without the payload
+    /// that echo would be indistinguishable from somebody else's change, and a save would be reported to the operator
+    /// as another window's doing.
+    ///
+    /// Three cases, and the last is the one that matters:
+    ///   * the published list **is** the one this window has: nothing to do and nothing to say — our own echo;
+    ///   * it differs and there is **nothing unsaved** here: take it, which is what makes two editors of one file
+    ///     agree instead of drifting apart until somebody looks;
+    ///   * it differs and there **are** unsaved edits: keep them and **say so**, because adopting a foreign list over
+    ///     the operator's typing would lose work, and saying nothing would leave the two disagreeing in the dark.
+    async function listenForCueListChanges() {
+      if (!hasTauri || typeof window.__TAURI__?.event?.listen !== "function") return;
+      try {
+        await window.__TAURI__.event.listen("timecode-cues-changed", (event) => {
+          const published = event?.payload;
+          if (!published || !Array.isArray(published.cues)) return;
+          // **All four fields, not just the cue array.** A published list whose cues are byte-identical can still be a
+          // change to the offset, the order or the drive mode — and comparing the array alone made an offset-only
+          // change reach nobody, because this check runs **before** the dirty rule and returns early on a match.
+          const sameHeld =
+            JSON.stringify(published.cues) === JSON.stringify(savedCues) &&
+            Math.trunc(Number(published.offset_frames ?? 0)) === Math.trunc(Number(savedOffsetFrames ?? 0)) &&
+            String(published.sort ?? CUE.SORT_MODES[0]) === String(sortFromFile ?? CUE.SORT_MODES[0]) &&
+            String(published.drive ?? CUE.DRIVE_MODES[0]) === String(savedDrive ?? CUE.DRIVE_MODES[0]);
+          if (sameHeld) return;
+          if (dirty()) {
+            cueListChangedElsewhere =
+              // No claim that can stop being true: the operator can press Undo until the draft matches what is saved,
+              // and "your unsaved changes are kept here" would then be a sentence about something that no longer
+              // exists. This window being out of date, however, stays the case until it adopts.
+              "The cue list was changed in another window, and this window is still showing the version it had. Saving here would replace that change.";
+            setStatus("");
+            return;
+          }
+          cueListChangedElsewhere = "";
+          adopt(published);
+        });
+      } catch (_) { /* a window that cannot hear the other one still edits the list */ }
+    }
+
+    applyLive(live);
+    listenForMacroLibraryChanges().then(load);
+    paintFromEngine();
+    listenForCueListChanges();
+    poll();
+    setInterval(poll, 250);
+  </script>
+</body>
+</html>

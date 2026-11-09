@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · a text size that is none of the kit's five</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* RULE 8, first check. The kit is a scale of five steps derived from one knob; 20px is none of them at any position
+     of that knob. The page is otherwise the conforming baseline, so this is the only thing wrong with it. */
+  #invented {
+    font-size: 20px;
+  }
+</style>
+</head>
+<body>
+  <!-- The size is a step invented on this screen. Every other text on the fixture comes from `fixture.css`'s
+       `font-size: var(--font-base)`, so the suite has a conforming majority to compare against. -->
+  <div class="panel" id="size-panel">
+    <span id="invented">a size this screen invented</span>
+  </div>
+</body>
+</html>

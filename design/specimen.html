@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WING CONTROLLER — design kit specimen</title>
+<!-- The kit's own two files, linked exactly as a consumer links them: the values first, then the components drawn
+     from them. Nothing else is loaded: no font, no script, no image, nothing from a network.
+     `scripts/test-specimen.mjs` fails if a reference that would need one appears. -->
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* This page is the reference, so it follows the kit it shows: every colour, size and space below is a token
+     reference, never a literal. **Every control it draws comes from `components.css`** rather than being retyped
+     here, because a component sheet the kit's own page does not use is a copy rather than a layer. What is left in
+     this block is the specimen's own furniture — the two columns, the samples, the swatches and the captions — which
+     is the part the kit deliberately does not name (§1: it names furniture, never an arrangement). */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--win-gray);
+    color: var(--ink);
+    font-family: var(--win-font);
+    font-size: var(--font-base);
+    line-height: 1.4;
+  }
+  .tok, .val, .measured, .mono { font-family: var(--mono); }
+
+  /* ---- the page's own furniture ------------------------------------------------------------------------------ */
+  .page-head { margin: var(--space-4); background: var(--face); }
+  .page-title {
+    background: var(--win-title-bg);
+    color: var(--win-title-text);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-base);
+  }
+  .page-head-body { padding: var(--space-3); }
+  .page-head h1 { margin: 0 0 var(--space-2); font-size: var(--font-lg); }
+  .page-head p { margin: 0 0 var(--space-2); max-width: 92ch; color: var(--muted); font-size: var(--font-xs); }
+  .page-head p.lead { color: var(--ink); font-size: var(--font-sm); }
+  .filter { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-2); }
+  .filter label { font-size: var(--font-xs); color: var(--ink); }
+  /* The filter's own width, and the one thing this page adds to the kit's field: the query is a token name, so it is
+     read as a value and is `--mono`. Everything else about it — the sunken pair, the ground, the type step — is
+     `input[type="search"]` in `components.css`. */
+  .filter input[type="search"] { min-width: 24ch; font-family: var(--mono); }
+
+  /* ---- the two themes, side by side ------------------------------------------------------------------------- */
+  .themes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: 0 var(--space-4) var(--space-4);
+    align-items: start;
+  }
+  @media (max-width: 1100px) { .themes { grid-template-columns: minmax(0, 1fr); } }
+  .theme-col { padding: var(--space-3); background: var(--win-gray); color: var(--ink); }
+  .theme-title { margin: 0 0 var(--space-3); font-size: var(--font-sm); font-weight: normal; }
+
+  /* ---- samples ------------------------------------------------------------------------------------------------ */
+  .block { margin: 0 0 var(--space-4); }
+  .block > h3 {
+    margin: 0 0 var(--space-2);
+    padding-bottom: var(--space-1);
+    border-bottom: 1px solid var(--line);
+    font-size: var(--font-sm);
+    font-weight: normal;
+  }
+  .sample { margin: 0 0 var(--space-3); padding: var(--space-2); background: var(--face); }
+  .sample-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); margin-bottom: var(--space-2); }
+  .tok { font-size: var(--font-xs); color: var(--ink); }
+  .val {
+    padding: 0 var(--space-1);
+    background: var(--field);
+    color: var(--ink);
+    font-size: var(--font-xs);
+    overflow-wrap: anywhere;
+    border: 1px solid;
+    border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  }
+  .measured { color: var(--muted); font-size: var(--font-xs); }
+  .note { color: var(--muted); font-size: var(--font-xs); }
+  .sample-body { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+  .swatch {
+    display: block;
+    width: 100%;
+    height: 26px;
+    border: 1px solid;
+    border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  }
+  .ramp-demo {
+    display: block;
+    width: 100%;
+    height: 16px;
+    background: var(--meter-ramp);
+    border: 1px solid;
+    border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  }
+  .space-demo { display: block; height: 16px; background: var(--accent); }
+  /* The composition layer's two samples. The shapes come from the kit's own `.raised`/`.sunken` classes rather than a
+     pair retyped here, and the two values are read from the tokens: a demo that hard-coded the teal would be the second
+     answer this kit exists to remove. */
+  .desk-demo { display: block; width: 100%; padding: var(--space-3); background: var(--desk); }
+  .desk-demo-window {
+    display: block;
+    padding: var(--space-2);
+    background: var(--face);
+    color: var(--ink);
+    font-size: var(--font-xs);
+  }
+  .ops-demo { display: block; width: var(--ops-col-width); max-width: 100%; height: 14px; background: var(--face-2); }
+  .type-demo { display: block; color: var(--ink); }
+  /* The leading sample: the type sample's own shape, with the line box the token decides. The measure is in `ch`,
+     the page's own furniture, so the paragraph wraps and the line box is something a reader can see rather than a
+     number printed beside a single line. */
+  .leading-demo {
+    display: block;
+    width: 34ch;
+    color: var(--ink);
+    font-size: var(--font-base);
+    line-height: var(--leading-base);
+  }
+  .crt-demo {
+    display: block;
+    padding: var(--space-1) var(--space-2);
+    background: var(--crt);
+    color: var(--crt-ink);
+    font-family: var(--mono);
+    font-size: var(--font-sm);
+  }
+  .knob-row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; width: 100%; }
+  .knob-row label { font-size: var(--font-xs); color: var(--muted); }
+  input[type="range"] { accent-color: var(--accent); }
+
+  /* ---- components: the vocabulary of §8 ----------------------------------------------------------------------- */
+  /* These are the sample *frames*, not the components: the component drawings themselves are `components.css`, which
+     this page links, and `scripts/test-specimen.mjs` requires a rendered sample for every word of §8. */
+  .component { margin: 0 0 var(--space-4); }
+  .component-cap { margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--font-xs); }
+  .component-cap strong { color: var(--ink); font-family: var(--mono); font-weight: normal; }
+  .bevel-demo { display: block; width: 112px; height: 44px; background: var(--face-2); }
+</style>
+</head>
+<body>
+
+<header class="page-head raised">
+  <div class="page-title">WING CONTROLLER — design kit specimen</div>
+  <div class="page-head-body">
+    <h1>Every value the kit declares, and every component it names, in both themes</h1>
+    <p class="lead">
+      This is the reference an agent opens when it has to make something look like the kit and cannot see a screen.
+      The two columns are the same markup under the two themes: <strong>light</strong> is <code>:root</code>,
+      <strong>dark</strong> is <code>body.theme-dark</code>, and they are shown together so a difference between them
+      is visible rather than remembered.
+    </p>
+    <p>
+      <strong>How to read a sample.</strong> Every sample is a card labelled with the token's CSS name. Beside that
+      name the card prints <em>the value that card resolves to in this column</em>, read from the live cascade when the
+      page loaded — so a printed value cannot disagree with the colour or size next to it. A reading that is measured
+      rather than declared (a border colour, a font size) is printed after the arrow. Type a token name into the
+      filter to find its sample; each name appears once per column.
+    </p>
+    <p>
+      Nothing here is downloaded: the only files this page links are <code>tokens.css</code> and
+      <code>components.css</code>, both in this folder — the kit's values, then the kit's drawings of them, which is the
+      order a consumer links them in too. The kit
+      itself carries no JavaScript on purpose; this page carries one small local script, because it has to read the
+      live values and show two themes at once — a script in this folder is still nothing downloaded and no build step.
+      The kit's version is the one in <code>VERSION</code> — this page does not copy the number, so it cannot go stale.
+      The dark column is drawn by re-declaring, on that column only, the values the dark cascade resolved; everything
+      the dark theme inherits keeps inheriting, which is how the type scale stays one knob for both columns.
+    </p>
+    <div class="filter">
+      <label for="sample-filter">find a sample:</label>
+      <input id="sample-filter" data-control="sample-filter" type="search" placeholder="--meter-ramp" autocomplete="off">
+    </div>
+    <noscript><p>Without JavaScript the samples still draw, but the printed values, the dark column and the filter do not.</p></noscript>
+  </div>
+</header>
+
+<main class="themes">
+  <section class="theme-col sunken" data-theme="light" aria-label="light theme">
+    <h2 class="theme-title">light · <code>:root</code></h2>
+    <div class="theme-body">
+
+      <section class="block">
+        <h3>Components — the vocabulary of §8</h3>
+
+        <div class="component" data-component="window">
+          <div class="c-window">
+            <div class="c-titlebar">
+              <span>Meters</span>
+              <span class="c-titlebtns"><span class="c-mini">–</span><span class="c-mini">□</span><span class="c-mini">×</span></span>
+            </div>
+            <div class="c-window-body"><span class="note">the surface everything else sits on</span></div>
+          </div>
+          <p class="component-cap"><strong>window</strong> — a top-level surface with its own title bar</p>
+        </div>
+
+        <div class="component" data-component="panel">
+          <div class="c-panel">
+            <div class="c-panel-head">Channels</div>
+            <div class="c-panel-body"><span class="note">a titled region inside a window</span></div>
+          </div>
+          <p class="component-cap"><strong>panel</strong> — a titled region inside a window</p>
+        </div>
+
+        <div class="component" data-component="card">
+          <div class="c-card">
+            <div class="c-card-head card-head-row">
+              <span>Scene 1 · recalled 14:02</span>
+              <button class="c-btn" type="button" data-control="toggle" aria-pressed="false">Follow</button>
+            </div>
+            <span class="note">a raised, self-contained block inside a panel</span>
+          </div>
+          <p class="component-cap"><strong>card</strong> — a raised, self-contained block inside a panel. A head carrying a title alone is <code>.c-card-head</code>; one carrying the action that belongs to the card is also <code>.card-head-row</code>, the kit's head row on the head's own face — a chip, a note and the control on one wrapping baseline, rather than the second plate <code>.section-head</code> would draw inside it. <strong>Follow</strong> is a live control: press it and it latches into the sunken pair</p>
+        </div>
+
+        <div class="component" data-component="row">
+          <div class="c-row raised">
+            <span class="c-row-name">CH 12 · lead vocal</span>
+            <span class="c-well">−6.0</span>
+            <span class="c-chip"><span class="dot is-confirmed"></span>live</span>
+            <button class="c-btn" type="button" data-control="mute-toggle">Mute</button>
+            <button class="c-btn" type="button" data-control="toggle" aria-pressed="true">Solo</button>
+          </div>
+          <p class="component-cap"><strong>row</strong> — one item of a list, with its own controls. <strong>Mute</strong> and <strong>Solo</strong> are the button’s two states: raised at rest, and the sunken pair a latched control wears. Both are live — press Mute and the pair sinks (<code>button:active</code>, <code>button[aria-pressed="true"]</code>)</p>
+        </div>
+
+        <div class="component" data-component="well">
+          <div class="c-row">
+            <span class="c-crt">01:02:03:04</span>
+            <span class="c-well">−6.0 dB</span>
+          </div>
+          <p class="component-cap"><strong>well</strong> — a sunken area holding a value the instrument reports</p>
+        </div>
+
+        <div class="component" data-component="meter">
+          <div class="c-row">
+            <span class="c-row-name">CH 12</span>
+            <span class="c-meter" style="flex: 1 1 24ch; --meter-level: 92%"><span class="c-meter-mask"></span></span>
+          </div>
+          <div class="c-row">
+            <span class="c-row-name">CH 13</span>
+            <span class="c-meter" style="flex: 1 1 24ch; --meter-level: 56%"><span class="c-meter-mask"></span></span>
+          </div>
+          <div class="c-row">
+            <span class="c-row-name">CH 14</span>
+            <span class="c-meter" style="flex: 1 1 24ch; --meter-level: 18%"><span class="c-meter-mask"></span></span>
+          </div>
+          <p class="component-cap"><strong>meter</strong> — a bar showing a level the instrument reports. <code>--meter-ramp</code> is the <em>track’s</em> own background, laid out once across the whole track, and <code>.c-meter-mask</code> is the unlit cover anchored to the right; the reading is a percentage written where the meter is used (<code>style="--meter-level: 74%"</code>), and the cover’s width is its inverse. Putting the ramp on the lit element instead squeezes green-to-red into the lit fraction — a quiet channel showing red at its end, which the conformance suite does not catch</p>
+        </div>
+
+        <div class="component" data-component="field">
+          <label class="c-label">name <input class="c-field" type="text" value="lead vocal" autocomplete="off"></label>
+          <label class="c-label">threshold <input class="c-field is-number" type="text" value="−24.0" autocomplete="off"></label>
+          <label class="c-label">bank
+            <select class="c-select">
+              <option>Main</option>
+              <option>Monitors</option>
+              <option>Solo bus</option>
+            </select>
+          </label>
+          <p class="component-cap"><strong>field</strong> — a sunken area the operator types into; a value read as a number is <code>--mono</code>. The <strong>select</strong> is the same field plus the kit’s own arrow, drawn in <code>--ink</code> so it follows the theme: the platform’s arrow sits inside the control and does not respect the kit’s edge pair, and <code>--line-dark</code> would be invisible on the dark field (measured 1.04:1)</p>
+        </div>
+
+        <div class="component" data-component="chip">
+          <div class="c-row">
+            <span class="c-chip"><span class="dot is-sent"></span>sent</span>
+            <span class="c-chip"><span class="dot is-confirmed"></span>confirmed</span>
+            <span class="c-chip"><span class="dot is-warning"></span>unconfirmed</span>
+            <span class="c-chip"><span class="dot is-unknown"></span>unknown</span>
+            <span class="c-chip"><span class="dot is-refusal"></span>refused</span>
+          </div>
+          <p class="component-cap"><strong>chip</strong> — a small raised label attached to a row: a state, a count, a section. The word carries the state; the dot only repeats it, because a state must be readable without colour (§11.6) — and the <strong>unknown</strong> dot is hollow rather than a filled disc, so the three answers differ in shape and not only in ink</p>
+        </div>
+
+        <div class="component" data-component="badge">
+          <div class="c-row">
+            <span class="c-chip">48 ch</span>
+            <span class="c-chip">16 bus</span>
+            <span class="c-chip">2 solo</span>
+          </div>
+          <p class="component-cap"><strong>badge</strong> — the same small raised label, carrying a count</p>
+        </div>
+
+        <div class="component" data-component="band">
+          <div class="c-band is-confirmed">Confirmed: the console took the write and read the value back from the same leaf</div>
+          <div class="c-band is-warning">Rehearsal armed — cues will not be sent</div>
+          <div class="c-band is-refusal">Refused: the console is not answering on this transport</div>
+          <div class="c-band is-unknown">Unknown: no reading since this window opened</div>
+          <p class="component-cap"><strong>band</strong> — a full-width strip that carries one message, and names its cause in the operator's words. The three answers a machine can give are told apart by shape as well as by colour (§11.6): the confirmed and refusal bands are <strong>solid</strong>, the unknown band is <strong>dashed</strong>, and the unknown dot in the chip above is <strong>hollow</strong> — so a reader who sees no green, red or grey still tells a refusal from an absence</p>
+        </div>
+
+        <div class="component" data-component="rail">
+          <div class="c-rail">
+            <span class="c-rail-item">1</span>
+            <span class="c-rail-item is-selected">2</span>
+            <span class="c-rail-item">3</span>
+            <span class="c-rail-item">4</span>
+          </div>
+          <p class="component-cap"><strong>rail</strong> — a narrow column used to navigate a list bigger than the screen</p>
+        </div>
+      </section>
+
+      <section class="block">
+        <h3>Bevels — the two shapes, and no third</h3>
+
+        <figure class="sample raised" data-bevel="raised">
+          <figcaption class="sample-head"><code class="tok">bevel.raised</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="bevel-demo raised"></span>
+            <span class="note">a control: light before dark. The reading names the token each edge resolved to.</span>
+          </div>
+        </figure>
+
+        <figure class="sample raised" data-bevel="sunken">
+          <figcaption class="sample-head"><code class="tok">bevel.sunken</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="bevel-demo sunken"></span>
+            <span class="note">a well: the same pair, reversed. A control inside a well is fine; one element wearing both is not.</span>
+          </div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>Colour — the face and the window furniture</h3>
+
+        <figure class="sample raised" data-token="--face">
+          <figcaption class="sample-head"><code class="tok">--face</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--face)"></span><span class="note">the metal a raised control is made of</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--face-2">
+          <figcaption class="sample-head"><code class="tok">--face-2</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--face-2)"></span><span class="note">the second step: a card laid on a face</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--face-3">
+          <figcaption class="sample-head"><code class="tok">--face-3</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--face-3)"></span><span class="note">the third step, and the one the theme moves furthest</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--field">
+          <figcaption class="sample-head"><code class="tok">--field</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--field)"></span><span class="note">the sunken surface a field or a well is filled with</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-gray">
+          <figcaption class="sample-head"><code class="tok">--win-gray</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-gray)"></span><span class="note">the classic window grey: the desk a window stands on</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-btn-face">
+          <figcaption class="sample-head"><code class="tok">--win-btn-face</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-btn-face)"></span><span class="note">the meters window's own name for the button face</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-btn-highlight">
+          <figcaption class="sample-head"><code class="tok">--win-btn-highlight</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-btn-highlight)"></span><span class="note">the meters window's top-left highlight</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-btn-shadow">
+          <figcaption class="sample-head"><code class="tok">--win-btn-shadow</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-btn-shadow)"></span><span class="note">the meters window's bottom-right shadow</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-btn-dark-shadow">
+          <figcaption class="sample-head"><code class="tok">--win-btn-dark-shadow</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-btn-dark-shadow)"></span><span class="note">the darkest step of a button bevel</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-window-frame">
+          <figcaption class="sample-head"><code class="tok">--win-window-frame</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-window-frame)"></span><span class="note">the outline of a window; it does not change with the theme</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-text">
+          <figcaption class="sample-head"><code class="tok">--win-text</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-text)"></span><span class="note">the meters window's ink</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-title-bg">
+          <figcaption class="sample-head"><code class="tok">--win-title-bg</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-title-bg)"></span><span class="note">the title bar of a window</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--win-title-text">
+          <figcaption class="sample-head"><code class="tok">--win-title-text</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--win-title-text)"></span><span class="note">the ink a title bar carries</span></div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>Ink — three weights of text</h3>
+
+        <figure class="sample raised" data-token="--ink">
+          <figcaption class="sample-head"><code class="tok">--ink</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--ink)"></span><span class="note">what matters</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--muted">
+          <figcaption class="sample-head"><code class="tok">--muted</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--muted)"></span><span class="note">what explains</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--dim">
+          <figcaption class="sample-head"><code class="tok">--dim</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--dim)"></span><span class="note">what is absent, and the colour of the unknown state</span></div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>Lines — the four steps a bevel is built from</h3>
+
+        <figure class="sample raised" data-token="--line">
+          <figcaption class="sample-head"><code class="tok">--line</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--line)"></span><span class="note">the divider between two flat faces</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--line-mid">
+          <figcaption class="sample-head"><code class="tok">--line-mid</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--line-mid)"></span><span class="note">the same step, spelled the way the meters window spells it</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--line-light">
+          <figcaption class="sample-head"><code class="tok">--line-light</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--line-light)"></span><span class="note">the top-left highlight of a bevel</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--line-dark">
+          <figcaption class="sample-head"><code class="tok">--line-dark</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--line-dark)"></span><span class="note">the bottom-right shadow of a bevel</span></div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>Colour has meaning — never choose one for how it looks (§5)</h3>
+
+        <figure class="sample raised" data-token="--accent">
+          <figcaption class="sample-head"><code class="tok">--accent</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--accent)"></span><span class="note">selection and focus — the thing the operator is acting on. Never a status.</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--maroon">
+          <figcaption class="sample-head"><code class="tok">--maroon</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--maroon)"></span><span class="note">a warning that is not yet a refusal: attention, and the action is still possible</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--amber">
+          <figcaption class="sample-head"><code class="tok">--amber</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--amber)"></span><span class="note">unfinished or inherited: a value that was not set here</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--green">
+          <figcaption class="sample-head"><code class="tok">--green</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--green)"></span><span class="note">confirmed: the thing happened and was verified</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--green-dim">
+          <figcaption class="sample-head"><code class="tok">--green-dim</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--green-dim)"></span><span class="note">confirmed, at the weight of a background</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--yellow">
+          <figcaption class="sample-head"><code class="tok">--yellow</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--yellow)"></span><span class="note">attention, and the meter's warning band</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--red">
+          <figcaption class="sample-head"><code class="tok">--red</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--red)"></span><span class="note">refusal or failure: this will not happen</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--red-bright">
+          <figcaption class="sample-head"><code class="tok">--red-bright</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--red-bright)"></span><span class="note">refusal at its loudest</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--gold">
+          <figcaption class="sample-head"><code class="tok">--gold</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--gold)"></span><span class="note">the top of the meter's scale</span></div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>The instrument — the well, its phosphor, and the scale knob</h3>
+
+        <figure class="sample raised" data-token="--crt">
+          <figcaption class="sample-head"><code class="tok">--crt</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="swatch" style="background: var(--crt)"></span><span class="note">the instrument's own well</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--crt-ink">
+          <figcaption class="sample-head"><code class="tok">--crt-ink</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="swatch" style="background: var(--crt-ink)"></span>
+            <span class="crt-demo">00:01:23:14</span>
+            <span class="note">the phosphor. It is deliberately the same in both themes: the instrument, not the furniture.</span>
+          </div>
+        </figure>
+
+        <figure class="sample raised" data-token="--meter-ramp">
+          <figcaption class="sample-head"><code class="tok">--meter-ramp</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="ramp-demo"></span>
+            <span class="note">the level ramp: measured from the instrument window, green to the reference, warning above it, red at the top — and the same in both themes</span>
+          </div>
+        </figure>
+
+        <figure class="sample raised" data-token="--meter-scale">
+          <figcaption class="sample-head"><code class="tok">--meter-scale</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="knob-row">
+              <label>the single knob every font step is derived from
+                <input data-control="meter-scale-knob" type="range" min="1" max="2" step="0.05" value="1">
+              </label>
+            </span>
+            <span class="note">move it: the type samples below resize, in both columns — no screen invents a pixel size</span>
+          </div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>Type — two families, and one scale</h3>
+
+        <figure class="sample raised" data-token="--win-font">
+          <figcaption class="sample-head"><code class="tok">--win-font</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="type-demo" style="font-size: var(--font-base)">Channel 12 · lead vocal · saved with the scene</span>
+            <span class="note">the interface family</span>
+          </div>
+        </figure>
+
+        <figure class="sample raised" data-token="--mono">
+          <figcaption class="sample-head"><code class="tok">--mono</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="type-demo" style="font-size: var(--font-base); font-family: var(--mono)">01:02:03:04 · CH 12 · −6.0 dB</span>
+            <span class="note">anything the operator reads as a value, so a column of numbers compares</span>
+          </div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-badge">
+          <figcaption class="sample-head"><code class="tok">--font-badge</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-badge)">A badge: 48 ch</span><span class="note">the smallest step</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-xs">
+          <figcaption class="sample-head"><code class="tok">--font-xs</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-xs)">Explanatory text and the names of things</span><span class="note">explanations</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-sm">
+          <figcaption class="sample-head"><code class="tok">--font-sm</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-sm)">A section title inside a window</span><span class="note">section titles</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-base">
+          <figcaption class="sample-head"><code class="tok">--font-base</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-base)">Input 12 · −6.0 dB · 48 kHz</span><span class="note">the base size of the interface</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-lg">
+          <figcaption class="sample-head"><code class="tok">--font-lg</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-lg)">A window heading</span><span class="note">the largest interface step</span></div>
+        </figure>
+
+        <!-- The four instrument steps (roadmap §4l, D-TYPE-4). They are the first sizes above the interface's 18px
+             ceiling, and they exist because the readings an operator watches are larger than any text an interface
+             scale is expected to carry: a reported value inside a card or a panel, and a window's clock face. Their
+             floors are the sizes measured in the windows, not sizes chosen here. -->
+        <figure class="sample raised" data-token="--font-readout">
+          <figcaption class="sample-head"><code class="tok">--font-readout</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-readout)">00:12:34:15</span><span class="note">an instrument reading in a card: the value the instrument reports</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-readout-lg">
+          <figcaption class="sample-head"><code class="tok">--font-readout-lg</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-readout-lg)">00:12:34:15</span><span class="note">the same reading on a full-width panel</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-clock">
+          <figcaption class="sample-head"><code class="tok">--font-clock</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-clock)">00:12:34:15</span><span class="note">a window's clock face</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--font-clock-lg">
+          <figcaption class="sample-head"><code class="tok">--font-clock-lg</code><span class="val">…</span><span class="measured">→ <span data-measure="fontSize" data-from=".type-demo">…</span></span></figcaption>
+          <div class="sample-body"><span class="type-demo" style="font-size: var(--font-clock-lg)">00:12:34:15</span><span class="note">a clock face in a wide window: read across a room</span></div>
+        </figure>
+
+        <!-- The leading family (2026-10-08): one step, `base`, because the kit's drawings use one. Neither of those
+             sheets sets a `line-height` on a drawing — the one `layout.css` carries is its `body` frame — so every
+             control and card the kit ships inherits the line box of the page that links them; the two pages that
+             compose a frame both wrote `1.35` by hand until a stranger reported it, and `layout.css` §0 now carries the
+             rule and this token. The value is the application's own (`desktop/ui/index.html:88`), and the family is
+             spelled `leading` and not `line` because `--line-*` is the bevel's four edge steps. The sample is drawn on
+             three lines on purpose: a line box that a reader cannot see between two lines is a number, not a sample. -->
+        <figure class="sample raised" data-token="--leading-base">
+          <figcaption class="sample-head"><code class="tok">--leading-base</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="leading-demo">A paragraph in the kit's prose size, wrapped onto three lines, so the space between them is what the token decides: the line box the page frame gives every drawing the kit ships.</span><span class="note">the line box of the page frame: the <code>line-height</code> <code>layout.css</code> gives <code>body</code></span></div>
+        </figure>
+      </section>
+
+      <section class="block">
+        <h3>Space — a four-pixel grid, named by its step</h3>
+
+        <figure class="sample raised" data-token="--space-1">
+          <figcaption class="sample-head"><code class="tok">--space-1</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="space-demo" style="width: var(--space-1)"></span><span class="note">the first step</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--space-2">
+          <figcaption class="sample-head"><code class="tok">--space-2</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="space-demo" style="width: var(--space-2)"></span><span class="note">the second step</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--space-3">
+          <figcaption class="sample-head"><code class="tok">--space-3</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="space-demo" style="width: var(--space-3)"></span><span class="note">the third step</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--space-4">
+          <figcaption class="sample-head"><code class="tok">--space-4</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="space-demo" style="width: var(--space-4)"></span><span class="note">the fourth step: the gap between panels</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--space-5">
+          <figcaption class="sample-head"><code class="tok">--space-5</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="space-demo" style="width: var(--space-5)"></span><span class="note">the fifth step</span></div>
+        </figure>
+
+        <figure class="sample raised" data-token="--space-6">
+          <figcaption class="sample-head"><code class="tok">--space-6</code><span class="val">…</span></figcaption>
+          <div class="sample-body"><span class="space-demo" style="width: var(--space-6)"></span><span class="note">the sixth step</span></div>
+        </figure>
+      </section>
+
+      <!-- The composition layer's two values (2026-10-08, kit 1.4.0). `--desk` is the ground the windows are placed
+           on, so the sample draws a window standing on it; `--ops-col-width` is the width of the operator column in
+           `layout.css`, so the sample draws the column at that width. Both are values a consumer used to have to spell
+           for itself: the desktop came from the application's own `:root` and the column width from a `var()` fallback
+           inside a 32,000-line window. The samples are visually measured here, which is why the block sits at the foot
+           of the page: adding it moved no earlier band of `design/reference/`. -->
+      <section class="block">
+        <h3>The composition — the ground the windows stand on, and the operator column</h3>
+
+        <figure class="sample raised" data-token="--desk">
+          <figcaption class="sample-head"><code class="tok">--desk</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="desk-demo"><span class="desk-demo-window raised">a window on the desktop</span></span>
+            <span class="note">the ground the application's own window is placed on: not a surface inside a window, and the two themes disagree about it on purpose</span>
+          </div>
+        </figure>
+
+        <figure class="sample raised" data-token="--ops-col-width">
+          <figcaption class="sample-head"><code class="tok">--ops-col-width</code><span class="val">…</span></figcaption>
+          <div class="sample-body">
+            <span class="ops-demo sunken"></span>
+            <span class="note">the width of the operator column in <code>layout.css</code>: the one part of the plan the operator resizes, and the same in both themes</span>
+          </div>
+        </figure>
+      </section>
+
+    </div>
+  </section>
+
+  <section class="theme-col sunken" data-theme="dark" aria-label="dark theme">
+    <h2 class="theme-title">dark · <code>body.theme-dark</code></h2>
+    <div class="theme-body"><!-- filled with a copy of the light column, so the two cannot disagree about markup --></div>
+  </section>
+</main>
+
+<script>
+// The page holds samples, not a token list. Two consequences, both deliberate:
+//
+//   1. **There is no list to go stale.** Each sample names the token it demonstrates in `data-token`; the script walks
+//      the DOM and reads that token from the live cascade. When `tokens.css` gains a value, the samples that use it
+//      print the new value with no change here. (`scripts/test-specimen.mjs` is what demands a *sample* for every token
+//      in `tokens.json`; the page cannot know that list without a network request, and the kit forbids one.)
+//   2. **Both themes are one page.** The dark theme is `body.theme-dark`, which cannot apply to a column, so the script
+//      resolves the dark cascade on `<body>`, re-declares on the dark column only the values that actually changed, and
+//      copies the light column into it. A value the dark theme *inherits* is not copied, so the scale knob keeps
+//      reaching both columns.
+(() => {
+  const body = document.body;
+  const columns = [...document.querySelectorAll('[data-theme]')];
+  const lightColumn = document.querySelector('[data-theme="light"]');
+  const darkColumn = document.querySelector('[data-theme="dark"]');
+
+  try {
+    const readCascade = (dark) => {
+      body.classList.toggle('theme-dark', dark);
+      const style = getComputedStyle(body);
+      const values = new Map();
+      for (const sample of lightColumn.querySelectorAll('.sample[data-token]')) {
+        const name = sample.dataset.token;
+        if (!values.has(name)) values.set(name, style.getPropertyValue(name).trim());
+      }
+      body.classList.remove('theme-dark');
+      return values;
+    };
+
+    const light = readCascade(false);
+    const dark = readCascade(true);
+
+    const rules = [];
+    for (const [name, value] of dark) {
+      if (value && value !== light.get(name)) rules.push(name + ':' + value + ';');
+    }
+    const scope = document.createElement('style');
+    scope.id = 'specimen-dark-scope';
+    scope.textContent = '[data-theme="dark"]{' + rules.join('') + '}';
+    document.head.appendChild(scope);
+
+    darkColumn.querySelector('.theme-body').appendChild(lightColumn.querySelector('.theme-body').cloneNode(true));
+
+    // A bevel reading names the token each edge resolved to, matched by value, so the demo cannot describe a bevel it
+    // is not drawing. The probe normalises a token's spelling (`#ffffff`) and a computed border (`rgb(255, 255, 255)`)
+    // to the one form the browser produces.
+    const probe = document.createElement('span');
+    const normalise = (value) => { probe.style.color = ''; probe.style.color = value; return probe.style.color; };
+
+    const measureBevels = () => {
+      for (const column of columns) {
+        const style = getComputedStyle(column);
+        const candidates = [
+          ['--line-light', style.getPropertyValue('--line-light').trim()],
+          ['--line-dark', style.getPropertyValue('--line-dark').trim()],
+        ];
+        for (const sample of column.querySelectorAll('.sample[data-bevel]')) {
+          const demo = sample.querySelector('.bevel-demo');
+          if (!demo) continue;
+          const borders = getComputedStyle(demo);
+          const describe = (colour) => {
+            for (const [name, value] of candidates) {
+              if (value && normalise(value) === normalise(colour)) return name + ' ' + value;
+            }
+            return colour + ' (not a line token)';
+          };
+          sample.querySelector('.val').textContent =
+            'top/left ' + describe(borders.borderTopColor) + ' · bottom/right ' + describe(borders.borderBottomColor);
+        }
+      }
+    };
+
+    const fill = () => {
+      for (const column of columns) {
+        const style = getComputedStyle(column);
+        for (const sample of column.querySelectorAll('.sample[data-token]')) {
+          const raw = style.getPropertyValue(sample.dataset.token).trim();
+          sample.querySelector('.val').textContent = raw === '' ? 'unresolved in this theme' : raw;
+        }
+        for (const sample of column.querySelectorAll('.sample')) {
+          for (const measured of sample.querySelectorAll('[data-measure]')) {
+            const target = measured.dataset.from ? sample.querySelector(measured.dataset.from) : sample;
+            measured.textContent = target ? getComputedStyle(target)[measured.dataset.measure] : '';
+          }
+        }
+      }
+      measureBevels();
+    };
+
+    fill();
+
+    const knob = document.querySelector('[data-control="meter-scale-knob"]');
+    if (knob) {
+      knob.addEventListener('input', () => {
+        document.documentElement.style.setProperty('--meter-scale', knob.value);
+        fill();
+      });
+    }
+
+    // The specimen's controls have to work, or they are the placeholders this project keeps finding: Mute latches its
+    // label and its `aria-pressed`, and every `[data-control="toggle"]` control latches its own. `aria-pressed="true"`
+    // is the sunken pair `components.css` draws for a control that is down — so the shape is shown by a control that
+    // actually changes state, not by a picture of one.
+    for (const button of document.querySelectorAll('[data-control="mute-toggle"]')) {
+      button.addEventListener('click', () => {
+        const muted = button.textContent !== 'Muted';
+        button.textContent = muted ? 'Muted' : 'Mute';
+        button.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      });
+    }
+    for (const button of document.querySelectorAll('[data-control="toggle"]')) {
+      button.addEventListener('click', () => {
+        button.setAttribute('aria-pressed', button.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      });
+    }
+
+    const filter = document.querySelector('[data-control="sample-filter"]');
+    if (filter) {
+      filter.addEventListener('input', () => {
+        const query = filter.value.trim().toLowerCase();
+        for (const sample of document.querySelectorAll('.sample, .component')) {
+          const label = sample.dataset.token || sample.dataset.bevel || sample.dataset.component || '';
+          sample.hidden = query !== '' && !label.toLowerCase().includes(query);
+        }
+      });
+    }
+
+    body.dataset.specimenReady = '1';
+  } catch (error) {
+    body.dataset.specimenError = String((error && error.message) || error);
+  }
+})();
+</script>
+</body>
+</html>

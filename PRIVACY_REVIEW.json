@@ -1,0 +1,1284 @@
+{
+  "summary": {
+    "sourceRevision": "fbd98fd6a6d549bc5f81df872c25948e92f9a222",
+    "files": 614,
+    "bytes": 21341413,
+    "excludedTrackedPaths": 1089,
+    "potentialSecrets": 0,
+    "reviewFindings": 228,
+    "transformations": 6,
+    "privateIdentityFragmentsChecked": 1,
+    "limits": [
+      "Pattern scan only; unknown token formats and embedded/binary data are not cleared.",
+      "Privacy reviews include fixtures and other false positives; matched values are never printed.",
+      "The original engineering history is excluded, not certified clean.",
+      "Export does not run validation; see separately recorded gate results."
+    ]
+  },
+  "findings": [
+    {
+      "file": "assets/expo.icon/Assets/grid.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/android-icon-background.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/android-icon-foreground.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/android-icon-monochrome.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/expo-badge-white.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/expo-badge.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/expo-logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/favicon.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/icon.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/logo-glow.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/react-logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/react-logo@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/react-logo@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/splash-icon.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tabIcons/explore.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tabIcons/explore@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tabIcons/explore@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tabIcons/home.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tabIcons/home@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tabIcons/home@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "assets/images/tutorial-web.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "crates/wing-core/src/lib.rs",
+      "line": 13754,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "crates/wing-core/src/lib.rs",
+      "line": 13759,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "crates/wing-core/src/lib.rs",
+      "line": 13763,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/reference/specimen-colour-tokens-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/reference/specimen-components-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/reference/specimen-instrument-and-type-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/reference/specimen-type-and-space-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/workstation/reference/catalogue-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/workstation/reference/catalogue-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/workstation/reference/properties-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/workstation/reference/properties-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/workstation/reference/workstation-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/package/workstation/reference/workstation-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/reference/specimen-colour-tokens-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/reference/specimen-components-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/reference/specimen-instrument-and-type-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/reference/specimen-type-and-space-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/guide-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/guide-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/index-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/index-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/ltc-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/ltc-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/meters-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/meters-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/timecode-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/timecode-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/workstation/reference/catalogue-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/workstation/reference/catalogue-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/workstation/reference/properties-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/workstation/reference/properties-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/workstation/reference/workstation-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/workstation/reference/workstation-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/128x128.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/128x128@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/32x32.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/64x64.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square107x107Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square142x142Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square150x150Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square284x284Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square30x30Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square310x310Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square44x44Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square71x71Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/Square89x89Logo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/StoreLogo.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-hdpi/ic_launcher.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-hdpi/ic_launcher_foreground.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-hdpi/ic_launcher_round.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-mdpi/ic_launcher.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-mdpi/ic_launcher_foreground.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-mdpi/ic_launcher_round.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xhdpi/ic_launcher.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xhdpi/ic_launcher_foreground.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xhdpi/ic_launcher_round.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_round.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_round.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/icon.icns",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/icon.ico",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/icon.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-20x20@1x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-20x20@2x-1.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-20x20@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-20x20@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-29x29@1x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-29x29@2x-1.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-29x29@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-29x29@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-40x40@1x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-40x40@2x-1.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-40x40@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-40x40@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-512@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-60x60@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-60x60@3x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-76x76@1x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-76x76@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/icons/ios/AppIcon-83.5x83.5@2x.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/inter_app_osc.rs",
+      "line": 1535,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/inter_app_osc.rs",
+      "line": 1536,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/inter_app_osc.rs",
+      "line": 1538,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 12876,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15004,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15005,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15008,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15009,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15035,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15038,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 15040,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 16019,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 16363,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 20844,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 20849,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 20850,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 20853,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 20867,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 21980,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 22853,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 23072,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 23076,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 23108,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 23144,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 23258,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24503,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24504,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24505,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24507,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24513,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24513,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24520,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/tauri.conf.json",
+      "line": 38,
+      "kind": "email-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/guide-content.js",
+      "line": 8,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/guide-content.js",
+      "line": 50,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/guide.html",
+      "line": 248,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/icon-backup.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/icon.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 7360,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 8218,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 8229,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 8941,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 9987,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 12091,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 15399,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 16506,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 16741,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 17353,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 17773,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 19221,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 21265,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 23323,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 25258,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 30007,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/index.html",
+      "line": 31910,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/ui/logo-marble-w.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "docs/guide/01-start-here.md",
+      "line": 48,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "docs/guide/08-diagnostics.md",
+      "line": 40,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "package-lock.json",
+      "line": 3455,
+      "kind": "email-address",
+      "severity": "review"
+    },
+    {
+      "file": "package-lock.json",
+      "line": 11190,
+      "kind": "email-address",
+      "severity": "review"
+    },
+    {
+      "file": "package-lock.json",
+      "line": 11531,
+      "kind": "email-address",
+      "severity": "review"
+    },
+    {
+      "file": "package-lock.json",
+      "line": 12412,
+      "kind": "email-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/lib/desktop-ui-harness.mjs",
+      "line": 330,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/lib/desktop-ui-harness.mjs",
+      "line": 411,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/lib/desktop-ui-harness.mjs",
+      "line": 412,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-design-conformance.mjs",
+      "line": 76,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-action-target-browser.mjs",
+      "line": 958,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-build-identity.mjs",
+      "line": 78,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-build-identity.mjs",
+      "line": 79,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-build-identity.mjs",
+      "line": 80,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-build-identity.mjs",
+      "line": 80,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-field-validation-browser.mjs",
+      "line": 1455,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-field-validation-browser.mjs",
+      "line": 1491,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-field-validation-browser.mjs",
+      "line": 1709,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-field-validation-browser.mjs",
+      "line": 1778,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-field-validation-browser.mjs",
+      "line": 1840,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-hud-panic-browser.mjs",
+      "line": 286,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-interapp-smoke-browser.mjs",
+      "line": 171,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-interapp-smoke-browser.mjs",
+      "line": 171,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-live-reapply-and-guards-browser.mjs",
+      "line": 342,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-shoot-and-guards-browser.mjs",
+      "line": 350,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 112,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 130,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 141,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 154,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 202,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 210,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 211,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-browser.mjs",
+      "line": 218,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 151,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 226,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 227,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 263,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 367,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 368,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 533,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 534,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 619,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 620,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-station-backup-dialog-browser.mjs",
+      "line": 147,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-release-provenance.mjs",
+      "line": 13,
+      "kind": "email-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 181,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 341,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 344,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 351,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 353,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 359,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 374,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 378,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/verify-install.sh",
+      "line": 381,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-burst-hardware.sh",
+      "line": 18,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-burst-hardware.sh",
+      "line": 28,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-hardware-checks.mjs",
+      "line": 26,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-hardware-checks.mjs",
+      "line": 26,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-hardware-checks.mjs",
+      "line": 44,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-live-audit.mjs",
+      "line": 29,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-osc-gets.mjs",
+      "line": 10,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-osc-listen.mjs",
+      "line": 9,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-osc-probe.mjs",
+      "line": 13,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/wing-soak-windows.mjs",
+      "line": 256,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "src/app/index.tsx",
+      "line": 270,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "src/osc/OscManager.js",
+      "line": 14,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "src/osc/OscManager.js",
+      "line": 133,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "src/osc/WingSession.js",
+      "line": 34,
+      "kind": "lan-address",
+      "severity": "review"
+    }
+  ]
+}

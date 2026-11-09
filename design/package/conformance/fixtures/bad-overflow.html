@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>conformance fixture · a page wider than the window it is rendered in</title>
+<!-- THIS PAGE IS WRONG ON PURPOSE, AND ONLY ONE THING IS WRONG WITH IT. It links the kit's three sheets in the order
+     `UI_SYSTEM.md` §10 makes a contract (`design/layout.html` lines 10-12: the values, the drawings, the plan), it
+     composes the kit's own classes, and it declares no plan of its own — so rules 1 to 10 have nothing to report. The
+     one defect is the element below whose explicit width is wider than the window the suite renders pages in, which is
+     what rule 11 measures and no other rule can see.
+
+     WHY 900px, AND WHY THAT NUMBER IS THE WHOLE FIXTURE. **The suite declares its own viewport** (`collect.mjs`
+     `VIEWPORT`, 756 x 469, forced on the tab with `Emulation.setDeviceMetricsOverride` before a page is loaded), so the
+     window the browser was started with no longer reaches this page. Until 2026-10-08 it did: the suite rendered every
+     page in whatever window the debug Chrome gave it — headless Chrome's own 756 x 469 on this machine, which is the
+     756 `design/conformance/allow.mjs` still quotes in the rule-8 declaration for timecode.html's clock ("at the
+     suite's own rendering (756 x 469) `7vw` is 52.92px") — and measured that day, with a foreign browser started at
+     `--window-size=1280,900` answering the port, this card **fitted** and this fixture passed. The honest number is
+     therefore chosen against the declared viewport rather than against a guess: 900 is 144px past 756, and it is not a
+     width any kit token names — it is the defect, stated plainly rather than derived. A number only just above 756 was
+     rejected: 144px is far enough out that no rounding or scrollbar difference can erase the overflow. **What that
+     rejection used to say — "a fixture whose failure depends on the window it is given proves nothing" — is exactly
+     what this fixture was measured doing**, and it is why the viewport is declared rather than inherited: the fixture's
+     failure is now a fact about the page at a number the suite states, not a fact about whose browser answered. -->
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="../../components.css">
+<link rel="stylesheet" href="../../layout.css">
+<style>
+  /* This page's own furniture: one caption class, and nothing else. No colour or size is invented here — every value
+     is a token reference or a class the kit already draws. */
+  .fixture-note { color: var(--muted); font-size: var(--font-sm); }
+
+  /* ================================================================================================================
+     THE DEFECT, AND THE WHOLE POINT OF THIS PAGE. One explicit width, wider than the 756px window the suite renders
+     in, on a card that sits outside the plan so that the finding has exactly one element to name. A width the kit
+     never names, on a page that otherwise composes the kit: the page is wider than the window, the window scrolls
+     sideways, and every rule that reads a computed style or a bevel reports the page as correct. That gap is what
+     rule 11 exists to close.
+     ================================================================================================================ */
+  #wider-than-the-window { width: 900px; }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- The master header, composed from the kit (`layout.css` §2's `header.master-header` and `components.css`'s
+       `.c-panel-head`). It is not part of this page's defect. -->
+  <header class="master-header c-panel-head">
+    <div class="card-head-row">
+      <span class="c-chip">the fixture</span>
+      <span class="fixture-note">a page that composes the kit and is one width too wide</span>
+    </div>
+  </header>
+
+  <!-- The plan, composed and NOT retyped (`layout.css`'s `.layout`, `.stack`, `.builder-column`): two columns, the
+       seam, and the kit's own gap and floor. Rule 10 is the rule that watches for a second answer here, and this page
+       gives none. -->
+  <div class="layout">
+
+    <div class="stack builder-column">
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area</span>
+          <span class="fixture-note">the page the suite renders, with the kit's plan underneath it</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">a value the operator reads</span>
+          <span class="c-well">-6.0 dB</span>
+        </div>
+      </section>
+    </div>
+
+    <aside class="stack ops-column">
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">where the show is</span>
+          <span class="c-well">12:34:56</span>
+        </div>
+      </section>
+    </aside>
+
+  </div>
+
+  <!-- THE ONE DEFECT. Deliberately outside the plan above: inside a grid track this width would push the operator
+       column off the screen too, and the finding would have two or three elements competing to be named. It stands on
+       its own, so the element the rule names is the element that is wrong. -->
+  <section class="c-card" id="wider-than-the-window">
+    <div class="c-card-head card-head-row">
+      <span class="c-chip">the defect</span>
+      <span class="fixture-note">this card is wider than the window the suite renders in, on purpose</span>
+    </div>
+    <p class="fixture-note">
+      The card carries an explicit width of 900px — 144px past the suite's own 756px rendering — so the page scrolls
+      sideways and the operator cannot reach what stands off its right edge without a trackpad gesture. Every other
+      rule in this suite reads a computed style, a bevel or a colour, and all of them report this page as correct.
+    </p>
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  A fragment, merged into the bundle's own Info.plist by the bundler (Tauri looks for this file beside
+  `tauri.conf.json`; see `MacConfig::info_plist`).
+  It exists for one reason, found in the review of 2026-10-03: LTC reads timecode from an **audio input**, and
+  macOS **terminates** a process that records without a usage description rather than asking for permission. The
+  feature would have worked in a development run and killed the installed application the first time an operator
+  pressed "Listen".
+  The wording is what the operator reads in the system's own permission dialog, so it says what the application does
+  with the microphone and nothing more: it does not listen unless asked, and it is not recording anything else.
+  `scripts/test-desktop-audio-permission.mjs` keeps this honest in the gate: if the audio input code is present, this
+  key has to be too.
+-->
+<plist version="1.0">
+<dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>WING CONTROLLER reads timecode (LTC) from an audio input when you ask it to in Settings → Timecode. It listens only while you have started it, and stops when you do.</string>
+</dict>
+</plist>

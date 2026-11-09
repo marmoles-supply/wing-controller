@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · a token that does not exist</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+</head>
+<body>
+  <!-- RULE 4. --space-9 is not in the kit. The padding falls back to 0 silently, which is exactly how a foreign
+       consumer lost 33 token references without a single test going red. -->
+  <div class="card" id="padded" style="padding: var(--space-9)">Padding from a token that does not exist</div>
+</body>
+</html>

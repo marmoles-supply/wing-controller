@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · the kit's names reassigned to a ramp of this page's own</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* RULE 8, and the measured blind spot this fixture exists for. A consumer of this kit replaced the whole type scale
+     with a ramp of its own and **reassigned the kit's names** to point at it — `--font-sm: var(--t-sm)` — so every
+     text in its interface changed size while the suite reported 0 failures in both themes (roadmap §4j). Nothing in
+     rules 1-7 looks at a font size: the palette is untouched, the bevels are the kit's, the wells are wells. The ramp
+     below is the same shape at fixture scale. */
+  :root {
+    --t-sm: 14px;
+    --t-base: 15px;
+    --font-sm: var(--t-sm);
+    --font-base: var(--t-base);
+  }
+</style>
+</head>
+<body>
+  <div class="panel" id="renamed-panel">
+    <span id="renamed">set in the kit's own name, at a size the kit never gave it</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+[package]
+name = "wing-controller-desktop"
+version = "0.2.99"
+edition = "2021"
+publish = false
+license-file = "../../LICENSE"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# `unstable` is what exposes `Manager::get_webview`, needed to hand the focus to the webview itself
+# (see `focus_webview`): without it a click focuses the field in the DOM but the window's first
+# responder is not the webview, so WebKit refuses every keystroke.
+tauri = { version = "2", features = ["unstable"] }
+# Diálogos nativos de guardar/abrir para el backup de estación: sin esto el export era una descarga
+# por `data:` URL que en la app empaquetada no escribía ningún fichero (auditoría, PLAN:167).
+tauri-plugin-dialog = "2"
+# MIDI between applications (Phase B of docs/INTER_APP_PLAN_REVIEW_2026-10-02.md). `midir` is the thin,
+# dependency-light wrapper over CoreMIDI that this project needs: it enumerates ports, and it can create the
+# two **virtual** ports other applications see us as (its `VirtualInput`/`VirtualOutput` are documented as
+# available on "every platform but Windows"). Nothing else in the tree pulls a MIDI stack in, and no async
+# runtime comes with it: CoreMIDI delivers on its own thread, which is what keeps this feature off the meter
+# path. Pinned to the version whose virtual-port API was read before writing this.
+midir = "0.11"
+# Audio input, for LTC (Phase T4 of docs/TIMECODE_PLAN.md). LTC is timecode carried by an audio signal, so reading it
+# from an interface — or from a virtual audio device another application feeds — needs an audio input, and this is
+# the crate that has one on macOS without pulling in a DAW's worth of graph: `cpal` wraps CoreAudio, is pure Rust
+# otherwise, and offers exactly what this needs (enumerate devices, open one input, a callback with samples).
+#
+# The plan puts this step **last** on purpose: it is the one that changes the application's footprint, because it
+# needs a device and macOS's audio-input permission. Nothing here runs until an operator asks for it.
+cpal = "0.18"
+# One instance, one desk (readiness audit A3, 2026-09-30): a second launch focuses the window that is
+# already open instead of starting a second application, which could stream twice, write the same files
+# twice and fire the same macro twice — for a toggle, two flips and a parameter that ends where it
+# started. Pinned to 2.4.0 on purpose: 2.5.x requires tauri 2.12, and taking that would upgrade the whole
+# windowing stack (tao, muda, brotli, 38 packages) a week before a show. 2.4.0 adds its crates and
+# changes no existing version (Cargo.lock: additions only).
+tauri-plugin-single-instance = "=2.4.0"
+# The interface shield (docs/BINARY_PROTECTION_PLAN_2026-10-09.md, `src/ui_vault.rs`). The interface no
+# longer travels in the binary as text: it is a ChaCha20-Poly1305 vault built by
+# `scripts/build-ui-vault.mjs`, and it cannot be built without an authenticated cipher.
+#
+# These two crates are the whole cost of that decision, and both are pure Rust with no C toolchain and no
+# async runtime, so neither adds a step to this project's build. `sha2` was already in the tree
+# transitively — naming it directly changes no resolved version — and `chacha20poly1305` adds only its own
+# small RustCrypto stack. ChaCha20-Poly1305 rather than AES-GCM because it is constant-time in software
+# with no hardware or key-schedule assumption; the once-per-window cost is a few milliseconds either way.
+chacha20poly1305 = "0.10"
+sha2 = "0.10"
+# Licences (docs/LICENSING_PLAN_2026-10-09.md). A licence is an Ed25519-signed token, so the application needs
+# a verifier and the tree has none. **Pinned to 2.2**: 3.0 depends on `sha2 ^0.11` and this tree already
+# carries `sha2 0.10.9` for the interface vault, so taking 3.0 would put two versions of the same hash crate
+# in the binary for no gain. Verification is public-key only — there is no secret in this crate's use of it.
+ed25519-dalek = "2.2"
+# The login Keychain, for the trial record's strongest mirror (D-L2). **0.3.2 is the version that matches
+# what `wry` already pulls in** — `objc2 0.6.4` and `objc2-core-foundation 0.3.2` — so this adds one binding
+# to a system framework the application already links, and no second copy of the objc2 stack. The `SecItem`
+# feature it needs is on by default.
+objc2-security = "0.3.2"
+# A licence file is `<base64url payload>.<base64url signature>`. `base64` 0.22 is already compiled in this
+# tree — three versions of it are — so naming it directly costs no build time and avoids a hand-rolled decoder
+# on a path that decides whether the application may drive a console.
+base64 = "0.22"
+wing-core = { path = "../../crates/wing-core" }
+wing-runtime = { path = "../../crates/wing-runtime" }
+wing-transport = { path = "../../crates/wing-transport" }

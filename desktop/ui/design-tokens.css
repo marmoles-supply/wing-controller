@@ -1,0 +1,171 @@
+/* WING CONTROLLER — design tokens, as shipped.
+ *
+ * GENERATED FILE — do not edit. The one file a human edits is `design/tokens.json`; `design/tokens.css` is rendered
+ * from it by `scripts/generate-design-tokens.mjs`, and this copy exists because the packaged frontend is `desktop/ui`
+ * byte for byte, so a stylesheet outside it is not shipped. Run
+ * `node scripts/sync-design-tokens.mjs` after changing the tokens: `scripts/test-design-tokens.mjs` fails when the two
+ * differ.
+ */
+
+/* WING CONTROLLER — design tokens, canonical CSS form. Version 1.5.0.
+ *
+ * GENERATED FILE — do not edit. The one file a human edits is `design/tokens.json`; this CSS is rendered from it by
+ * `scripts/generate-design-tokens.mjs`, and `scripts/test-design-tokens-generator.mjs` fails when the two disagree. A
+ * consumer still links THIS file, and being generated changed nothing it reads: the JSON is the authoring form, the CSS
+ * is the public one.
+ *
+ * The values are the application's own, extracted from the windows it ships (`desktop/ui/*.html`) rather than invented
+ * for a document: the palette of the instrument windows (`timecode.html`, `ltc.html`) as the base, the bevel vocabulary
+ * of `meters.html` (`--win-*`), and the type scale from the same window.
+ *
+ * Two rules make this file the published form rather than a fourth opinion:
+ *
+ *   1. **Every name the windows already use is an alias here**, so a window can link this file and delete its own
+ *      `:root` without renaming a single rule. A rename can follow; a rename is not a prerequisite.
+ *   2. **The app ships a copy, and a test compares them.** `desktop/ui/design-tokens.css` is generated from this file;
+ *      `scripts/test-design-tokens.mjs` fails if the two ever differ. One home, no drift — the pattern this project
+ *      already uses for `version.json` and `desktop/ui/version.js`.
+ *
+ * Light is `:root`, dark is `body.theme-dark`, and the dark theme re-declares only what changes. The CRT well and its
+ * phosphor is the same in both themes on purpose, and the well is not: they are the instrument, not the furniture.
+ */
+
+:root {
+  /* ---- the face: the metal the application is made of ------------------------------------------------------- */
+  --face: #c0c0c0;
+  --face-2: #d4d0c8;
+  --face-3: #ffffff;
+  --field: #ffffff;
+
+  /* ---- ink: text, and the two weights of it ---------------------------------------------------------------- */
+  --ink: #000000;
+  --muted: #404040;
+  --dim: #4a4a4a;
+
+  /* ---- lines, and the four steps a bevel is built from ----------------------------------------------------- */
+  /* `--line-light` is the top-left highlight, `--line-dark` the bottom-right shadow, `--line`/`--line-mid` the
+   * divider between two flat faces. A raised control is light-then-dark; a sunken one is the same pair reversed. */
+  --line: #808080;
+  --line-mid: #808080;
+  --line-light: #ffffff;
+  --line-dark: #000000;
+
+  /* ---- the classic window furniture, spelled the way the meters window spells it ---------------------------- */
+  --win-gray: #c0c0c0;
+  --win-btn-face: #c0c0c0;
+  --win-btn-highlight: #ffffff;
+  --win-btn-shadow: #808080;
+  --win-btn-dark-shadow: #000000;
+  --win-window-frame: #000000;
+  --win-text: #000000;
+  --win-title-bg: #000080;
+  --win-title-text: #ffffff;
+
+  /* ---- the desktop the windows are placed on ---------------------------------------------------------------- */
+  /* `--desk` is not a surface INSIDE a window: it is the ground the application's window sits on, and the two themes
+   * disagree about it on purpose (the classic teal against near-black, `#008080` / `#0e1111`). It is the value the
+   * session in `openwing` had to spell outside this file to paint a desktop at all, and it is measured from
+   * `desktop/ui/index.html:41` and `:4978` rather than invented here. */
+  --desk: #008080;
+
+  /* ---- accents: what a colour means, not what it looks like ------------------------------------------------- */
+  /* `--accent` is the selection and the focus. `--maroon` is a warning that is not yet a refusal. `--amber` is an
+   * unfinished or inherited value. The four state colours below are the meter and status vocabulary. */
+  --accent: #000080;
+  --maroon: #800000;
+  --amber: #d0a84e;
+  --green: #2ecc71;
+  --green-dim: #1b5e39;
+  --yellow: #f1c40f;
+  --red: #b94444;
+  --red-bright: #ff1a1a;
+  --gold: #ffd700;
+
+  /* ---- the instrument: a sunken well, its phosphor, and the level ramp ------------------------------------- */
+  --crt: #050a08;
+  --crt-ink: #70e7a9;
+  /* The level ramp of a meter. It is MEASURED, not chosen: green up to the reference, warning
+   * above it, red at the top, with the stops at 0/56/82/99 % taken from the instrument window
+   * (`meters.html`). Like `--crt-ink`, it is deliberately the SAME in both themes: a meter is
+   * the instrument, not the furniture, and an operator reads the same colour in either theme.
+   * Added at the request of the control-app session (openwing, 2026-10-07); it was the only
+   * value that app had to spell outside this file. */
+  --meter-ramp: linear-gradient(to right,
+    #00a86b 0%, #00e676 56%, #ffeb3b 56%, #ff9800 82%,
+    #f44336 82%, #e53935 99%, #ff0000 100%);
+
+  /* ---- type ------------------------------------------------------------------------------------------------ */
+  --win-font: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Segoe UI", Geneva, sans-serif;
+  --mono: "Lucida Console", "Courier New", Consolas, monospace;
+  /* One scale knob, and every step derived from it, so a meter bank can grow without inventing sizes. */
+  --meter-scale: 1.25;
+  --font-badge: clamp(8px, calc(8px + (var(--meter-scale) - 1) * 1.2px), 10px);
+  --font-xs: clamp(8.5px, calc(8.5px + (var(--meter-scale) - 1) * 3.2px), 16px);
+  --font-sm: clamp(9.5px, calc(9.5px + (var(--meter-scale) - 1) * 3.6px), 18px);
+  --font-base: clamp(10.5px, calc(10.5px + (var(--meter-scale) - 1) * 2px), 13px);
+  --font-lg: clamp(11.5px, calc(11.5px + (var(--meter-scale) - 1) * 2.5px), 14px);
+  --font-readout: clamp(22px, calc(22px + (var(--meter-scale) - 1) * 5.5px), 27.5px);
+  --font-readout-lg: clamp(26px, calc(26px + (var(--meter-scale) - 1) * 6.5px), 32.5px);
+  --font-clock: clamp(30px, calc(30px + (var(--meter-scale) - 1) * 7.5px), 37.5px);
+  --font-clock-lg: clamp(52px, calc(52px + (var(--meter-scale) - 1) * 13px), 65px);
+
+  /* ---- leading: the line box of the page frame --------------------------------------------------------------- */
+  /* `--leading-base` is the ONE step of the kit's leading family, and the family is one step because the kit's
+   * drawings use one: neither of those sheets sets a `line-height` on a drawing — the one `layout.css` carries is the
+   * frame's own `body` rule below — so every control, card and panel the kit ships inherits the line box of the page
+   * that links it, and the two pages that compose a frame both wrote this same `1.35` by hand until a stranger reported
+   * it (`design/CANON_PLAN.md`, P1's third criterion, finding 4). The specimen is a document page and is not one of
+   * the two; it keeps its own 1.4. It is the line box `design/layout.css` gives `body`, and the value is the
+   * application's own rather than invented here: `desktop/ui/index.html:88` sets `line-height: 1.35` on its `body`.
+   * It is theme-independent — a line box is typography, not a palette — and the family is spelled `leading` and not
+   * `line` because `--line`, `--line-mid`, `--line-light` and `--line-dark` are the bevel's four edge steps. */
+  --leading-base: 1.35;
+
+  /* ---- spacing: a four-pixel grid, named by its step --------------------------------------------------------- */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 12px;
+  --space-6: 16px;
+
+  /* ---- the arrangement: the one measurement the kit's composition layer needs ------------------------------- */
+  /* `--ops-col-width` is the width of the operator column in `design/layout.css` — the right-hand column of the
+   * two-column plan every window of this application is built on. It is a TOKEN rather than a loose variable because
+   * `desktop/ui/index.html:172` writes it as `minmax(260px, var(--ops-col-width, 420px))` inside a 32,000-line file:
+   * a consumer could not find the number, and a consumer that guessed 420px was copying a default rather than reading
+   * one. It is the same in both themes — a column is furniture, not a palette — and it is the one part of the plan the
+   * operator resizes, which is why it is the one part the kit names. */
+  --ops-col-width: 420px;
+}
+
+/* The dark theme. Only what changes is re-declared; everything else inherits, which is what keeps the two themes from
+ * drifting apart — the failure this project has already paid for once, when a window froze its face colour to the light
+ * value because a `:root` alias was resolved before the dark rule could override it. **Never alias a token to another
+ * token inside `:root` if the dark theme re-declares the target**: alias it in the window, or re-declare the alias here. */
+body.theme-dark {
+  --face: #222726;
+  --face-2: #2b3230;
+  --face-3: #1a1e1d;
+  --field: #0f1614;
+  --ink: #e0e8e4;
+  --muted: #93a49d;
+  --dim: #9aa8a2;
+  --line: #343c3a;
+  --line-mid: #343c3a;
+  --line-light: #44504c;
+  --line-dark: #0d100f;
+  --win-gray: #181a1b;
+  --win-btn-face: #222527;
+  --win-btn-highlight: #3a3f42;
+  --win-btn-shadow: #121415;
+  --win-btn-dark-shadow: #08090a;
+  --win-text: #e0e6ed;
+  --win-title-bg: #153243;
+  --win-title-text: #70e7a9;
+  --accent: #2f9bd8;
+  --maroon: #ffab40;
+  --crt: #030806;
+  --desk: #0e1111;
+  /* `--crt-ink` is deliberately absent: the phosphor is the same in both themes. */
+}

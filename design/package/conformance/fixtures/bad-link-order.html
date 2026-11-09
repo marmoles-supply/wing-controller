@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>conformance fixture · the kit's three sheets, linked out of order</title>
+<!-- THIS PAGE IS WRONG ON PURPOSE. It claims the canon — it links the kit's own three sheets and uses the kit's own
+     classes, so the disorder is real rather than cosmetic — and it links them out of the order `UI_SYSTEM.md` §10
+     makes a contract. `design/layout.html` lines 10-12 are the correct order: tokens, components, layout. Here
+     `components.css` comes BEFORE `tokens.css`, so every `var()` in the drawings is asked for a value the values
+     sheet has not declared yet, and `layout.css` comes last over a page whose drawings never got their tokens. -->
+<link rel="stylesheet" href="../../components.css">
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="../../layout.css">
+<style>
+  /* This page's own furniture, copied from `design/layout.html` so the copied regions render at all. No colour or
+     size is invented here: everything is a token reference or a class the kit already draws. */
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    font-family: var(--win-font);
+    font-size: var(--font-base);
+    line-height: 1.35;
+  }
+  .region-note { color: var(--muted); font-size: var(--font-xs); }
+  .card-head-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- The master header, copied from `design/layout.html` (rule 2 of 4): brand left, transport middle, readout right.
+       It is drawn by `components.css`'s `.c-panel-head` and placed by `layout.css`'s `header.master-header`. -->
+  <header class="master-header c-panel-head">
+    <div class="card-head-row">
+      <span class="c-chip">the brand</span>
+      <span class="region-note">the window's name, its build mark and its help: what the operator sees first</span>
+    </div>
+    <div class="card-head-row">
+      <span class="c-chip">the transport</span>
+      <span class="region-note">connect · stop · panic — the three things reached for without leaving the window</span>
+    </div>
+    <div class="card-head-row">
+      <span class="region-note">the standing readout</span>
+      <span class="c-well">0.0 Hz</span>
+    </div>
+  </header>
+
+  <!-- The plan, copied from `design/layout.html` (rule 3 of 4): two columns, the 6px seam, and the stack. -->
+  <div class="layout">
+
+    <div class="stack builder-column">
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 1</span>
+          <span class="region-note">the list — the window's subject, one row per item, and the only place a row is chosen</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 12 · the selected one</span>
+          <span class="c-well">-6.0 dB</span>
+          <span class="c-chip">armed</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 13</span>
+          <span class="c-well">0.0 dB</span>
+        </div>
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 2</span>
+          <span class="region-note">the editor — the card the operator is working in, and the widest thing in the plan</span>
+        </div>
+        <label class="c-label">
+          the field the operator types into
+          <input type="text" value="a name" spellcheck="false">
+        </label>
+        <div class="c-row">
+          <span class="c-row-name">what the next step will act on</span>
+          <span class="c-well">/ch/1/mute</span>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="column-resizer" aria-hidden="true">
+      <div class="resizer-handle"></div>
+    </div>
+
+    <aside class="stack ops-column">
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column · 1</span>
+          <span class="region-note">the standings: read rather than worked in</span>
+        </div>
+        <div class="c-band">one message, full width, carrying its cause in the operator's own words</div>
+      </section>
+
+    </aside>
+
+  </div>
+
+</main>
+
+</body>
+</html>

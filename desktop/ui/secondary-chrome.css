@@ -1,0 +1,52 @@
+/* Application layout adapters. Drawings live in design/workstation.css.
+ * Keep window-specific dimensions and scrolling here; do not copy the bevel.
+ */
+body.wc-cues { padding: 8px; gap: 8px; }
+.wc-cues > header { gap: 12px; }
+.wc-cues > main { width: 100%; margin: 0; padding: 0; gap: 8px; }
+.wc-cues #table { padding: 8px; }
+.wc-cues #inspector { padding: 8px; }
+.wc-cues #inspector > h2 { margin-top: 0; }
+.wc-cues .bar { padding: 4px 0 8px; background: transparent; }
+.wc-cues #rows { background: var(--field); }
+.wc-cues > footer { flex-wrap: wrap; }
+.wc-cues .clock-title { margin-bottom: 4px; }
+
+body.wc-clock { padding: 6px; }
+.wc-clock > header { padding: 2px 5px; gap: 4px; }
+.wc-clock > #position { margin: 0; }
+.wc-clock > #state { background: var(--face); padding: 2px 6px; }
+.wc-clock #cue-panel { min-height: 0; }
+.wc-clock .cue-bar { margin: 0 0 4px; }
+.wc-clock > #cue { background: var(--face); }
+@media (max-height: 240px) {
+  body.wc-clock.cue-open { padding: 2px 6px; }
+  .wc-clock.cue-open > header { padding: 0 5px; }
+  .wc-clock.cue-open > #state,
+  .wc-clock.cue-open > #cue { padding: 0 4px; }
+  .wc-clock .cue-bar :is(button, input, select) { min-height: 20px; }
+}
+/* The floating clock has a real 260px minimum. Keep its controls reachable. */
+@media (max-width: 360px) {
+  .wc-clock > header { flex-wrap: wrap; }
+  .wc-clock #version-well { display: none; }
+}
+
+.wc-bridge .app-layout { padding: 8px; gap: 8px; }
+.wc-bridge .header-toolbar { margin: 0; align-items: stretch; }
+.wc-bridge .bridge-sidebar { margin: 4px; }
+/* The desk's dither renderer sets image-rendering:pixelated on body. Do not
+ * inherit that sampling mode for a 512px bitmap downscaled to 20px. In Chrome
+ * 155 the inherited mode changed logo pixels between frozen captures; explicit
+ * auto retained the original shadows and produced six identical frames. */
+body.wc-bridge .brand-logo-img { image-rendering: auto; }
+
+.wc-guide .window { padding: 8px; gap: 8px; box-sizing: border-box; }
+.wc-guide .window > .layout { gap: 8px; }
+.wc-guide .sidebar { padding: 8px; }
+.wc-guide .content { padding: 8px; }
+.wc-guide .content h1 { font-size: var(--font-lg); }
+@media print {
+  .wc-guide .window { height: auto; display: block; padding: 0; }
+  .wc-guide .content { box-shadow: none; border: 0; }
+}

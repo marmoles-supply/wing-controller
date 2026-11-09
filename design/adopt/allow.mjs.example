@@ -1,0 +1,36 @@
+// Copy this to <your folder>/design/conformance/allow.mjs and replace every placeholder.
+//
+// A deviation is a DECISION WITH A REASON, never a mute button: the judge accepts only what is listed here, prints every
+// accepted deviation by name in its report, and names any entry that matched nothing. An undeclared finding is a failure,
+// and a declaration without a reason is a defect.
+export default {
+  // What the drift dashboard calls this row.
+  app: '<the operator-facing name of this application>',
+
+  // The window this declaration is about, relative to the folder holding this file.
+  allowApp: '<index.html or the equivalent>',
+
+  // The version of the kit this repository copied - the VERSION file beside the kit's conformance directory.
+  // It must match what you actually took: a number that is wrong is worse than no number, because the dashboard
+  // will report you as up to date when you are not.
+  kitVersion: '<e.g. 1.5.0>',
+
+  deviations: [
+    // Example, with the shape and the level of detail expected:
+    // {
+    //   rule: 3,                        // the UI_SYSTEM.md section 11 point (1-7). Omit it to match any rule.
+    //   match: 'rgb(255, 0, 255)',      // text the judge reported: a measured value, a hex colour, an element, a path.
+    //   reason: 'the panic flash is magenta on purpose: it must be visible in both themes, and it is the only magenta',
+    // },
+    //
+    // Example of a whole-family declaration, which is legitimate ONLY when the reason really covers the family and the
+    // reach is stated. A match broad enough to silence hundreds of findings is the mute button this mechanism forbids.
+    //
+    // {
+    //   rule: 3,
+    //   match: '#inter-app-list',
+    //   reason: "the inter-application list carries our instrument's own livery (18 values, measured reach) rather than
+    //            the kit's furniture palette; the kit governs surfaces, this is a livery",
+    // },
+  ],
+};

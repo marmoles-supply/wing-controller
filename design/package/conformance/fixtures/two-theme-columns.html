@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · a page that paints two themes at once</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* A page may paint both themes side by side. No ordinary app does, and the kit's own specimen does it by design:
+     `body.theme-dark` cannot apply to a column, so the dark column re-declares the kit's own dark values it uses
+     (exactly what `design/specimen.html` resolves from the live cascade at load). The bevels below are then the kit's
+     own pair as **each column resolves it**, so rule 1 must judge every element against the pair where it lives: a
+     rule that resolves one pair for the whole page fails the dark column even though its bevels are correct.
+     The literals are the kit's `body.theme-dark` values; if they drift from the kit, rule 3 reports their colours as
+     unknown, so a fixture may spell them — the failure mode is loud. */
+  .columns { display: flex; gap: var(--space-4); }
+  [data-theme="dark"] {
+    --win-btn-face: #222527;
+    --win-text: #e0e6ed;
+    --win-btn-highlight: #3a3f42;
+    --win-btn-dark-shadow: #08090a;
+    --line-light: #44504c;
+    --line-dark: #0d100f;
+    --crt: #030806;
+  }
+</style>
+</head>
+<body>
+  <!-- `.card` draws the raised pair from --win-btn-highlight/--win-btn-dark-shadow and `.well` the sunken pair from
+       --line-dark/--line-light, so the two collections of step tokens are both exercised. -->
+  <div class="columns">
+    <section data-theme="light" aria-label="the light theme">
+      <div class="card" id="light-raised">raised in the light pair</div>
+      <div class="well" id="light-sunken">sunken in the light pair</div>
+    </section>
+    <section data-theme="dark" aria-label="the dark theme">
+      <div class="card" id="dark-raised">raised in the dark pair</div>
+      <div class="well" id="dark-sunken">sunken in the dark pair</div>
+    </section>
+  </div>
+</body>
+</html>

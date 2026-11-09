@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "WING CONTROLLER",
+  "version": "0.2.99",
+  "identifier": "com.wingcontroller.desktop",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "WING CONTROLLER · by MÁRMOLES SUPPLY CO. [BETA]",
+        "width": 1440,
+        "height": 860,
+        "minWidth": 980,
+        "minHeight": 560,
+        "acceptFirstMouse": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: asset:; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+      "dangerousDisableAssetCspModification": [
+        "script-src",
+        "style-src"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.png"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "WING CONTROLLER Broadcast Mixing Workstation",
+    "longDescription": "High-performance macOS desktop workstation for Behringer WING consoles.",
+    "macOS": {
+      "entitlements": "entitlements.plist"
+    }
+  }
+}

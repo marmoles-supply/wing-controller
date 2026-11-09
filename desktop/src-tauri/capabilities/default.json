@@ -1,0 +1,19 @@
+{
+  "identifier": "default",
+  "description": "Core permissions for the workstation window, the detached Meter Bridge window, the clock and the LTC window.",
+  "windows": [
+    "main",
+    "meters",
+    "timecode",
+    "ltc",
+    "guide"
+  ],
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:window:allow-set-focus",
+    "core:window:allow-destroy"
+  ]
+}

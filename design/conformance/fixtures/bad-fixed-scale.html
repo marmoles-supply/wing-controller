@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · the right size, written so the knob cannot move it</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+<style>
+  /* RULE 8, second check, and the one a single photograph cannot see. 9.5px **is** one of the kit's five steps at
+     --meter-scale 1 — so the first check passes — but it is a literal, so raising the knob moves nothing. The second
+     reading, at --meter-scale 1.5, is what catches it: the kit's `--font-sm` goes 9.5px -> 11.3px and this stays put. */
+  #fixed {
+    font-size: 9.5px;
+  }
+</style>
+</head>
+<body>
+  <div class="panel" id="fixed-panel">
+    <span id="fixed">the right size, nailed down</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WING CONTROLLER — reference window</title>
+<!-- The kit's three sheets, linked in the order `UI_SYSTEM.md` §10 makes a contract: the values, the drawings, the
+     plan. Nothing else is loaded: no font, no image, nothing from a network, no build step. -->
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="../layout.css">
+<style>
+  /* THIS PAGE'S OWN FURNITURE, AND NOTHING ELSE. The composition is `layout.css` and the drawings are `components.css`;
+     what is left here is the annotation layer this window exists to carry, and the four things the kit still does not
+     name: R4's one step down the scale, R5's grip, R6's confirmed band edge, and the page ground. The header furniture
+     this page used to retype is GONE — `components.css` §3 now draws `.header-brand`, `.product-mark`, `.window-name`,
+     `.tab-row`, `.header-actions` and `.tab.is-active` with the same declarations this page wrote, and names the band's
+     reason state `.c-band.is-reason`; a window that kept its copies would be the second answer to one question, and the
+     kit's own note beside those rules records the move. Every value below is a token reference.
+     **THE PAGE FRAME IS THE KIT'S NOW, AND THIS PAGE WRITES NONE OF IT.** The body's ground, ink, family, base size and
+     line box stood here — including the literal `1.35` a stranger reported — and they are `layout.css` §0's, whose line
+     box is the kit's `--leading-base` (`design/tokens.json`). Deleting them rather than restating them is the fix: a
+     window that keeps its own copy of the frame is the defect this kit exists to remove. */
+
+  /* --- R1: nothing of the header is written here ---------------------------------------------------------------
+     MEASURED 2026-10-08, on a copy of `design/` outside the tree: the file as committed at R6 and this one give the
+     same findings, rule for rule — the only difference is rule 4's reference count, 55 → 46, which is the nine token
+     references that left with the rules below. The five rules that stood here (`.header-brand`, `.product-mark`,
+     `.window-name`, `.tab-row`, `.header-actions`) and the tab's selected state (`.tab.is-active`) are
+     `components.css` §3's now, with the same declarations and the same tokens. The band's reason state is the kit's
+     own `.c-band.is-reason` for the same reason: `.c-band.is-offline` was this page's local alias of it, which is
+     exactly the second answer §10 forbids. A consumer's header is `<header class="master-header c-panel-head">` and
+     nothing else; the kit's note beside `header.master-header` records why the face is a deliberate borrowing. */
+
+  /* --- R4: one reading, one step down the kit's scale ------------------------------------------------------------
+     The well itself is the kit's own — `.c-well` (`components.css` §2) is the reversed edge pair over `--field`, set in
+     `--mono`, at `--font-xs`. The secondary reading is that same well one kit step down, so this page names a size the
+     kit already gives a name to. It is `--font-badge`, not a pixel, because §11 rule 8 makes `--meter-scale` the only
+     thing that moves a size: a number written here would move nothing when the knob is raised. No second well is drawn
+     and no colour is written — only which of the kit's nine steps this one line of type uses. */
+  .c-well.is-secondary { font-size: var(--font-badge); }
+
+  /* --- R5: the grip, which the kit does not name ---------------------------------------------------------------
+     MEASURED 2026-10-08: `components.css` names no grip and `layout.css` has no handle for a card — the kit's one
+     grip is `.resizer-handle`, the 42px bar down the column seam, and it belongs to the seam. So this is composed
+     from what the kit already owns and nothing new: the real window's own mark (`desktop/ui/index.html:8143`, a
+     handle reading `⋮⋮` with `cursor: grab` and `user-select: none`) on the kit's own `button` drawing, which is
+     raised — so it is visible in both themes because the kit's dark block moves `--win-btn-face` and `--win-text`,
+     not because this page names a colour. `cursor` is the one value here, and the kit has no word for it; the same
+     kind of value `layout.css` writes on its own seam handle (`cursor: col-resize`). No colour, no size and no token
+     is invented: the glyph keeps the button's own `--font-xs`, one of the kit's steps, which is why no `font-size`
+     is written here at all. */
+  .card-grip { cursor: grab; user-select: none; -webkit-user-select: none; }
+  .card-grip:active { cursor: grabbing; }
+
+  /* --- R6: the third band's edge, and the shapes a colour cannot carry ------------------------------------------
+     MEASURED 2026-10-08 against `components.css` §3: the kit names a dot for every state this region shows
+     (`.dot.is-confirmed`, `.dot.is-refusal`, `.dot.is-unknown`) and a band for two of them (`.c-band.is-refusal`,
+     `.c-band.is-unknown`) — **the kit names no `.c-band.is-confirmed`**. So the confirmed band's left edge is
+     composed here from the kit's own colour for that state, `--green`, the token `.dot.is-confirmed` already uses —
+     the same shape this page gave the reason band when it composed `.c-band.is-offline` from `--dim`, until the kit
+     named that one `.c-band.is-reason` and the local alias went. No token is invented and no colour is
+     written. The other three declarations are the difference §11 rule 6 asks for and colour cannot give — a broken
+     edge and a hollow mark for what is not settled, weight for a refusal — so a reader who sees no green, red or
+     grey still tells the three apart. Each is a value the kit already owns (`--dim`, `--green`, the kit's border),
+     put where the rule needs it; none of them is a size, so `--meter-scale` moves nothing here. */
+  .c-band.is-confirmed { border-left-color: var(--green); }
+  .c-band.is-unknown { border-left-style: dashed; }
+  .c-row.is-refused { font-weight: 700; }
+  .c-row.is-unknown { font-style: italic; }
+  .c-row.is-unknown .dot { background: transparent; border: 1px solid var(--dim); }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- ============================================================================================================
+       R1 — THE MASTER HEADER. WHAT IT IS: the window's identity strip, the first thing a reader of this file meets
+       and the row every screen of WING CONTROLLER opens with: the product mark and the window's name at the left, the
+       tab row that says which screen is showing, and the trailing controls at the right — a theme switch that works,
+       and the band that says, in the operator's words, what this window does not offer.
+
+       WHICH RULE OF `UI_SYSTEM.md` §11 IT DEMONSTRATES: "both themes were looked at, and nothing froze to the light
+       palette" (the fourth box), read with the first half of the fifth — "a control that cannot work is absent, not
+       greyed". The tab row is drawn as the kit's raised control so the state is depth (UI_SYSTEM.md §4) and not a
+       second colour.
+
+       WHICH STATE IT IS IN: live in both themes. The theme switch toggles `body.theme-dark` and writes
+       `localStorage.wing_theme` — the key every other window of this project reads — and follows the `storage` event, so
+       this window is the one place the canon shows its own light and dark face side by side. **There is deliberately no
+       Connect control**: this window opens no session, so the action would be one that cannot act, and §11.5 says such
+       a control is ABSENT rather than greyed — a greyed button is a promise, and a tooltip promising a future feature
+       is a promise with a date on it. The band therefore carries the reason with nothing to press beside it, and the
+       suite's `rule 5 · disabled-control` finding is answered by the absence rather than declared away. *Corrected
+       2026-10-08*: an earlier revision drew the button greyed with its reason beside it, on this plan's own
+       instruction; the suite refused it and commit `55c355c7` removed the button, keeping the band. The plan's text
+       was the thing that was wrong, not the rule — a canon that excuses itself in its own example teaches the excuse.
+
+       WHAT A CONSUMER DOES WITH IT: keep the arrangement — mark, name, tabs, then the trailing controls — and replace
+       the mark and the tabs with your own. Nothing of it is drawn here any more: it is all `components.css` §3 and
+       `layout.css` §2, which is the point of the header being the first thing a fork copies.
+       ============================================================================================================ -->
+  <header class="master-header c-panel-head">
+    <div class="header-brand">
+      <span class="product-mark" id="product-mark" title="Double-click to switch the theme">WING CONTROLLER</span>
+      <h1 class="window-name">Reference window</h1>
+    </div>
+    <nav class="tab-row" aria-label="Sections">
+      <button type="button" class="tab is-active" aria-current="page">Builder</button>
+      <button type="button" class="tab">Readouts</button>
+      <button type="button" class="tab">Log</button>
+    </nav>
+    <div class="header-actions">
+      <span class="c-band is-reason" id="connect-reason">No console: the reference window opens no session, so Connect has nothing to reach.</span>
+      <button type="button" class="c-mini" id="theme-switch" aria-pressed="false">Theme: light</button>
+    </div>
+  </header>
+
+  <!-- ============================================================================================================
+       R2 — THE TWO-COLUMN LAYOUT. WHAT IT IS: `.layout`, the plan itself — the left column is the work area (the
+       things the operator sets, a `.stack.builder-column` of cards) and the right is the operator column (the things
+       the operator reads), separated by the kit's own seam. Nothing here is a column definition of this page's own:
+       the tracks, the 6px seam and the sticky right column are all `layout.css`.
+
+       WHICH RULE OF `UI_SYSTEM.md` §11 IT DEMONSTRATES: "every raised element is light-before-dark; every sunken one
+       is the reverse" (the first box, obeyed by linking the kit's own drawings rather than redrawing them), read with
+       the ordering convention the plan states and this file exists to carry — SETTINGS LEFT, READINGS RIGHT. The seam
+       is the kit's `column-resizer`, not a border of ours, which is the same rule at the level of the plan.
+
+       WHICH STATE IT IS IN: it holds at its minimum width and in both themes. The right column is `position: sticky`
+       with `top: var(--space-4)` and `max-height: calc(100vh - var(--space-6))`, so it stays in view and scrolls inside
+       ITSELF while the work area scrolls with the document; below 1180px `layout.css` makes it one column and drops the
+       seam, and `layout.css` is what does that — this page declares no media query of its own.
+
+       WHAT A CONSUMER DOES WITH IT: keep it. The left/right order is the canon; the column widths come from the kit's
+       own `--ops-col-width` token and the two floors inside `layout.css`, so there is nothing here to copy and nothing
+       to guess. Delete cards, never the plan.
+       ============================================================================================================ -->
+  <div class="layout">
+    <div class="stack builder-column">
+
+      <!-- R3 — a stack of three cards in the work area, and NONE OF THEM FOLDS.
+           THE FOLD IS NOT HERE, BECAUSE THE KIT PUTS IT IN THE OTHER COLUMN. `layout.css:46-47` is explicit — the work
+           area's cards *do not collapse*, because *the operator is working in them and folding one away would hide the
+           work* — and `layout.css:48-49` gives the fold to the operator column's cards. `layout.html` draws its own
+           folded card in the operator column, never here. An earlier revision of this
+           page folded this stack's third card, which put the reference window on the wrong side of the sheet it exists
+           to teach; `PLAN.md`'s R3 entry keeps that contradiction on the record, with who found it and why, and records
+           the fix. The fold, its state class and its summary chip now live on R4, in the operator column. These three
+           cards therefore carry the kit's `c-card` and no state class — which is all a work-area card needs. -->
+      <section class="c-card">
+        <header class="c-card-head"><h2>Card one</h2></header>
+        <div class="panel-body">Eight macros are saved for this show.</div>
+      </section>
+
+      <section class="c-card">
+        <header class="c-card-head"><h2>Card two</h2></header>
+        <div class="panel-body">Select a row to load its steps into the editor.</div>
+      </section>
+
+      <section class="c-card">
+        <header class="c-card-head"><h2>Card three</h2></header>
+        <div class="panel-body">The steps this card holds, open like the other two.</div>
+      </section>
+
+      <!-- ==========================================================================================================
+           R5 — THE REORDERABLE CARD, AND IT IS WHERE THE ORDER IS THE OPERATOR'S. WHAT IT IS: a card — not a diagram
+           — holding the builder column's cards as a short list of rows, each one carrying the grip the real window's
+           draggable cards carry (`desktop/ui/index.html:8143`: a handle reading `⋮⋮` with `cursor: grab`). The list
+           is the region: the reader sees that the cards have an ORDER and that the order is a thing the operator
+           sets, which is a fact `desktop/ui/index.html` lives by and no other region of this window can show.
+
+           WHICH RULE OF `UI_SYSTEM.md` §11 IT DEMONSTRATES: the fifth box — "a control that cannot work is absent,
+           not greyed" — read with the canon the plan states and this file exists to carry: **A CARD LIST IS NOT A
+           FIXED TABLE; THE ORDER IS THE OPERATOR'S**. The grip is a control and not a picture of one, which is what
+           the fifth box asks of anything that looks pressable: Tab reaches it, Enter, Space and the arrow keys move
+           its row, both ends wrap so no press is silently nothing (§7.2), and the focus ring is the kit's own
+           `:focus-visible` rule, so "where the keyboard is" is one sentence here as everywhere else (§5: `--accent`
+           is focus and never a status). The entries are the kit's **row** (§8), and the grip is drawn by the kit's
+           own `button` rule — this region carries no second bevel and no new token.
+
+           WHICH STATE IT IS IN: normal, in both themes, and reachable by keyboard. The grip wears the kit's button
+           drawing (`--win-btn-face` behind `--win-text`), which the kit's dark block moves with the theme, so it does
+           not freeze to the light palette; this page adds the one declaration the kit has no word for, the hand
+           (`cursor: grab`), which is the same kind of value `layout.css` writes on its own seam handle. Nothing here
+           is a size: the glyph keeps the button's own `--font-xs`, one of the kit's nine steps, so no `font-size` is
+           written in this region at all.
+
+           WHAT A CONSUMER DOES WITH IT: **keep it only if the window has a list the operator orders; delete it
+           otherwise.** The grip, the row, the wrap and the key handler are the whole mechanism, and a window whose
+           cards have one fixed order should delete this card rather than carry a handle that orders nothing. The
+           pointer drag the real window also has belongs to the window that owns the list, exactly as the seam above
+           says of its own resize: this region carries the affordance and the keyboard path, and leaves the pointer to
+           the consumer.
+           ========================================================================================================== -->
+      <section class="c-card">
+        <header class="c-card-head"><h2>Card order</h2></header>
+        <div class="panel-body" id="card-order">
+          <div class="c-row">
+            <button type="button" class="card-grip" aria-label="Inspector: move up one place" title="Press to move this entry up; Arrow Down moves it down">⋮⋮</button>
+            <span class="c-row-name">Inspector</span>
+          </div>
+          <div class="c-row">
+            <button type="button" class="card-grip" aria-label="Connection: move up one place" title="Press to move this entry up; Arrow Down moves it down">⋮⋮</button>
+            <span class="c-row-name">Connection</span>
+          </div>
+          <div class="c-row">
+            <button type="button" class="card-grip" aria-label="Timecode: move up one place" title="Press to move this entry up; Arrow Down moves it down">⋮⋮</button>
+            <span class="c-row-name">Timecode</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- The seam: 6px of the grid with a 2px grip down its middle, and the kit draws it (`layout.css` `.column-resizer`
+         plus `.resizer-handle`). It is the operator's resize handle in a window that owns the drag; this window carries
+         the seam's place and not a pointer handler, which is the boundary `layout.css` states for itself. -->
+    <div class="column-resizer" aria-hidden="true">
+      <div class="resizer-handle"></div>
+    </div>
+
+    <!-- The operator column: `.ops-column` is the kit's name for the fixed one, and it is what makes it sticky. The
+         readouts that live here belong to R4. -->
+    <aside class="stack ops-column">
+
+      <!-- ==========================================================================================================
+           R4 — THE READOUTS CARD, AND IT IS WHERE THE DENSE TYPE LIVES. WHAT IT IS: the operator column's instrument
+           card — the things the operator READS rather than sets, which is the right-hand half of the ordering R2
+           carries. It holds a labelled reading in a well, the same kind of reading one step down the type scale, and
+           the one reading this window cannot report, which says why instead of showing a number it does not have.
+
+           THE FOLD IS HERE, AND THIS IS THE COLUMN THE KIT GIVES IT TO — BUT THE CARD ARRIVES **OPEN**, AND THAT IS
+           THE POINT. `layout.css` §5 is the fold rule, and it targets `.c-card.is-collapsed`, with `.card-summary` as
+           the one element its head keeps visible while the body goes; `layout.css:48-49` gives that state to the
+           operator column's cards, and the real window's foldable cards are its readouts. This card therefore carries
+           `c-card`, the kit's `c-chip card-summary` as its folded face, and the state class only while the operator
+           has folded it with the toggle. **A CARD THAT ARRIVES FOLDED IS UNVERIFIED, NOT CONFORMANT**:
+           `design/conformance/collect.mjs` skips every element with no box, and a folded body has none, so the
+           readings below are not judged at all while the card is folded — **MEASURED 2026-10-08 on this page, folded:
+           `RULE 2 · PASS · checked numbers 0`** — and the adopter that forked this kit measured
+           `RULE 6 · NOT CHECKED · no element declares data-state` on its own page, where the three states sat inside
+           the folded card, and `checked numbers 4` · `checked states 3` there once it was open. **MEASURED on this
+           page, open: `RULE 2 · PASS · checked numbers 2` and `RULE 6 · PASS · checked states 3`** — the card carries
+           two values, not the adopter's four, and rule 6 read 3 before this change as well, because R6's three states
+           are their own card below and were never folded. So the window teaches the state without starting in the
+           state that hides it, and **the fold is one press away on the `#fold-toggle` button in the head**, which
+           stays operable and keeps the fold demonstrable. The application's own `.panel` is NOT what that rule
+           addresses: `components.css` says the two names are not aliases (`.c-panel` is a well under a raised head,
+           `.panel` is a raised block), so a `.panel.is-collapsed` would look right in the source and never fold.
+           *Corrected 2026-10-08*: this card used to stand open while R3's third card carried the fold in the work
+           area, which is backwards against the sheet this window teaches — `PLAN.md`'s R3 entry records who found that
+           contradiction and why, and the fold is on this card now. *Corrected again 2026-10-08*: the fold moved here
+           and the card then arrived folded, which hid the readings from the rules written to judge them; the state
+           class is off the card and the fold is the button's. Nothing here is drawn by this page: the names are the
+           kit's own.
+
+           THE FOLD IS OPERABLE, AND THIS IS THE MECHANISM A CONSUMER COPIES. The control is a `<button>` in the head
+           — the kit's own `button` drawing, so this page invents no second look — carrying `aria-expanded` (`false`
+           folded, `true` open) and a short label that names what it does ("Unfold" / "Fold"). The handler toggles the
+           card's `is-collapsed` class and the attribute together. **The hiding is still the kit's**:
+           `.c-card.is-collapsed > :not(.c-card-head)` (`layout.css` §5) is what removes the body and keeps the
+           `.card-summary` chip, so none of that rule is restated in this page's script or sheet. `design/layout.html`
+           carries the same button, the same attributes and the same `apply()`, so the mechanism is copied once and
+           works in both pages. *Added 2026-10-08*: the folded card used to carry the class and nothing else — no
+           control, no `aria-expanded`, no handler — which `PLAN.md` records as a stranger's finding: a window that
+           taught a state with no way to change it. `PLAN.md`'s paragraph is marked FIXED, not deleted.
+
+           WHICH RULE OF `UI_SYSTEM.md` §11 IT DEMONSTRATES: rule 2 in full — "every value the operator reads as a
+           number is `--mono`, and every one of them sits in a well" — read with rule 8, "every text size is one of the
+           kit's steps". The values are `--mono` and sunken because `.c-well` IS the kit's well: the reversed edge pair
+           over `--field`, in the number type (`components.css` §2). The secondary reading is one of the kit's own steps
+           down (`--font-badge`, the one rule R4 adds to this page's sheet), so nothing here is a pixel and
+           `--meter-scale` moves it with every other size on the page.
+
+           WHICH STATE IT IS IN: **open on arrival**, in both themes — the readings below are what rule 2 was written
+           to judge and what the collector skips when they have no box — with the fold one press away on the head's
+           `#fold-toggle` (`aria-expanded` `true` here, `false` folded) — and unavailable. The two readings are the
+           shape at rest — this window is static and offline, it opens no session and measures nothing, and the band
+           below says exactly that rather than letting a plausible number pass for a measurement. The third reading
+           has no source at all, so its reason stands where its reading would be, in the kit's `--dim` band (§7.2 and
+           §7.4): neither `--` nor an invented number, because a report that lies about what was done is the defect,
+           not the machine.
+
+           WHAT A CONSUMER DOES WITH IT: keep the shape — a label, a well with its unit, and one reading a step further
+           down the scale — and replace the readings and their labels. A reading that comes from a live session is
+           filled in from that source; a reading with no source keeps its reason and stays empty. Delete the card, never
+           the well around a number.
+           ========================================================================================================== -->
+      <section class="c-card">
+        <header class="c-card-head">
+          <h2>Readouts</h2>
+          <span class="c-chip card-summary">Peak -12.5 dB · RMS -18.0 dB</span>
+          <button type="button" id="fold-toggle" aria-expanded="true">Fold</button>
+        </header>
+        <div class="panel-body">
+          <div class="c-label">
+            <span>Input 1 peak</span>
+            <span class="c-well">-12.5 dB</span>
+          </div>
+          <div class="c-label">
+            <span>Input 1 RMS</span>
+            <span class="c-well is-secondary">-18.0 dB</span>
+          </div>
+          <div class="c-label">
+            <span>Console clock offset</span>
+          </div>
+          <div class="c-band is-reason">No source: this window opens no session and measures nothing, so the two values
+            above are the shape at rest and not a reading. The clock offset has no source at all, so its reason stands
+            where its reading would be — never a placeholder number.</div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================================================
+           R6 — THE THREE STATES, AND IT IS WHERE A MACHINE'S ANSWER LIVES. WHAT IT IS: one card in the operator
+           column holding the three answers a machine is allowed to give, all three at once so a reader sees them
+           without pressing anything: the work was DONE, the work was REFUSED and here is why, and NOBODY KNOWS.
+           Each answer is the kit's own state mark, a word, and a shape that is not a colour — the word is the honest
+           sentence (`Confirmed` / `Refused` / `Unknown`), the refusal carries its cause in the operator's words, and
+           the three are told apart by weight, by a broken edge and by a hollow mark as well as by ink. This is the
+           region rule 6 was written for: a window that can only say two of the three is a window that cannot tell a
+           refusal from an absence, and an operator who cannot see the colour must still read which one it is.
+
+           WHICH RULE OF `UI_SYSTEM.md` §11 IT DEMONSTRATES: rule 6 in full — "anything a machine decided can say
+           yes, no or unknown, and the three are told apart without colour" — read with the second half of rule 5,
+           "a refusal names its cause in the operator's own words" (the kit's own note beside the refusal band says
+           the same), and with §5, which gives each state colour its meaning rather than its look. WHICH OF THE THREE
+           STATES: **all three, one element each** — `data-state="yes"` (the write is confirmed), `data-state="no"`
+           (the write was refused, with its cause) and `data-state="unknown"` (no answer arrived, so nothing can say
+           whether it landed). The card declares the vocabulary it can take once, `data-state-set="yes no unknown"`,
+           which is the mark rule 6 reads; the states themselves are what the three rows carry.
+
+           WHICH STATE THE PAGE IS IN: the three shapes at rest, and the page says so rather than letting them pass
+           for traffic. This window opens no session, so no machine has actually decided anything here: the sentences
+           are the shape each answer takes when one arrives, which is why the refusal names a cause a real console
+           gives (a strip whose model has no gate has no `/gate/thr` to write — the model is read before the write)
+           and not a plausible-looking number. The colour comes from the kit's own dots and bands, so both themes
+           move it; the shapes do not depend on the theme at all, which is the point.
+
+           WHAT A CONSUMER DOES WITH IT: **keep all three.** A window that reports what a machine decided copies this
+           whole card and then says where its own three answers come from: rule 6 is not decoration, it is the
+           difference between "sent" and "confirmed" and between "refused" and "we do not know", and a consumer that
+           deletes the third state deletes the honest one.
+           ========================================================================================================== -->
+      <section class="c-card" data-state-set="yes no unknown">
+        <header class="c-card-head"><h2>Machine decisions</h2></header>
+        <div class="panel-body">
+          <div class="c-row" data-state="yes">
+            <span class="dot is-confirmed" aria-hidden="true"></span>
+            <span class="c-row-name">✓ Confirmed</span>
+          </div>
+          <div class="c-band is-confirmed">Accepted: the console took the write and read the value back from the same
+            leaf, so this is a confirmation and not a hope.</div>
+
+          <div class="c-row is-refused" data-state="no">
+            <span class="dot is-refusal" aria-hidden="true"></span>
+            <span class="c-row-name">✕ Refused</span>
+          </div>
+          <div class="c-band is-refusal" data-refusal>Refused: channel 12 runs DEQ2 and that model has no gate, so
+            there is no `/gate/thr` on that strip to write — the value was not stored, and nothing about it is
+            pending.</div>
+
+          <div class="c-row is-unknown" data-state="unknown">
+            <span class="dot is-unknown" aria-hidden="true"></span>
+            <span class="c-row-name">? Unknown</span>
+          </div>
+          <div class="c-band is-unknown">Unknown: the read timed out before the console answered, so nothing here can
+            say whether the write was stored — an absent answer, which is not the same sentence as a refusal.</div>
+        </div>
+      </section>
+
+    </aside>
+  </div>
+
+</main>
+
+<script>
+  /* Three things, and all three are state the reader can reach: the theme switch, R4's fold, and R5's grip.
+     `wing_theme` in localStorage is the key every other window in this project uses, so a window opened here is not a
+     foreign window in the application's own theme. The switch says which theme is ON twice over: the visible label
+     names it for the operator, and `aria-pressed` carries the same state to a screen reader. The depth of the control
+     (`components.css`) says it is pressable, not which way it is set. *Corrected 2026-10-08*: the label read "Theme"
+     in both themes, so the state reached the accessibility tree and not the screen — an operator who does not read a
+     screen reader had to press it to find out. The label now names the theme that is on ("Theme: light" /
+     "Theme: dark"), which is what the state is, and `aria-pressed` stays truthful. */
+  (function () {
+    var KEY = 'wing_theme';
+    var root = document.body;
+    var button = document.getElementById('theme-switch');
+    function apply(theme) {
+      var dark = theme === 'dark';
+      root.classList.toggle('theme-dark', dark);
+      button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+      button.textContent = 'Theme: ' + (dark ? 'dark' : 'light');
+    }
+    function toggle() {
+      var next = root.classList.contains('theme-dark') ? 'light' : 'dark';
+      localStorage.setItem(KEY, next);
+      apply(next);
+    }
+    apply(localStorage.getItem(KEY) || 'light');
+    button.addEventListener('click', toggle);
+    /* The product mark is not a control; the double-click is the shortcut the real window gives it and it is
+       announced in its title, so it is discovered rather than hidden. */
+    document.getElementById('product-mark').addEventListener('dblclick', toggle);
+    window.addEventListener('storage', function (e) {
+      if (e.key === KEY) { apply(e.newValue || 'light'); }
+    });
+  })();
+
+/* THE FOLD, AND IT IS THE SAME MECHANISM IN `design/layout.html` AND `design/reference-window/index.html`, so a
+   consumer copies one thing. The shape is the theme switch's `apply()` in the reference window: one function sets the
+   card's class and the button's `aria-` value together, so what is drawn and what is announced cannot drift. The
+   hiding itself is NOT here — the kit draws it (`.c-card.is-collapsed > :not(.c-card-head)`, `layout.css` §5), and
+   `.card-summary` is the chip that state keeps, so this script only changes the state. **The card arrives OPEN** (the
+   reason is R4's own comment: a folded body has no box, so the conformance collector skips it and the readings go
+   unjudged), which is why the initial `apply()` below reads the card's own class instead of asserting a state - press
+   the button once and the card folds. `<button>` is focusable and
+   Enter/Space fire it natively, so no key handler is written and nothing is prevented. */
+(function () {
+  var button = document.getElementById('fold-toggle');
+  var card = button.closest('.c-card');
+  function apply(collapsed) {
+    card.classList.toggle('is-collapsed', collapsed);
+    button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    button.textContent = collapsed ? 'Unfold' : 'Fold';
+  }
+  function toggle() {
+    apply(!card.classList.contains('is-collapsed'));
+  }
+  apply(card.classList.contains('is-collapsed'));
+  button.addEventListener('click', toggle);
+})();
+
+  /* R5's ORDER, AND THE PART THAT MAKES THE GRIP A CONTROL RATHER THAN A PROMISE. §7.1 says a control that cannot do
+     its job is not on screen, so the grip does the job it looks like it does: press it (or press Enter or Space, which
+     a button turns into the same click) and its entry moves up one place; Arrow Down moves it down, Arrow Up moves it
+     up; both ends wrap, so a press is never silently nothing (§7.2); and focus follows the entry it moved, so a
+     keyboard user is not dropped back to the top of the page. The pointer drag the real window also has is the
+     consuming window's, which is the boundary the seam above draws for its own resize. */
+  (function () {
+    var order = document.getElementById('card-order');
+    if (!order) return;
+    function move(row, by) {
+      var rows = Array.prototype.slice.call(order.children);
+      var from = rows.indexOf(row);
+      if (from < 0) return;
+      var to = (from + by + rows.length) % rows.length;
+      if (to === from) return;
+      rows.splice(from, 1);
+      rows.splice(to, 0, row);
+      rows.forEach(function (item) { order.appendChild(item); });
+      var grip = row.querySelector('.card-grip');
+      if (grip) grip.focus();
+    }
+    function gripOf(event) {
+      var grip = event.target.closest ? event.target.closest('.card-grip') : null;
+      return grip && order.contains(grip) ? grip : null;
+    }
+    order.addEventListener('click', function (event) {
+      var grip = gripOf(event);
+      if (grip) move(grip.closest('.c-row'), -1);
+    });
+    order.addEventListener('keydown', function (event) {
+      var grip = gripOf(event);
+      if (!grip || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
+      event.preventDefault();
+      move(grip.closest('.c-row'), event.key === 'ArrowDown' ? 1 : -1);
+    });
+  })();
+</script>
+
+</body>
+</html>

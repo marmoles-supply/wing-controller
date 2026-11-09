@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WING CONTROLLER · Complete Guide</title>
+    <link rel="icon" type="image/png" href="icon.png" />
+    <script src="version.js"></script>
+    <script src="dither.js"></script>
+    <script src="guide-content.js"></script>
+    <!-- The caret rule every field obeys: the first click selects the value so typing overwrites it, the
+         second puts the caret at its end. One module for every window, so the same gesture cannot behave
+         differently per screen; the rule and the WebKit workaround behind it live there and nowhere else. -->
+    <script src="field-editing.js"></script>
+    <link rel="stylesheet" href="design-tokens.css" />
+    <!-- The kit's drawings and then its plan, from the values above. That is the kit's own order — values, drawings,
+         plan — and this window's own sheet still follows, so a deliberate override wins. All three are copies the
+         application ships beside this window (`scripts/sync-design-components.mjs`); `layout.css` is
+         `design/layout.css`, the kit's composition of a window, and the one thing this window has to say back to it
+         is stated at `.layout` below. -->
+    <link rel="stylesheet" href="components.css" />
+    <link rel="stylesheet" href="layout.css" />
+    <style>
+      /* The light palette is the kit's, linked above (`design-tokens.css`), not a copy of it. This block used to
+         restate nine colours the kit already carries under the same nine names — `--face`, `--face-2`, `--face-3`,
+         `--field`, `--ink`, `--muted`, `--line-mid`, `--line-light` and `--line-dark` — and, measured token by token
+         against that linked copy, **all nine equalled the kit's own light value**, so the names still resolve and not
+         a pixel moves (the screens lock renders this window exactly as it did). `var(--same-name)` written in their
+         place would be a custom-property cycle and would blank every one of them, which is why the duplication is
+         deleted rather than substituted. The two font families stay: they are not colours, and this pass is about the
+         palette. */
+      :root {
+        --win-font: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Segoe UI", Geneva, sans-serif;
+        --mono: "Lucida Console", "Courier New", Consolas, monospace;
+        /* `--navy` is the one colour this window still names for itself, and it is left as a decision rather than
+           renamed. Its light value `#000080` is the value the kit carries twice under two meanings — `--win-title-bg`
+           (the classic title bar) and `--accent` (the selection: §5 makes it "the thing the operator is acting on") —
+           and this one name wears both roles here, the bar at `.titlebar` and the selected chapter at
+           `.chapters li.is-active`. It is the only name in the window whose dark value could not follow the kit:
+           the kit's dark `--accent` is the blue `#2f9bd8`, so pointing the selection at it would move the dark
+           palette, and the dark value below is the reading window's own green. */
+        --navy: #000080;
+        font-family: var(--win-font);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        border-radius: 0 !important;
+      }
+      body {
+        margin: 0;
+        background: var(--face);
+        color: var(--ink);
+        font-family: var(--win-font);
+        font-size: var(--font-base);
+        line-height: 1.45;
+      }
+      /* The dark theme is this window's own, and it is *declared* rather than copied: eight of the nine tokens below
+         differ from the value this kit copy declares under the same name — `--face-2`, `--face-3`, `--field`, `--ink`,
+         `--muted`, `--line-mid`, `--line-light`, `--line-dark` — because the guide is a long-form reading window whose
+         dark surface order is the reverse of the kit's chrome, and each difference is a decision with a reason, not a
+         mute button: `design/conformance/allow.mjs` (rule 4) and `desktop/ui/allow.mjs` carry one entry per token
+         (`docs/DESIGN_DISAGREEMENTS_2026-10-08.md` rows 2–10). `--navy` is the same name as in `:root`, for the same
+         two roles. The one rung that was purely the kit's chrome is gone: `--face: #222726` was this kit copy's own
+         dark `--face`, the window's script toggles the class the kit reads (`body.theme-dark`), and the screens lock
+         proves no pixel moved. */
+      body.theme-dark {
+        --face-2: #1b201f;
+        --face-3: #2c3533;
+        --ink: #e6efeb;
+        --muted: #b9c6c0;
+        --line-dark: #0b0f0e;
+        --line-mid: #47524e;
+        --line-light: #59645f;
+        --navy: #70e7a9;
+        --field: #171c1b;
+      }
+
+      .window {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        height: 100vh;
+      }
+
+      .titlebar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 6px;
+        background: var(--navy);
+        /* The ink is the kit's `--win-title-text`, the token the kit's own `.c-titlebar` draws its label in — the
+           meaning is unambiguous, and the light value is the same `#ffffff` this rule used to spell by hand. The dark
+           theme restates it below (`#d8ffe9`). The bar's ground stays `--navy`: that name also paints the selected
+           chapter, and it is explained in `:root`. */
+        color: var(--win-title-text);
+        font-weight: bold;
+      }
+      body.theme-dark .titlebar {
+        background: #14372b;
+        color: #d8ffe9;
+      }
+      .titlebar .spacer {
+        margin-left: auto;
+      }
+      /* The titlebar's two buttons and the search's "✕" are drawn by the kit now (`components.css`, linked above):
+         its `button` rule carries the raised bevel, `--win-btn-face`, `--win-text` and the interface size, so the
+         rules this window used to write for them are gone — the three-selector `button` block that replaced the
+         user agent's `buttontext`, and the `font-size`/`padding` override that used to size the titlebar pair. */
+
+      /* The kit's plan is linked above (`layout.css`), and one of its declarations has to be answered here rather
+         than inherited: the plan supplies `align-items: start`, because the shell it draws is the application's
+         two-column WORK AREA, where each column sizes to its own content and scrolls inside itself. This window is
+         not that shell — it is a DOCUMENT window: `.window` is `100vh` with `grid-template-rows: auto 1fr auto`, the
+         title bar and the status bar are pinned at the top and the bottom, and `.content` is the one pane that
+         scrolls. Under the plan's `start` both grid items shrink to their content instead: the sidebar ends at y 390
+         with bare window background below it, `.content` grows to its full 1458 px, and the document becomes
+         1481 px tall inside a 1000 px window. The article then paints OVER the status bar — measured before this
+         line, `document.elementFromPoint(800, 990)` returned an article `p` where it must return `.statusbar`, the
+         status line was cut mid-word at x 236, and `#guide-build` (the version and build number) was not painted at
+         all: a change a pixel count calls 2.902 % light / 2.991 % dark, and a reader calls broken. With
+         `align-items: stretch` the guide renders **byte-identical** to `design/screens/guide-light.png` and
+         `guide-dark.png` in both themes (the screens lock's strongest form), so this is not a workaround for the
+         kit's sheet: it is the guide saying which shell it is. */
+      .layout {
+        display: grid;
+        grid-template-columns: 236px 1fr;
+        min-height: 0;
+        align-items: stretch;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        border-right: 2px solid var(--line-mid);
+        background: var(--face-2);
+        padding: 6px;
+        gap: 6px;
+      }
+      .search-row {
+        display: flex;
+        gap: 4px;
+      }
+      .search-row input {
+        /* The drawing is the kit's `input` rule: `--field`, `--ink`, the interface font and the sunken pair. What
+           is left here is this window's layout — the box fills the row and may shrink with it — and the mono the
+           search term was set in is dropped with the rest, because the kit draws a search field in the interface
+           font and reserves `--mono` for a value the operator reads as a number (§11 point 2). */
+        flex: 1;
+        min-width: 0;
+      }
+      .chapters {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        flex: 1;
+        border: 1px solid var(--line-dark);
+        border-top-color: var(--line-dark);
+        border-left-color: var(--line-dark);
+        border-right-color: var(--line-light);
+        border-bottom-color: var(--line-light);
+        background: var(--face);
+      }
+      .chapters li {
+        padding: 4px 6px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--line-mid);
+        font-size: var(--font-base);
+      }
+      .chapters li:hover {
+        background: var(--face-3);
+        color: var(--ink);
+      }
+      .chapters li.is-active {
+        background: var(--navy);
+        /* `#ffffff` stays hand-written. The kit names no ink for a *filled* selection: its own selected rail item
+           (`components.css`, `.c-rail-item.is-selected`) colours the text with `--accent` instead of filling the row,
+           so the five kit tokens that carry `#ffffff` — `--win-title-text` is the title bar's, `--face-3`, `--field`
+           and `--line-light` are surfaces — are the same value under other meanings. The dark theme restates this ink
+           as `#06231a` on the same green (declared in `design/conformance/allow.mjs`, rule 3). */
+        color: #ffffff;
+        font-weight: bold;
+      }
+      body.theme-dark .chapters li.is-active {
+        color: #06231a;
+      }
+      .chapters li .word-count {
+        float: right;
+        font-family: var(--mono);
+        font-size: var(--font-sm);
+        opacity: 0.75;
+      }
+      .sidebar-note {
+        color: var(--muted);
+        font-size: var(--font-sm);
+        line-height: 1.3;
+      }
+
+      .content {
+        min-height: 0;
+        overflow: auto;
+        background: var(--face-3);
+        color: var(--ink);
+        padding: 14px 20px 40px;
+      }
+      body.theme-dark .content {
+        background: #141917;
+      }
+      .content article {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .content h2 {
+        /* The one size in this window that is not one of the kit's steps, declared in `design/conformance/allow.mjs`
+           (rule 8) with its reach. A chapter title is document structure, not interface furniture: the kit's five
+           INTERFACE steps are `clamp()`s that reach at most 18px at any `--meter-scale`, and the nearest one below 17px
+           is `--font-lg` = 11.5px — which is exactly the size this window gives its h3, so "the step below" would
+           collapse the chapter title into its own subsection heading. The kit's four INSTRUMENT steps (`--font-readout`
+           at 22px and up, `DESIGN-SYSTEM-ROADMAP.md` §4l) are above it by design and are not a document hierarchy, so
+           the nearest step above 17px is 22px: five pixels too far for a chapter title. Declared, not flattened. */
+        font-size: 17px;
+        margin: 0 0 10px;
+        padding-bottom: 4px;
+        border-bottom: 2px solid var(--line-mid);
+      }
+      .content h3 {
+        font-size: var(--font-lg);
+        margin: 18px 0 6px;
+      }
+      .content h4 {
+        font-size: var(--font-base);
+        margin: 14px 0 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .content p,
+      .content li {
+        font-size: var(--font-base);
+        line-height: 1.55;
+      }
+      .content code {
+        font-family: var(--mono);
+        font-size: var(--font-sm);
+        background: #ecebe5;
+        /* The kit's sunken pair, not a flat frame. §11 point 2 puts a value the operator reads in a well,
+           and this is the guide's well: `192.168.1.10` is one of the values in it, so a uniform border
+           made the suite count it as "on an unsunken surface". Light on the bottom and right, dark on the
+           top and left, read from the tokens this window already declares. */
+        border: 1px solid;
+        border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+        padding: 0 3px;
+      }
+      body.theme-dark .content code {
+        background: #1f2725;
+      }
+      /* A port number in a prose table is still a number the operator reads: three cells in chapter 1
+         list 2223/2222/2222 as bare `<strong>` text in the interface font, on the page background. They
+         take the mono type and the same well as the inline code above, and only cells that hold such a
+         value are touched (`td:has(> strong)` in that chapter). */
+      #section-start-here td:has(> strong) {
+        font-family: var(--mono);
+        background: #ecebe5;
+        border: 1px solid;
+        border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+      }
+      body.theme-dark #section-start-here td:has(> strong) {
+        background: #1f2725;
+      }
+      /* A `<pre>` block is a code sample's own paper, and its four colours are this window's shades rather than the
+         kit's values: `#f2f1ec` is a lighter paper than the inline well's `#ecebe5` and `#101413` a darker one than
+         its dark ground, so neither is a kit surface (`--field` is `#ffffff`/`#0f1614`, `--face-3`
+         `#ffffff`/`#1a1e1d`). The 1px frame is the flat `#c9c7bf`/`#38423f` this window draws for a code block — not
+         the sunken pair the inline `code` well above takes from `--line-dark`/`--line-light` — and no kit token
+         carries either value. Left with this reason rather than mapped onto the wrong token. */
+      .content pre {
+        font-family: var(--mono);
+        font-size: var(--font-sm);
+        background: #f2f1ec;
+        border: 1px solid #c9c7bf;
+        padding: 6px 8px;
+        overflow: auto;
+      }
+      body.theme-dark .content pre {
+        background: #101413;
+        border-color: #38423f;
+      }
+      .content table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 8px 0;
+        font-size: var(--font-base);
+      }
+      .content th,
+      .content td {
+        border: 1px solid var(--line-mid);
+        padding: 3px 6px;
+        text-align: left;
+        vertical-align: top;
+      }
+      .content th {
+        background: var(--face-2);
+      }
+      .content blockquote {
+        margin: 8px 0;
+        padding: 5px 8px;
+        border-left: 3px solid var(--line-mid);
+        background: var(--face-2);
+      }
+      /* The search highlight is its own ground in both themes: `#ffe680` is a highlighter yellow no kit token carries
+         (`--yellow` is `#f1c40f`, `--gold` `#ffd700`, `--amber` `#d0a84e`), so the ink on it must not follow the theme
+         either — `var(--ink)` would become `#e6efeb` in the dark theme, pale ink on a mid yellow. `#000000` is
+         hand-written for that reason and is the same in both themes on purpose, the shape the meters window's amber
+         pill is declared with in `design/conformance/allow.mjs` (rule 4). */
+      .content mark {
+        background: #ffe680;
+        color: #000000;
+      }
+      .content .empty {
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .statusbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 6px;
+        border-top: 2px solid var(--line-light);
+        background: var(--face);
+        color: var(--muted);
+        font-size: var(--font-base);
+      }
+      .statusbar .spacer {
+        margin-left: auto;
+      }
+
+      /* Printing: everything, one chapter after another, without the chrome. */
+      @media print {
+        .titlebar,
+        .sidebar,
+        .statusbar {
+          display: none !important;
+        }
+        .layout {
+          display: block;
+        }
+        .content {
+          overflow: visible;
+          padding: 0;
+        }
+        .content article {
+          display: block !important;
+          max-width: none;
+          page-break-after: always;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="workstation.css" />
+    <link rel="stylesheet" href="secondary-chrome.css" />
+    <script src="secondary-chrome.js" defer></script>
+  </head>
+  <body class="wc-app wc-guide">
+    <div class="window">
+      <div class="titlebar wc-toolbar">
+        <span id="app-version-mark">WING CONTROLLER</span>
+        <span>· Complete Guide</span>
+        <span class="spacer"></span>
+        <button type="button" id="btn-print" title="Print or save the whole guide as PDF">Print</button>
+        <button type="button" id="btn-close-guide" title="Close this window (Escape)">Close</button>
+      </div>
+
+      <div class="layout">
+        <div class="sidebar wc-card">
+          <div class="search-row">
+            <input id="guide-search" type="search" placeholder="Search the guide…" title="Filter chapters and highlight matches (Cmd/Ctrl+F)" />
+            <button type="button" id="btn-clear-search" title="Clear the search">✕</button>
+          </div>
+          <ul class="chapters" id="guide-chapters"></ul>
+          <div class="sidebar-note" id="guide-note"></div>
+        </div>
+        <div class="content wc-card" id="guide-content"></div>
+      </div>
+
+      <div class="statusbar wc-status">
+        <span id="guide-status">Loading…</span>
+        <span class="spacer"></span>
+        <span id="guide-build"></span>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const hasTauri = Boolean(window.__TAURI__);
+        const sections = Array.isArray(window.WING_GUIDE_SECTIONS) ? window.WING_GUIDE_SECTIONS : [];
+        const chaptersEl = document.getElementById("guide-chapters");
+        const contentEl = document.getElementById("guide-content");
+        const searchEl = document.getElementById("guide-search");
+        const statusEl = document.getElementById("guide-status");
+        const noteEl = document.getElementById("guide-note");
+
+        // The version block is `APP_VERSION_INFO`: that is the global `scripts/sync-version.mjs` generates into
+        // `version.js`, which this window loads at the top. This read `window.WING_VERSION` — a name nothing in this
+        // repository has ever defined — so the build line was set to the empty string on every launch and the version
+        // mark never updated from its markup. A version line that can only ever be blank is worse than no line: it
+        // reads as a build that has lost its version.
+        document.getElementById("guide-build").textContent = window.APP_VERSION_INFO
+          ? `v${window.APP_VERSION_INFO.version} · build ${window.APP_VERSION_INFO.build}`
+          : "";
+        if (window.APP_VERSION_INFO?.fullTitle) {
+          document.getElementById("app-version-mark").textContent = window.APP_VERSION_INFO.appName || "WING CONTROLLER";
+        }
+
+        const escapeHtml = (text) =>
+          String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        if (sections.length === 0) {
+          contentEl.innerHTML =
+            '<article><h2>No guide content</h2><p class="empty">This window could not load the guide that ships with the application. Quit and reopen the window; if it stays empty, reinstall WING CONTROLLER (the guide travels inside the app).</p></article>';
+          statusEl.textContent = "No chapters";
+          return;
+        }
+
+        const totalWords = sections.reduce((sum, section) => sum + (section.words || 0), 0);
+        contentEl.innerHTML = sections
+          .map(
+            (section, index) =>
+              `<article data-section="${escapeHtml(section.id)}" id="section-${escapeHtml(section.id)}"${index === 0 ? "" : ' style="display: none;"'}>${section.html}</article>`,
+          )
+          .join("\n");
+
+        const articles = Array.from(contentEl.querySelectorAll("article"));
+        const buttons = sections.map((section, index) => {
+          const item = document.createElement("li");
+          item.dataset.section = section.id;
+          item.innerHTML = `${escapeHtml(section.title)}<span class="word-count">${section.words}</span>`;
+          item.addEventListener("click", () => show(index, true));
+          chaptersEl.appendChild(item);
+          return item;
+        });
+
+        let current = 0;
+        function show(index, updateHash = false) {
+          current = Math.max(0, Math.min(sections.length - 1, index));
+          articles.forEach((article, i) => {
+            article.style.display = i === current ? "block" : "none";
+          });
+          buttons.forEach((button, i) => button.classList.toggle("is-active", i === current));
+          contentEl.scrollTop = 0;
+          const section = sections[current];
+          statusEl.textContent = `Chapter ${current + 1} of ${sections.length} · ${section.words} words · ${totalWords} words in the guide`;
+          if (updateHash) {
+            try {
+              history.replaceState(null, "", `#${section.id}`);
+            } catch (_) {}
+          }
+        }
+
+        const sectionFromHash = () => {
+          const wanted = decodeURIComponent(String(location.hash || "").replace(/^#/, "")).toLowerCase();
+          if (!wanted) return null;
+          const index = sections.findIndex((section) => section.id.toLowerCase() === wanted);
+          return index >= 0 ? index : null;
+        };
+
+        // --- Search: filters the chapter list and highlights inside the open chapter ---
+        const clearHighlights = () => {
+          contentEl.querySelectorAll("mark").forEach((mark) => {
+            const parent = mark.parentNode;
+            parent.replaceChild(document.createTextNode(mark.textContent), mark);
+            parent.normalize();
+          });
+        };
+
+        const highlight = (needle) => {
+          if (!needle) return;
+          const walker = document.createTreeWalker(articles[current], NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          while (walker.nextNode()) nodes.push(walker.currentNode);
+          const lowered = needle.toLowerCase();
+          nodes.forEach((node) => {
+            const text = node.nodeValue;
+            const index = text.toLowerCase().indexOf(lowered);
+            if (index < 0) return;
+            const mark = document.createElement("mark");
+            mark.textContent = text.slice(index, index + needle.length);
+            const after = node.splitText(index);
+            after.nodeValue = after.nodeValue.slice(needle.length);
+            node.parentNode.insertBefore(mark, after);
+          });
+        };
+
+        function applySearch() {
+          const query = searchEl.value.trim();
+          clearHighlights();
+          if (!query) {
+            buttons.forEach((button) => {
+              button.style.display = "";
+            });
+            statusEl.textContent = `Chapter ${current + 1} of ${sections.length} · ${sections[current].words} words · ${totalWords} words in the guide`;
+            noteEl.textContent = "";
+            return;
+          }
+          const lowered = query.toLowerCase();
+          let hits = 0;
+          buttons.forEach((button, index) => {
+            const haystack = `${sections[index].title}\n${articles[index].textContent}`.toLowerCase();
+            const matches = haystack.includes(lowered);
+            button.style.display = matches ? "" : "none";
+            if (matches) hits += 1;
+          });
+          highlight(query);
+          const inChapter = articles[current].textContent.toLowerCase().includes(lowered);
+          statusEl.textContent = `${hits} chapter${hits === 1 ? "" : "s"} match "${query}"${inChapter ? "" : " — none in this chapter"}`;
+          noteEl.textContent = hits === 0 ? "Nothing found. Try a single word (meter, bank, panic…)." : "Matches are highlighted in the open chapter.";
+        }
+
+        searchEl.addEventListener("input", applySearch);
+        document.getElementById("btn-clear-search").addEventListener("click", () => {
+          searchEl.value = "";
+          applySearch();
+          searchEl.focus();
+        });
+
+        // --- Keyboard: the guide stays out of the way of the workstation shortcuts ---
+        document.addEventListener("keydown", (event) => {
+          const meta = event.metaKey || event.ctrlKey;
+          if (meta && (event.key === "f" || event.key === "F")) {
+            event.preventDefault();
+            searchEl.focus();
+            searchEl.select();
+            return;
+          }
+          if (event.key === "Escape") {
+            if (searchEl.value) {
+              searchEl.value = "";
+              applySearch();
+              return;
+            }
+            closeWindow();
+            return;
+          }
+          if (event.target === searchEl) return;
+          if (event.key === "ArrowRight" || event.key === "PageDown" && event.shiftKey) show(current + 1, true);
+          if (event.key === "ArrowLeft" || event.key === "PageUp" && event.shiftKey) show(current - 1, true);
+        });
+
+        // --- Window plumbing: theme, geometry, close ---
+        function applyTheme() {
+          let theme = "light";
+          try {
+            theme = localStorage.getItem("wing_theme") || "light";
+          } catch (_) {}
+          document.body.classList.toggle("theme-dark", theme === "dark");
+        }
+        applyTheme();
+        window.addEventListener("storage", (event) => {
+          if (event.key === "wing_theme") applyTheme();
+        });
+
+        const GEOMETRY_KEY = "wing_guide_geom";
+        const currentWindow = () => (hasTauri ? window.__TAURI__?.window?.getCurrentWindow?.() : null);
+
+        async function restoreGeometry() {
+          const win = currentWindow();
+          if (!win) return;
+          let geometry = null;
+          try {
+            geometry = JSON.parse(localStorage.getItem(GEOMETRY_KEY) || "null");
+          } catch (_) {}
+          if (!geometry) return;
+          try {
+            if (Number.isFinite(geometry.width) && Number.isFinite(geometry.height)) {
+              await win.setSize(new window.__TAURI__.window.LogicalSize(geometry.width, geometry.height));
+            }
+            if (Number.isFinite(geometry.x) && Number.isFinite(geometry.y)) {
+              await win.setPosition(new window.__TAURI__.window.LogicalPosition(geometry.x, geometry.y));
+            }
+          } catch (_) {}
+        }
+
+        async function saveGeometry() {
+          const win = currentWindow();
+          if (!win) return;
+          try {
+            const size = await win.innerSize();
+            const position = await win.outerPosition();
+            const scale = window.devicePixelRatio || 1;
+            localStorage.setItem(
+              GEOMETRY_KEY,
+              JSON.stringify({
+                width: Math.round(size.width / scale),
+                height: Math.round(size.height / scale),
+                x: Math.round(position.x / scale),
+                y: Math.round(position.y / scale),
+              }),
+            );
+          } catch (_) {}
+        }
+
+        let saveTimer = null;
+        const scheduleSave = () => {
+          clearTimeout(saveTimer);
+          saveTimer = setTimeout(saveGeometry, 400);
+        };
+        window.addEventListener("resize", scheduleSave);
+        window.addEventListener("beforeunload", saveGeometry);
+
+        async function closeWindow() {
+          await saveGeometry();
+          const win = currentWindow();
+          if (win) {
+            try {
+              if (typeof win.close === "function") {
+                await win.close();
+                return;
+              }
+            } catch (_) {}
+          }
+          try {
+            await window.__TAURI__?.core?.invoke?.("close_guide_window");
+          } catch (_) {}
+        }
+
+        document.getElementById("btn-close-guide").addEventListener("click", closeWindow);
+        document.getElementById("btn-print").addEventListener("click", () => window.print());
+
+        restoreGeometry();
+        show(sectionFromHash() ?? 0, false);
+        searchEl.focus({ preventScroll: true });
+      })();
+    </script>
+  </body>
+</html>

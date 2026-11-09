@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The entitlements the signed bundle needs, and the reason each one is here.
+
+  `com.apple.security.device.audio-input` is what the hardened runtime checks before it lets a process record. The
+  `Info.plist` beside this file carries the *description* macOS shows in its permission dialog; this file carries the
+  *right* to ask. Both are required, and on 2026-10-03 only the first was here — which is exactly why the LTC input
+  listed devices and then failed to open: a bundle signed with the hardened runtime and no audio-input entitlement
+  cannot capture, however well the code asks.
+
+  `com.apple.security.device.microphone` used to sit beside it "just in case". It is the *sandbox's* name for the
+  same permission, this application is not sandboxed, and nothing in the build or in `scripts/verify-install.sh`
+  ever measured it — so it granted nothing and only widened the signature's declared privileges. It was removed
+  on 2026-10-04 (independent security audit, least privilege). Add it back the day a sandboxed signature needs it,
+  and measure it then; the entitlement this build depends on is `audio-input`, and `scripts/verify-install.sh`
+  reads it back out of the signed bundle.
+-->
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+</dict>
+</plist>

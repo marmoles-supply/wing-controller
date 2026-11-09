@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>conformance fixture · the kit's plan, linked and then retyped</title>
+<!-- THIS PAGE IS WRONG ON PURPOSE. It links the kit's three sheets, in the order `UI_SYSTEM.md` §10 makes a contract
+     (`design/layout.html` lines 10-12), and it uses the kit's own class names — `.layout`, `.stack`,
+     `.builder-column` — and then answers the same question a second time in its own `<style>`. The plan is already
+     `layout.css`: the two-column grid with its 6px seam (`:122`), the 8px stack gap (`:180`), and `min-width: 0` on
+     the builder column, the one declaration that lets it shrink (`:187`). This page re-declares all three by hand, so
+     it carries a second plan that can drift from the first, which is the defect P5 of `design/CANON_PLAN.md` names:
+     a window that claims the canon "must not re-declare the plan it can link". -->
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="../../components.css">
+<link rel="stylesheet" href="../../layout.css">
+<style>
+  /* This page's own furniture, copied from `design/layout.html` so the copied regions render at all. No colour or size
+     is invented here: every value is a token reference or a class the kit already draws. */
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    font-family: var(--win-font);
+    font-size: var(--font-base);
+    line-height: 1.35;
+  }
+  .region-note { color: var(--muted); font-size: var(--font-xs); }
+  .card-head-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+
+  /* ==============================================================================================================
+     THE DEFECT, AND THE WHOLE POINT OF THIS PAGE. The three rules below are the plan `layout.css` already carries,
+     written a second time, by hand, with values the kit never named. `layout.css` gives the tracks as
+     `minmax(480px, 1fr) var(--space-3) minmax(260px, var(--ops-col-width))` — a 6px seam that is the kit's own token —
+     and this page says 8px and 380px instead; the stack gap is `var(--space-4)` (8px) and this says 10px; and the
+     builder column gives up the `min-width: 0` that exists precisely so a grid item may shrink, replacing it with a
+     `min-width: 280px` floor that pushes the plan wider than the window it is in.
+     ============================================================================================================== */
+  .layout { grid-template-columns: minmax(520px, 1fr) 8px minmax(300px, 380px); }
+  .stack { gap: 10px; }
+  .builder-column { min-width: 280px; }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- The master header, copied from `design/layout.html` (rule 2 of 4). It is not part of this page's defect: the
+       page retypes the plan, not the header. -->
+  <header class="master-header c-panel-head">
+    <div class="card-head-row">
+      <span class="c-chip">the brand</span>
+      <span class="region-note">the window's name, its build mark and its help: what the operator sees first</span>
+    </div>
+    <div class="card-head-row">
+      <span class="c-chip">the transport</span>
+      <span class="region-note">connect · stop · panic — the three things reached for without leaving the window</span>
+    </div>
+    <div class="card-head-row">
+      <span class="region-note">the standing readout</span>
+      <span class="c-well">0.0 Hz</span>
+    </div>
+  </header>
+
+  <!-- The plan, copied from `design/layout.html` (rule 3 of 4): two columns, the seam, and the stacks — the same
+       markup as the plan page, on a page that also re-declares the plan in its head. -->
+  <div class="layout">
+
+    <!-- The work area, retyped: it carries `.stack .builder-column`, and both names are answered twice, once by
+         `layout.css` and once by this page's own block. -->
+    <div class="stack builder-column">
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 1</span>
+          <span class="region-note">the list — the window's subject, one row per item, and the only place a row is chosen</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 12 · the selected one</span>
+          <span class="c-well">-6.0 dB</span>
+          <span class="c-chip">armed</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 13</span>
+          <span class="c-well">0.0 dB</span>
+        </div>
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 2</span>
+          <span class="region-note">the editor — the card the operator is working in, and the widest thing in the plan</span>
+        </div>
+        <label class="c-label">
+          the field the operator types into
+          <input type="text" value="a name" spellcheck="false">
+        </label>
+        <div class="c-row">
+          <span class="c-row-name">what the next step will act on</span>
+          <span class="c-well">/ch/1/mute</span>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="column-resizer" aria-hidden="true">
+      <div class="resizer-handle"></div>
+    </div>
+
+    <aside class="stack ops-column">
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column · 1</span>
+          <span class="region-note">the standing readout — the value the operator watches while working elsewhere</span>
+        </div>
+        <div class="c-label">
+          <span>where the show is</span>
+          <span class="c-well">--:--:--:--</span>
+        </div>
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column · 2</span>
+          <span class="region-note">the log — what happened, newest first, and why it happened</span>
+        </div>
+        <div class="c-band">a message the operator reads without opening anything else</div>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <!-- What a reader is looking at. This is the page's own furniture, a panel rather than a card in either column. -->
+  <section class="c-panel">
+    <div class="c-panel-head">What is wrong with this page — the plan, linked and then answered again</div>
+    <div class="c-panel-body">
+      <p class="region-note">
+        This page links <code>tokens.css</code>, <code>components.css</code> and <code>layout.css</code>, in that order,
+        and uses the kit's own class names — so nothing here is cosmetic. It then re-declares three of the plan's
+        decisions in its own <code>&lt;style&gt;</code>: <code>.layout</code>'s <code>grid-template-columns</code>,
+        <code>.stack</code>'s <code>gap</code> and <code>.builder-column</code>'s <code>min-width</code>. Two answers to
+        one question, and the second one is the one that wins.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

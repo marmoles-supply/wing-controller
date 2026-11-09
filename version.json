@@ -1,0 +1,11 @@
+{
+  "version": "0.2.99",
+  "build": "20261020.1",
+  "buildDate": "2026-10-20",
+  "appName": "WING CONTROLLER",
+  "brand": "MÁRMOLES SUPPLY CO.",
+  "copyrightYear": 2026,
+  "copyright": "© 2026 MÁRMOLES SUPPLY CO.",
+  "engine": "Live Safety Engine",
+  "protocol": "OSC UDP 2223; discovery UDP 2222; native meters TCP 2222"
+}

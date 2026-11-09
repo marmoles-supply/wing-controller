@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>conformance fixture · a page that conforms</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="stylesheet" href="fixture.css">
+</head>
+<body>
+  <!-- raised panel, raised card, sunken wells, numbers in the wells, three machine states, a refusal that names its
+       cause, and a control that works. -->
+  <div class="panel" id="status-panel">
+    <div class="card" id="level-card">
+      <span class="well" id="clock">12:34:56</span>
+      <span class="well" id="gain">-6.0 dB</span>
+    </div>
+    <div id="states" data-state-set="yes no unknown">
+      <span class="chip" data-state="yes">ARMED</span>
+      <span class="chip" data-state="no">SAFE</span>
+      <span class="chip" data-state="unknown">NO ANSWER</span>
+    </div>
+  </div>
+  <button id="shoot">Shoot</button>
+  <div class="card" id="refusal" role="alert" data-refusal>Refused: the console did not answer on the network.</div>
+</body>
+</html>

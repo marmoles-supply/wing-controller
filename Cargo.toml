@@ -1,0 +1,42 @@
+[workspace]
+members = [
+    "desktop/src-tauri",
+    "crates/wing-core",
+    "crates/wing-probe",
+    "crates/wing-runtime",
+    "crates/wing-transport",
+]
+resolver = "2"
+
+# Release hardening (docs/BINARY_PROTECTION_PLAN_2026-10-09.md).
+#
+# Measured on `target/release/wing-controller-desktop` before this block existed (2026-10-08, 15.6 MB,
+# arm64): the default release profile left **12,254 symbols of this project's own crates** in the binary,
+# demangled and readable — `install_persisted_timecode_cues`, `import_macro_library`, `save_station_backup`,
+# `meter_descriptors_for_target_for_models` and the rest. That is a function-level map of the application
+# handed to whoever runs `nm`, and it costs nothing to remove.
+#
+# `strip = "symbols"` removes it. `lto = "fat"` and `codegen-units = 1` are here for the same reason: they
+# let LLVM inline across the whole program, which both shrinks the binary and dissolves the per-function
+# boundaries a reader would otherwise follow, and they drop the release build's own debug metadata.
+#
+# **`panic` is deliberately left alone.** `panic = "abort"` is the usual fourth line of this block, and it
+# is wrong for this application: the binary spawns 19 threads (`thread::spawn` across `main.rs`,
+# `ltc_device.rs` and `inter_app_osc.rs`) and a panic in one of them currently ends that thread while the
+# console control keeps running. Under `abort` the same panic takes the whole application down — at a show,
+# on the path that drives the desk. Stability is not traded for a hardening line whose benefit is a
+# smaller binary and one fewer exploit primitive; `docs/BINARY_PROTECTION_PLAN_2026-10-09.md` records the
+# decision, the rejected alternative and what would overturn it.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+debug = false
+incremental = false
+
+# The same treatment for every dependency: a symbol table is a symbol table whoever wrote the code, and
+# `nm` on a vendored crate names the libraries this application is built from just as usefully.
+[profile.release.package."*"]
+opt-level = 3
+strip = "symbols"

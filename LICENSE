@@ -1,0 +1,103 @@
+WING CONTROLLER Source-Available Licence 1.0
+
+Copyright (c) 2026 MÁRMOLES SUPPLY CO. and other contributors.
+
+This is a bespoke source-available software licence. It is not GPL and is not
+an OSI open-source licence.
+
+1. Scope and definitions
+
+"Software" means the original source code, original documentation and original
+artwork expressly distributed under this Licence, modifications to that material,
+and their compiled, object-code, executable and packaged forms. Third-party
+components, documents and assets with separate terms are excluded and retain
+those terms. Copyright permission for included original logos and artwork does
+not grant trademark rights or permission to imply endorsement.
+
+"Corresponding Source" means the preferred form for modifying the Software,
+including modifications, configuration and scripts needed to build and install
+the distributed version. It excludes ordinary, unmodified system tools and
+publicly available dependencies identified by version and their original source
+locations. It does not include private signing keys, credentials or customer
+data. Build instructions must allow a recipient to use their own signing keys.
+
+2. Permission and duration
+
+Subject to these conditions, each copyright holder grants a worldwide,
+non-exclusive, royalty-free copyright licence to use, study, run, copy, modify
+and redistribute the Software. The grant lasts for the duration of the applicable
+copyright and cannot be withdrawn for a copy already licensed while its recipient
+complies with these conditions. No automatic conversion to a different licence
+or later licence version applies.
+
+3. Professional use is permitted
+
+Individuals and organisations may use and privately modify the Software in paid
+employment, concerts, events, installations and other professional activities.
+Charging for the sound, production, engineering or other service performed using
+the Software is permitted. Selling an independently created output of using the
+Software does not by itself constitute selling the Software.
+
+4. Sale of the Software is prohibited
+
+You must not sell, rent, sublicense for a fee, or require payment for receiving,
+downloading, installing, accessing or continuing to use a copy of the Software
+or a modified or derivative version. This includes paid software subscriptions
+and charging for copies under a different name, or disguising such a charge in
+a bundle, mandatory donation or mandatory support purchase.
+
+Optional donations and separately charged services, including support, training
+and operation, are permitted if receipt and continued use of the Software do not
+depend on that payment. This section does not prohibit professional use permitted
+by section 3. No rights in separately licensed third-party software are restricted
+by this Licence.
+
+5. Redistribution must preserve source and terms
+
+Whenever you redistribute the Software or a modified or derivative version:
+
+(a) Provide every recipient, at the same time and without charge, its complete
+Corresponding Source, either with the copy or through a working download link.
+A link must remain available for as long as you distribute that version.
+
+(b) Distribute the Software, your modifications to it and its Corresponding
+Source under this exact Licence. Preserve copyright and attribution notices,
+include this Licence, and prominently identify changes and their dates.
+
+(c) Do not impose additional legal or technical restrictions preventing the
+recipient from exercising these permissions. Mere aggregation with independent
+works does not place those independent works under this Licence.
+
+(d) Do not imply that a modified version is an official release or is endorsed
+by an original author or any console manufacturer.
+
+6. Third-party rights and contributions
+
+This Licence grants only rights the respective licensor is entitled to grant.
+It grants no trademark rights, patent licence, endorsement or rights to private
+information. Third-party notices, licences and source obligations must be
+preserved independently. You must not combine and redistribute the Software with
+another work when their applicable licence requirements cannot both be met.
+
+An intentional contribution submitted for inclusion must be licensed by its
+copyright holder under these same terms, unless a separate written agreement
+explicitly states otherwise. Copyright is not assigned by making a contribution.
+
+7. Termination
+
+Permissions terminate automatically if you violate these conditions. Permissions
+are reinstated if you cease and fully remedy the violation before receiving any
+written notice from the relevant copyright holder, or within 30 days after that
+holder's first written notice of a violation. This automatic reinstatement does
+not apply if that same holder previously notified you of another violation.
+Termination of your rights does not terminate the
+rights of recipients who comply. Statutory rights and exceptions remain intact.
+
+8. No warranty; limitation of liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED "AS IS",
+WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. TO THE MAXIMUM EXTENT
+PERMITTED BY APPLICABLE LAW, NO AUTHOR OR COPYRIGHT HOLDER IS LIABLE FOR CLAIMS,
+DAMAGES OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE. NOTHING IN THIS
+LICENCE EXCLUDES LIABILITY THAT APPLICABLE LAW DOES NOT PERMIT TO BE EXCLUDED.

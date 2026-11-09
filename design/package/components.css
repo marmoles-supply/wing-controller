@@ -1,0 +1,532 @@
+/* WING CONTROLLER — the kit's component layer.
+ *
+ * WHAT THIS IS. `tokens.css` gives a page the kit's **values** — a colour, a size, the two steps a bevel is built
+ * from. This file gives it the kit's **components**: the drawings themselves. It is the sheet `design/specimen.html`
+ * links, and that is what makes it a layer rather than a copy — the page that defines what the kit looks like draws
+ * itself with these rules instead of retyping them. Its version is the one in `VERSION` beside this file; this header
+ * does not copy the number, so it cannot go stale.
+ *
+ * **A CONSUMER LINKS IT RATHER THAN RETYPING IT.** Before this file existed the kit shared tokens and did not share
+ * components, so every consuming application wrote its own `button { … }` and the same control was drawn as many times
+ * as there were projects — with the winner decided by where each sheet happened to sit in the cascade rather than by a
+ * decision anybody made. A sibling application measured exactly that and said it in one sentence: *"no era caché, ni
+ * coordinación, ni falta de acceso. Era mi hoja peleándose con la suya."* This file is that button, once, so the answer
+ * is to **link it and delete your own control rules**, not to re-derive them.
+ *
+ * LOAD ORDER — and this is the whole reason a deliberate override still wins:
+ *
+ *     <link rel="stylesheet" href="tokens.css">        <!-- 1. the kit's values -->
+ *     <link rel="stylesheet" href="components.css">    <!-- 2. the kit's drawings of them -->
+ *     <style>…</style>                                 <!-- 3. the window's own rules, last -->
+ *
+ * Four facts about the sheet, so a reader does not have to infer them from the rules:
+ *
+ *   1. **Every value is a token reference, never a literal.** Nothing here invents a colour or a size. If a value is
+ *      missing, it is added to `tokens.json` and the generated `tokens.css` follows (`UI_SYSTEM.md` §9) — a literal
+ *      here would be a second answer to a question the kit already answers.
+ *   2. **The controls are addressed twice, on purpose, from one set of declarations.** Each control is drawn once for
+ *      the kit's own class (`.c-btn`) and once for the element the kit draws (`button`), in a single selector list. A
+ *      page built from the kit's markup uses the classes; a page that already has plain `<button>` and `<select>`
+ *      elements deletes its own control rules and gets the same drawing. Two selectors, one answer — never two
+ *      declarations of it.
+ *   3. **It does not restyle what the kit does not draw.** The box model is set on the kit's own components and
+ *      controls, not with a `*` reset that would silently move a consumer's layout; the input types the kit has no
+ *      drawing for (a checkbox, a range, a colour well, a file picker) are left exactly as the platform drew them.
+ *   4. **The shape is the state, and it is the whole animation** (§4). Pressing a raised control sinks it; a control
+ *      that is down keeps the sunken pair. Nothing is decorated and nothing animates for its own sake.
+ *
+ * The vocabulary is `UI_SYSTEM.md` §8 — window, panel, card, row, well, meter, field, chip/badge, band, rail — and the
+ * two shapes are §4's raised (light before dark) and sunken (the same pair reversed). §7's rules are contracts here too.
+ * Two regions §8's table has no word for are drawn here — **the window's header band** (the product mark, the window's
+ * name, the tab row and the trailing controls, §3) and **the tab's selected state** (§2) — and §7.1's condition on the
+ * unavailable state is drawn as a pair rather than left to a sentence: the control that cannot act (§2) and the band
+ * that states its reason (`band.is-reason`, §3). A window still owes the reason. What the kit still cannot decide for
+ * you is whether a control may be unavailable at all — that judgement is the window's, and it is declared with its
+ * reason in an allowance file.
+ *
+ * This file is **hand-written, not generated**: a component is a decision about structure, and `tokens.json` is a
+ * table of values. What keeps it honest is the specimen — `scripts/test-specimen.mjs` requires a rendered sample for
+ * every word of §8, and `scripts/test-specimen-browser.mjs` renders the kit's own page and demands it in both themes.
+ */
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 0. The box model: on the kit's own components and controls, and on nothing else
+ * --------------------------------------------------------------------------------------------------------------- */
+.c-window, .c-titlebar, .c-titlebtns, .c-mini, .c-window-body,
+header.master-header, .header-brand, .product-mark, .window-name, .tab-row, .tab, .header-actions,
+.c-panel, .c-panel-head, .c-panel-body, .section-head, .panel, .panel-body, .c-card, .c-card-head, .card-head-row,
+.c-row, .c-row-name, .c-well, .c-crt, .c-meter, .c-meter-mask, .c-label, .c-field, .c-select, .c-btn, .c-chip, .dot,
+.c-band, .c-rail, .c-rail-item,
+button, select, input, textarea {
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 1. The two shapes, and no third (§4). An element wears one of the two; both is not a shape, it is a defect.
+ * --------------------------------------------------------------------------------------------------------------- */
+.raised { border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light); }
+.sunken { border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); }
+
+/* The focus ring: the same in every window, so "where the keyboard is" is one sentence (§5: `--accent` is selection
+ * and focus, and never a status). */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 2. The controls
+ * --------------------------------------------------------------------------------------------------------------- */
+
+/* A button is raised, and the bevel is its state: `:active` (and a control that stays down, `[aria-pressed="true"]`
+ * or `.is-on`) sinks it. That is the whole animation — depth is information, so it is never played for its own sake.
+ * The element form means a consumer can delete its own `button { … }` rule and keep its plain `<button>` markup. */
+.c-btn,
+.tab,
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  padding: var(--space-1) var(--space-3);
+  background: var(--win-btn-face);
+  color: var(--win-text);
+  font-family: var(--win-font);
+  font-size: var(--font-xs);
+  cursor: pointer;
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+.c-btn:active, .c-btn.sunken, .c-btn[aria-pressed="true"], .c-btn.is-on,
+button:active, button[aria-pressed="true"], button.is-on {
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+}
+
+/* THE UNAVAILABLE STATE, AND THE CONDITION THE KIT PUTS ON IT. A control may only be drawn unavailable when it
+ * states its reason where the operator can read it — in its own text, or in the `title`/accessible name the platform
+ * shows. §7.1 is the rule this exists to keep: a greyed control is a promise, so a control that cannot act in this
+ * state says which state it is and why, and it is otherwise **absent**. `--dim` is the kit's own name for "what is
+ * absent", so this ink is a token and not a literal (`meters.html` carries `#808080` for it and that is the next
+ * window's commit, not this layer's).
+ *
+ * **The specimen draws no such control, deliberately.** The kit's own reference page cannot show a greyed button
+ * without teaching one, and `scripts/test-specimen-browser.mjs` asserts the page carries none. A window that must
+ * keep one declares it in its allowance file with its reason — see `design/conformance/allow.mjs` for the entries
+ * that do. */
+.c-btn:disabled, .c-btn.is-unavailable,
+button:disabled, button[aria-disabled="true"] {
+  color: var(--dim);
+  cursor: default;
+}
+
+/* THE OTHER END OF IT: THE CONTROL THAT CARRIES ITS REASON, AND THE FACE IT GIVES UP FOR IT. The reference window
+ * (`design/reference-window/index.html`) composed this pair before the kit had it — a `.c-band` naming the cause, and
+ * a disabled control linked to it by `aria-describedby` — and the rule that flattened the control there was keyed to
+ * one id of that page. This is the same composition with both ends named: the band's ink is `--dim`
+ * (`band.is-reason`, beside the other band states in §3), and **a control that has a reason draws no face of its own**,
+ * because a raised plate is the face of a control that can act — so this one shows the ground it stands on and a flat
+ * `--line` frame, which the conformance suite skips as "a frame or a divider, not a shape" (rule 1, in
+ * `design/conformance/rules.mjs`). **The link is the contract, and CSS cannot follow it**: `aria-describedby` names
+ * the band's id and the band's text states the cause in the operator's own words. `disabled` and not `aria-disabled`
+ * stays the kit's advice for a control that genuinely cannot be pressed, so that no keystroke walks a keyboard user
+ * into it — and a control with no reason to state is not drawn unavailable at all, it is **absent** (§7.1), with the
+ * band explaining the absence. Both are legitimate states; neither is a greyed button with a promise in its `title`.
+ *
+ * **`transparent` is the one declaration in this file that is not a token, and it is not a value either**: it is the
+ * absence of a face, which is exactly what the state is. Painting a ground instead (`--face`, `--face-2`) would tie the
+ * control to whichever surface it happens to stand on, and a header, a card and a panel are three different grounds. */
+.c-btn[aria-describedby]:disabled, .c-btn[aria-describedby][aria-disabled="true"],
+button[aria-describedby]:disabled, button[aria-describedby][aria-disabled="true"] {
+  background: transparent;
+  border-color: var(--line);
+}
+
+/* A tab is a control, and it is the button above: `<button class="tab">` is drawn by the `button` entry in that
+ * selector list, and `.tab` is in the list as well because a tab is the kit's own name for one, so a page that writes
+ * the markup does not have to know which element it may use. **The selected tab is the one state a button does not
+ * already have, and §4 says depth is the state**: it sinks — the same pair inverted, exactly as `:active` does — and
+ * its ink is `--accent`, §5's colour for "the thing the operator is acting on", never a status. The application states
+ * the same fact its own way, as a folder tab that merges with the stage it opens onto and takes a green ink in the
+ * dark theme (`meters.html`, `button.seg-tab.is-active`, whose drawing its allowance file declares); that is a
+ * window's declared variation and this is the kit's, which needs no declaration. `aria-current="page"` is what says it
+ * to a screen reader, because a colour is not a sentence. */
+.tab.is-active {
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  color: var(--accent);
+}
+
+/* A field is sunken, and the operator types into it. **The element is addressed by what it IS by default**, because
+ * that is what a consumer writes: an `<input>` with no `type` attribute is a text field by HTML's own default, so
+ * `input:not([type])` is part of this list rather than left to the platform — a CSS attribute selector does not match
+ * an attribute that is absent, and the platform's own drawing follows the *browser's* colour scheme, not the page's.
+ * Measured 2026-10-08: this repository's main window writes 42 bare inputs; with `color-scheme: light dark` on a
+ * dark-preferring browser they painted `rgb(59, 59, 59)` with white ink inside a light window.
+ *
+ * The same rule read over the rest of the list, and it is why one entry is enough: `button` appears below as a bare
+ * **element**, so a `<button>` with no `type` (submit by HTML's default) is already drawn, whatever its type; `select`
+ * and `textarea` are elements here too. What is deliberately absent is the input types the kit has no drawing for — a
+ * checkbox, a radio, a range, a colour well, a file picker and a hidden field keep the platform's own drawing, because
+ * the kit names none of them. The four-value `border-color` form is what makes the browser honour all four edges of
+ * the sunken pair; that is also why no `appearance` reset is needed here, and why `select` has one (below). */
+.c-field,
+input:not([type]),
+input[type="text"], input[type="search"], input[type="number"], input[type="password"],
+input[type="email"], input[type="url"], input[type="tel"], input[type="date"], input[type="time"],
+input[type="datetime-local"], input[type="month"], input[type="week"],
+textarea {
+  padding: var(--space-1) var(--space-2);
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--win-font);
+  font-size: var(--font-xs);
+  border: 1px solid;
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+}
+/* The kit's `.c-field` fills the line it is on; the bare element does not, because that is a layout decision and not
+ * a drawing. A value the operator reads as a number is `--mono` (§6), wherever it is typed. */
+.c-field { flex: 1 1 16ch; }
+.c-field.is-number { font-family: var(--mono); }
+
+/* A `select` is the same sunken field plus **the kit's own arrow**. The platform's arrow is removed (`appearance`)
+ * and drawn back with two half-squares, so it follows the theme: a literal image — the usual recipe, and the one
+ * `meters.html` uses — carries one theme's colour into the other, which is the trap `UI_SYSTEM.md` §3 records.
+ * `appearance` is required here in a way the text field does not need: the platform draws its arrow *inside* the
+ * control, and it does not respect the kit's edge pair.
+ *
+ * **The arrow is drawn in `--ink`, and that is measured rather than taste.** The obvious choice for a drawn edge is
+ * `--line-dark`, and it fails in exactly one theme: against the dark field (`--field` #0f1614) the dark line step
+ * (`--line-dark` #0d100f) reads at **1.04:1** — an arrow nobody can see, which is the defect this kit's suite was
+ * written after a consumer shipped (1.16:1, and its own tests were green). `--ink` is the same black in the light
+ * theme (21:1 on the white field) and #e0e8e4 in the dark one (14.7:1), so the arrow is legible in both — and it is
+ * the ink the control's own text is set in, because an arrow is a glyph the operator reads. */
+.c-select,
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-6) var(--space-1) var(--space-2);
+  background-color: var(--field);
+  color: var(--ink);
+  font-family: var(--win-font);
+  font-size: var(--font-xs);
+  border: 1px solid;
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position: calc(100% - 12px) calc(50% - 1px), calc(100% - 8px) calc(50% - 1px);
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+
+/* A well holds a value the instrument reports; a CRT well is the instrument's own surface, and its phosphor is
+ * deliberately the same in both themes (§5). Both are `--mono`: a number set in the interface font is a number that
+ * cannot be compared down a column (§6). */
+.c-well {
+  padding: 0 var(--space-2);
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: var(--font-xs);
+  text-align: right;
+  border: 1px solid;
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+}
+.c-crt { padding: 0 var(--space-2); background: var(--crt); color: var(--crt-ink); font-family: var(--mono); font-size: var(--font-sm); }
+
+/* THE METER: A TRACK WITH THE RAMP ON IT, AND A COVER OVER THE PART THAT IS NOT LIT. The kit has carried
+ * `--meter-ramp` since 2026-10-07 and has never carried a bar to put it on, so every window that showed a level drew
+ * its own track, put the ramp on the lit element and retyped `.c-well`'s sunken edge pair to get one — which is exactly
+ * the retyping `design/adopt/` step 6 forbids and the reason a stranger's window had to invent this whole drawing
+ * (`design/CANON_PLAN.md`, "P1's third criterion, answered by a stranger", finding 1). This is that drawing, once.
+ *
+ * **THE RAMP SPANS THE TRACK. IT IS NEVER PAINTED ON THE LIT PART.** Measured, and it is the reason this comment is
+ * longer than the rule: the first version of this drawing put `var(--meter-ramp)` on the lit bar itself, so the
+ * gradient was squeezed into whatever fraction of the track was lit — `to right, green 0%, … red 100%` interpolated
+ * across the *lit width* — and a quiet channel at the bottom of its range ended in the ramp's own red. The
+ * conformance suite passed that page with 0 failures, because no rule reads where a gradient sits (same finding,
+ * "No rule reads where a gradient sits"); **only a screenshot caught it**. So the ramp is the track's own background,
+ * laid out across the whole track once, and the level is shown by an opaque `--field` cover over the unlit end. A
+ * reader who "simplifies" this by moving the ramp onto the lit element restores the defect, and the suite will not
+ * catch it.
+ *
+ * The reading is a percentage written where the meter is used — `style="--meter-level: 74%"` — and the cover's width is
+ * the inverse of it. That reading is not a design token and must not become one: a token is a value the kit fixes,
+ * while a level is the measurement the operator is reading, different on every meter and every frame. An unset meter
+ * shows **no** level (the cover spans the whole track) rather than a full one, because a bar that cannot say how much
+ * is lit must not look like full scale. The track wears the same sunken pair as `.c-well` above, not a bevel of its
+ * own, and its height is the kit's `--space-3` step. */
+.c-meter {
+  position: relative;
+  overflow: hidden;
+  height: var(--space-3);
+  background: var(--meter-ramp);
+  border: 1px solid;
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+}
+.c-meter-mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: calc(100% - var(--meter-level, 0%));
+  background: var(--field);
+}
+
+/* The kit's name for a readout that is not already a well or a CRT surface — and `code`, because an identifier or a
+ * path in a document is read as a value. */
+.c-mono, code { font-family: var(--mono); }
+
+/* A label is what explains a control: one line, explaining ink, and the field it belongs to sits beside or after it. */
+.c-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-xs);
+  color: var(--muted);
+}
+
+/* -----------------------------------------------------------------------------------------------------------------
+ * 3. The furniture (§8). Each class carries its own shape, so a consumer needs no second class to get one — except
+ *    `.c-row`, which is a layout primitive: whether a row carries a face is the window's decision, so it wears
+ *    `.raised` or `.sunken` when it wants one.
+ * --------------------------------------------------------------------------------------------------------------- */
+
+/* window: a top-level surface with its own title bar */
+.c-window {
+  background: var(--win-gray);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+.c-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--win-title-bg);
+  color: var(--win-title-text);
+  font-size: var(--font-xs);
+}
+.c-titlebtns { display: flex; gap: var(--space-1); }
+.c-mini {
+  display: inline-block;
+  min-width: 14px;
+  padding: 0 var(--space-1);
+  background: var(--win-btn-face);
+  color: var(--win-text);
+  text-align: center;
+  font-size: var(--font-badge);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+.c-window-body { padding: var(--space-2); }
+
+/* --- the window's header band ------------------------------------------------------------------------------------ */
+
+/* The application's master header is four parts in one row — the product mark, the window's name, the tab row and the
+ * trailing controls — and `layout.css` owns the row, its padding and the two widths at which it stacks. What the kit
+ * draws here is the furniture inside it, so a window writes the header once and does not redraw it. **These parts carry
+ * arrangement and ink, not a shape**: the only bevels in the band are the tab's (§2, where a tab is a button and the
+ * selected one sinks) and the flat frame of a control that cannot act (also §2, the reason pattern). The band's own
+ * face is the borrowing recorded with `.c-panel-head` below, and the five rules here are the reference window's own
+ * header rules moved into the layer with the same declarations and tokens, so a window that deletes its copies of them
+ * does not move a pixel. */
+
+/* The brand block: the mark and the window's name on one baseline. The kit names it because the alternative is two
+ * parts and not the row they share — ingredients instead of the thing — and because the reference window had to write
+ * this rule for itself: it is the eighth name its header needed, where `design/CANON_PLAN.md` lists seven. */
+.header-brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+
+/* The product mark: what the window IS, in explaining ink — §2's `--muted`, one weight below the name beside it. It is
+ * not a control; the reference window hangs its double-click theme shortcut on it and announces it in the `title`,
+ * which is how a shortcut is discovered rather than hidden. */
+.product-mark { font-size: var(--font-sm); color: var(--muted); }
+
+/* The window's name: the one `--font-lg` line in the band. `margin: 0` is not decoration — an `h1` carries the
+ * platform's own margins, and a baseline the browser decides is not the baseline the brand block is built on. */
+.window-name { margin: 0; font-size: var(--font-lg); }
+
+/* The tab row: the controls of §2, on the kit's smallest step of air. `wrap` because a header that overflows at its
+ * narrowest is the failure `layout.css`'s own 1180px band exists to prevent. */
+.tab-row { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+
+/* The trailing controls: the actions that belong to the window — the theme switch, and the band that says why a control
+ * is not there or cannot act. A step more air than the tabs, because a sentence beside a control is wider than a word. */
+.header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+/* panel: a titled region inside a window — and **`.panel` is the application's own name for one**, so both names are
+ * addressed in this block. **They do not draw the same thing, and this is the place to say so rather than leave it to
+ * be read as an alias**: the kit's `.c-panel` is a region whose body is a well (sunken, `--face`) under a raised head,
+ * while the application's `.panel` is a **raised** block — §8's *card* — with the application's own head inside it
+ * (`desktop/ui/index.html:250-258`: `background: var(--face)`, light-before-dark, plus its `padding`; `:281-306` for
+ * the head). Aliasing `.panel` to `.c-panel` was rejected: it would have painted the application's nine panels as
+ * wells and turned the migration it still owes (`design/CANON_PLAN.md`, P5) into a restyle. So `.panel` carries its own
+ * drawing, in the kit's one pair and without the two steps that window adds on top of it (its inner `--face-3` over
+ * `--line-mid`, and its drop shadow): those are that window's declared deviations (`design/conformance/allow.mjs`),
+ * not a second bevel this layer may name. The application's own numbers are kept where they are tokens: its 8px inset
+ * is this `--space-2` card plus the `--space-2` the body carries, which leaves the head at the 4px the window reaches
+ * with a negative margin and the body at its 8. */
+.c-panel {
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+}
+.panel {
+  padding: var(--space-2);
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+/* THE MASTER HEADER'S FACE IS A DELIBERATE BORROWING, and it is one declaration rather than two. `layout.css` gives
+ * `header.master-header` its row, its padding and its two stacking widths and says its drawing is this layer's
+ * `.c-panel-head`; `design/layout.html` and `design/reference-window/index.html` both compose
+ * `class="master-header c-panel-head"`. Naming the borrower here means a page that writes only
+ * `<header class="master-header">` gets the same raised `--face-2` strip without knowing the second class. **It costs
+ * one step of face, and the cost is recorded rather than smoothed over**: the application's own header is
+ * `background: var(--face)` (`desktop/ui/index.html:2937-2945`, measured), one step below `.c-panel-head`'s `--face-2`.
+ * Giving the header its own `--face` surface was rejected *for this change* because `layout.css`'s own header states
+ * this borrowing and this layer may not edit that file — a change here would leave two kit files contradicting each
+ * other. The five windows' migration (P5) owns moving the header's face, with `layout.css`'s sentence beside it. */
+.c-panel-head,
+.section-head,
+header.master-header {
+  padding: var(--space-1) var(--space-2);
+  background: var(--face-2);
+  color: var(--ink);
+  font-size: var(--font-xs);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+/* The head of a card carries a title and, behind it, one action — that is the application's own head
+ * (`desktop/ui/index.html:281-306`: a flex row with the title left and the control right, a step wider than the kit's
+ * panel head at `3px 6px` against `2px 4px`, and a floor of two `--space-5` steps so a head holding one small control
+ * does not collapse). It is arrangement, and it is here because a head that cannot hold an action is half of why the
+ * reference window needed this name at all. */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-1) var(--space-3);
+  min-height: calc(var(--space-5) * 2);
+}
+.c-panel-body, .panel-body { padding: var(--space-2); }
+
+/* card: a raised, self-contained block inside a panel */
+.c-card {
+  padding: var(--space-2);
+  background: var(--face-2);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+.c-card-head { margin-bottom: var(--space-1); font-size: var(--font-xs); }
+/* THE HEAD THAT CARRIES AN ACTION — a wrapping row of head furniture, on the head's own face, which is the arrangement
+ * the two head shapes above did not cover. `.c-card-head` is a **block**: it holds one title line and gives a second
+ * thing nowhere to sit. `.section-head` does hold a title and an action, but it is a **raised `--face-2` strip with a
+ * bevel of its own** — inside a raised `.c-card`, whose face is already `--face-2`, it draws a second plate — and its
+ * row is `space-between`, which pushes the one action to the far edge instead of setting it beside the title on the
+ * text baseline. So a card head carrying more than a title — a chip, a note, and the action that belongs to the card —
+ * needs the plate's *arrangement* without the plate, and this is that and nothing else. It is the class
+ * `design/layout.html` carried in its page-local `<style>` and every consumer that forked the page retyped; it is named
+ * here with the same four declarations rather than improved on the way past, so that page composes the kit's row instead
+ * of declaring its own. The master header's own lines (`header.master-header`, whose face is `.c-panel-head`) are the
+ * same arrangement, which is why it is a head row rather than a state of `.c-card-head`. */
+.card-head-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+
+/* row: one item of a list, with its own controls */
+.c-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); background: var(--face); }
+.c-row-name { flex: 1 1 12ch; font-size: var(--font-xs); }
+
+/* chip / badge: a small raised label attached to a row — a state, a count, a section */
+.c-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  background: var(--face-2);
+  color: var(--ink);
+  font-size: var(--font-badge);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+
+/* The dot repeats the word beside it; it never carries the state alone, because a state must be readable without
+ * colour (§11.6). Each colour is the meaning §5 gives it, and nothing else — and **the answer that is not settled is
+ * hollow rather than a filled disc**, which is the shape half of §11.6: a reader who sees no colour at all still tells
+ * `unknown` from `confirmed`, `refusal` and `sent`. That shape lived only in `design/reference-window/index.html`'s
+ * page-local stylesheet until the kit took it (the band's half is beside the band states below), so every window that
+ * reported what a machine decided had to copy it — the same defect as a program that forces a consumer to retype a
+ * control. `transparent` is the absence of a face rather than a value, exactly as `.c-btn[aria-describedby]:disabled`
+ * above uses it; the ring is `--dim`, §2's own ink for what is absent. */
+.dot { display: inline-block; width: 8px; height: 8px; background: var(--line); }
+.dot.is-confirmed { background: var(--green); }
+.dot.is-warning { background: var(--amber); }
+.dot.is-refusal { background: var(--red); }
+.dot.is-unknown { background: transparent; border: 1px solid var(--dim); }
+.dot.is-sent { background: var(--accent); }
+
+/* band: a full-width strip that carries one message, and names its cause in the operator's words */
+.c-band {
+  padding: var(--space-1) var(--space-2);
+  background: var(--face);
+  color: var(--ink);
+  font-size: var(--font-xs);
+  border-left: 4px solid var(--line);
+}
+.c-band.is-confirmed { border-left-color: var(--green); }
+.c-band.is-warning { border-left-color: var(--amber); }
+.c-band.is-refusal { border-left-color: var(--red); }
+.c-band.is-unknown { border-left-color: var(--dim); }
+
+/* THE THREE ANSWERS, AND THE DIFFERENCE COLOUR CANNOT CARRY (§11.6). The kit has named a dot and a band for every
+ * state since it was written, but the **shape** half of the rule lived only in `design/reference-window/index.html`:
+ * the confirmed edge, the dashed unknown edge and the hollow dot were page-local, so a consumer that reported what a
+ * machine decided copied them out of the reference window — the third finding of "P1's third criterion, answered by a
+ * stranger". Three declarations carry it here, all of them values the kit already owns. A settled answer is a **solid**
+ * edge — written out for the confirmed and refusal bands rather than left as `.c-band`'s default, so the three states
+ * read as one set instead of as a default nobody chose — the answer that is not settled is **dashed**, and the unknown
+ * dot is hollow (above). Green, red and grey are then a reinforcement rather than the only way to tell "the machine
+ * said no" from "nobody answered", which is the difference §11.6 exists to keep. */
+.c-band.is-confirmed, .c-band.is-refusal { border-left-style: solid; }
+.c-band.is-unknown { border-left-style: dashed; }
+
+/* THE REASON END OF §2'S UNAVAILABLE PATTERN. A band is the kit's word for a full-width strip that carries one message
+ * (§8), so the sentence that says why a control cannot act — or why it is not there at all — is a band and not a new
+ * word. Its ink is `--dim`, §2's own ink for what is absent, and its cause is spelled out in the operator's words. The
+ * control it explains links it with `aria-describedby` when one is on screen (§2 draws that end); it stands alone when
+ * the control is absent, which is what `design/reference-window/index.html` composes today. **It takes the free space
+ * in the row it shares with that control**, which is the one thing its own drawing owes the composition — the same
+ * declaration the reference window wrote for it, so deleting that copy does not move the header. Outside a flex row
+ * the declaration does nothing, which is why it can live here rather than in a window. */
+.c-band.is-reason { border-left-color: var(--dim); color: var(--dim); flex: 1 1 auto; }
+
+/* rail: a narrow column used to navigate a list bigger than the screen */
+.c-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 44px;
+  padding: var(--space-1);
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);
+}
+.c-rail-item { padding: var(--space-1) 0; background: var(--face-2); color: var(--ink); text-align: center; font-family: var(--mono); font-size: var(--font-xs); }
+.c-rail-item.is-selected { color: var(--accent); border: 1px solid var(--accent); }
+
+/* A heading inside a kit component takes the COMPONENT's size, not the browser's.
+   Measured 2026-10-08, in the reference window: a heading inside a card head had no
+   font-size of its own, so it inherited the user agent's 1.5em and multiplied whatever
+   step it sat in - 10.5px x 1.5 = 15.75px at --meter-scale 1 and 11px x 1.5 = 16.5px at
+   1.25 - which is none of the kit's nine steps and raised six rule-8 findings on three
+   cards. It is the third time that day an element with no size written landed outside
+   the kit (a guide button computing the platform's 13.3333px, a bare input drawn from
+   the browser's colour scheme), and it is why the reset is here rather than in the one
+   window that showed it: a window that links this sheet gets it without writing a rule.
+   `.section-head` and `.panel-body` joined the list with the names themselves, so the
+   reset has no hole exactly where this layer grew: `.panel :is(…)` is deliberately NOT
+   here, because the window's name is an `h1` with a size of its own (`--font-lg`). */
+.c-panel-head :is(h1, h2, h3, h4, h5, h6),
+.c-card-head :is(h1, h2, h3, h4, h5, h6),
+.c-panel-body :is(h1, h2, h3, h4, h5, h6),
+.section-head :is(h1, h2, h3, h4, h5, h6),
+.panel-body :is(h1, h2, h3, h4, h5, h6) { font-size: inherit; }

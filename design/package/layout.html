@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WING CONTROLLER — design kit layout</title>
+<!-- The kit's three sheets, linked in the order `UI_SYSTEM.md` §10 makes a contract: the values, the drawings, the
+     plan. Nothing else is loaded — no font, no image, nothing from a network, no build step. The page is a **plan**
+     carrying **one operable control** — the folded card's toggle, because a state a reader can see and cannot change
+     is the gap a stranger found in this page — and no data: every region below is labelled with what it is for. -->
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="layout.css">
+<style>
+  /* THIS PAGE'S OWN FURNITURE, AND NOTHING ELSE. The plan itself is `layout.css` and the drawings are `components.css`;
+     what is left here is the mockup's labelling — a caption class, the legend's paragraphs and the collapsed card's
+     own note — which is the part the kit deliberately does not name. Every colour and size below is a token reference,
+     never a literal: a mockup that invented a colour would be the second answer this kit exists to remove.
+     **THE PAGE FRAME IS NOT HERE EITHER.** This page used to carry the body's ground, ink, family, base size and
+     `line-height: 1.35` by hand — the literal a stranger reported, and the reason this change exists. The rule is
+     `layout.css` §0's now and the line box is the kit's `--leading-base` (`design/tokens.json`), so the declarations
+     were deleted rather than restated: a page that keeps its own copy is the defect, not the fix. If this page ever
+     wants a different frame it writes one after the link, which is what `UI_SYSTEM.md` §10 already says. */
+  /* A region's label: the chip beside it says which region it is, this says what the region is FOR. */
+  .region-note { color: var(--muted); font-size: var(--font-xs); }
+  /* `.card-head-row` stood here until the kit named it: the head whose parts sit on one wrapping baseline row is
+     `components.css`'s now, beside `.c-card-head`, so this page composes the kit's arrangement and declares only what
+     the kit does not draw. The head rows in the markup below are the kit's class, unchanged. */
+  /* The legend's own text. `--font-sm` for the sentences and `--font-base` for the one lead, so the whole page stays on
+     the kit's scale — a size the kit does not name is a declared deviation, and this page declares none. */
+  .legend { margin-top: var(--space-4); }
+  .legend-body { font-size: var(--font-sm); color: var(--muted); }
+  .legend-body p { margin: 0 0 var(--space-2); }
+  .legend-body p.lead { font-size: var(--font-base); color: var(--ink); }
+  .legend-body code { font-family: var(--mono); }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- ==================================================================================================================
+       RULE 2 OF 4 — the master header. The window's title strip: one flex row, brand left, transport in the middle and
+       the window's own controls right (`layout.css`, `header.master-header`). Its drawing is `components.css`'s
+       `.c-panel-head` — a raised strip — so this page retypes no bevel.
+       ================================================================================================================== -->
+  <header class="master-header c-panel-head">
+    <div class="card-head-row">
+      <span class="c-chip">the brand</span>
+      <span class="region-note">the window's name, its build mark and its help: what the operator sees first</span>
+    </div>
+    <div class="card-head-row">
+      <span class="c-chip">the transport</span>
+      <span class="region-note">connect · stop · panic — the three things reached for without leaving the window</span>
+    </div>
+    <div class="card-head-row">
+      <span class="region-note">the standing readout</span>
+      <span class="c-well">0.0 Hz</span>
+    </div>
+  </header>
+
+  <!-- ==================================================================================================================
+       RULE 3 OF 4 — the plan. Two columns and the 6px seam between them (`layout.css`, `.layout`). The left column is
+       the work area and the flexible one; the right is the operator column, as wide as `--ops-col-width`, and it is the
+       one that is fixed. Everything below is a `.stack`: one 8px gap between the cards in a column.
+       ================================================================================================================== -->
+  <div class="layout">
+
+    <!-- The work area. Its cards do NOT fold: the operator is working in them. -->
+    <div class="stack builder-column">
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 1</span>
+          <span class="region-note">the list — the window's subject, one row per item, and the only place a row is chosen</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 12 · the selected one</span>
+          <span class="c-well">-6.0 dB</span>
+          <span class="c-chip">armed</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 13</span>
+          <span class="c-well">0.0 dB</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">row 14</span>
+          <span class="c-well">-2.5 dB</span>
+        </div>
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 2</span>
+          <span class="region-note">the editor — the card the operator is working in, and the widest thing in the plan</span>
+        </div>
+        <label class="c-label">
+          the field the operator types into
+          <input type="text" value="a name" spellcheck="false">
+        </label>
+        <div class="c-row">
+          <span class="c-row-name">the steps of the thing being edited</span>
+          <span class="c-chip">step 1</span>
+          <span class="c-chip">step 2</span>
+          <span class="c-chip">step 3</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-name">what the next step will act on</span>
+          <span class="c-well">/ch/1/mute</span>
+        </div>
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">work area · 3</span>
+          <span class="region-note">the detail — what the selection means, read rather than edited</span>
+        </div>
+        <div class="c-label">
+          <span>the value this reading came from</span>
+          <span class="c-well">-6.0 dB</span>
+        </div>
+        <div class="c-band">one message, full width, carrying its cause in the operator's own words</div>
+      </section>
+
+    </div>
+
+    <!-- The seam: 6px of the grid with a 2px grip down its middle, showing the desktop through. It is what the operator
+         drags in a window, and what `layout.css` hides when the plan becomes one column. -->
+    <div class="column-resizer" aria-hidden="true">
+      <div class="resizer-handle"></div>
+    </div>
+
+    <!-- The operator column. Standings, not work: it is the fixed one (sticky, scrolling inside itself) and its cards
+         are the ones that fold. Three cards here, and the third is the folded one. -->
+    <aside class="stack ops-column">
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column · 1</span>
+          <span class="region-note">the standing readout — the value the operator watches while working elsewhere</span>
+        </div>
+        <div class="c-label">
+          <span>where the show is</span>
+          <span class="c-well">--:--:--:--</span>
+        </div>
+        <div class="c-label">
+          <span>what the window is doing</span>
+          <span class="c-well">0.0 Hz</span>
+        </div>
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column · 2</span>
+          <span class="region-note">the log — what happened, newest first, and why it happened</span>
+        </div>
+        <div class="c-band">a message the operator reads without opening anything else</div>
+        <div class="c-band is-unknown">and the one before it, still unresolved</div>
+      </section>
+
+      <!-- THE FOLDED CARD (rule 5 of `layout.css`), AND ITS FOLD IS OPERABLE. `is-collapsed` is the whole state: the
+           head stays, every other child goes, and the `.card-summary` chip inside the head — hidden while the card is
+           open — is what the operator reads instead of the body. **The rule that hides the body is the kit's**
+           (`.c-card.is-collapsed > :not(.c-card-head)`), so it is not restated here. What this page adds is the way to
+           change the state, and it is the same mechanism as the reference window's: a `<button>` in the head, drawn by
+           the kit's own `button` rules, carrying `aria-expanded` (`false` folded, `true` open) and a label naming what
+           it does. Nothing here is animated and nothing is greyed: the shape is the state, and the button is how the
+           state moves. -->
+      <section class="c-card is-collapsed">
+        <div class="c-card-head card-head-row">
+          <span class="c-chip">operator column · 3</span>
+          <span class="region-note">the folded card — its body is not rendered while it is folded</span>
+          <span class="c-chip card-summary">while folded: what this card reports</span>
+          <button type="button" id="fold-toggle" aria-expanded="false">Unfold</button>
+        </div>
+        <div class="c-label">
+          <span>the body of a card that is not folded sits here, and the plan gives it up to keep the column inside one
+            screenful</span>
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <!-- The legend: what a reader of this page is looking at, and which sheet draws which part of it. It is this page's
+       own furniture rather than part of the plan, which is why it is a panel and not a card in either column. -->
+  <section class="c-panel legend">
+    <div class="c-panel-head">How to read this page — the composed plan, and which sheet draws what</div>
+    <div class="c-panel-body legend-body">
+      <p class="lead">
+        The skeleton is <code>&lt;main&gt; → &lt;header class="master-header"&gt; → .layout → .stack of cards</code>, and
+        it is the same skeleton every window of WING CONTROLLER is built on.
+      </p>
+      <p>
+        <code>layout.css</code> owns the plan: <code>main</code>'s width on the desktop, the master header's row, the
+        two-column <code>.layout</code> and its 6px seam, the <code>.stack</code> gap, the sticky operator column, and
+        the folded card. <code>components.css</code> owns everything you can see inside those regions — the card, the
+        row, the well, the chip, the band, the field — and <code>tokens.css</code> owns every colour and size either of
+        them uses. This page carries no fourth opinion: it links the three sheets and adds only the labels.
+      </p>
+      <p>
+        <strong>Which card goes where.</strong> The left column is the window's subject — its list, its editor, its
+        detail — and it is the flexible one: it grows with the window and its cards never fold. The right column is the
+        window's standing instruments — what the operator checks rather than edits — and it is the fixed one: sticky
+        under the header, scrolling inside itself, and it is its cards that fold.
+      </p>
+      <p>
+        <strong>How the height is shared.</strong> It is not. The plan shares a row, not a height
+        (<code>align-items: start</code>), so each column is as tall as its own content; the operator column stays useful
+        by being sticky rather than by stretching. And the plan is not one width: below 1400px the operator column is
+        limited to what is free, and below 1180px the plan becomes one column, the seam is hidden and the header stacks —
+        both bands are in <code>layout.css</code> with the overflow that was measured when they were missing.
+      </p>
+      <p>
+        <strong>What this page deliberately is not.</strong> It is structure, and its labels are almost all of its
+        content: the chips label regions and do not act, and no greyed placeholder is drawn, because a mockup that
+        shipped one would be exactly the promise this project forbids. The page carries **one** control and one handler
+        — the folded card's toggle — and it is here because `PLAN.md` records the gap a stranger found: the fold was a
+        state with no way to change it. It is the same mechanism as the reference window's, so a consumer copies one
+        thing.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// The theme mechanism `UI_SYSTEM.md` §10 documents: light is `:root`, dark is the class on `<body>`, and the
+// operator's choice is `wing_theme` in `localStorage`. This page draws no theme switch — the reference window's is the
+// one in the kit — so the only thing that runs here is the key's read. If the storage read is unavailable the page
+// stays in the light theme, which is the default rather than a failure: there is nothing here that could not be shown.
+try {
+  document.body.classList.toggle('theme-dark', localStorage.getItem('wing_theme') === 'dark');
+} catch (error) {
+  document.body.dataset.themeRead = 'unavailable: the light theme is the default';
+}
+
+/* THE FOLD, AND IT IS THE SAME MECHANISM IN `design/layout.html` AND `design/reference-window/index.html`, so a
+   consumer copies one thing. The shape is the theme switch's `apply()` in the reference window: one function sets the
+   card's class and the button's `aria-` value together, so what is drawn and what is announced cannot drift. The
+   hiding itself is NOT here — the kit draws it (`.c-card.is-collapsed > :not(.c-card-head)`, `layout.css` §5), and
+   `.card-summary` is the chip that state keeps, so this script only changes the state. `<button>` is focusable and
+   Enter/Space fire it natively, so no key handler is written and nothing is prevented. */
+(function () {
+  var button = document.getElementById('fold-toggle');
+  var card = button.closest('.c-card');
+  function apply(collapsed) {
+    card.classList.toggle('is-collapsed', collapsed);
+    button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    button.textContent = collapsed ? 'Unfold' : 'Fold';
+  }
+  function toggle() {
+    apply(!card.classList.contains('is-collapsed'));
+  }
+  apply(card.classList.contains('is-collapsed'));
+  button.addEventListener('click', toggle);
+})();
+</script>
+</body>
+</html>

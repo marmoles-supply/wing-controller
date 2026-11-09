@@ -1,0 +1,66 @@
+// Prove the public-history contract in disposable repositories: archived facts
+// survive a new root commit, while altered notes and missing evidence fail.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { createReleaseProvenance } from './lib/release-provenance.mjs';
+
+const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'wing-provenance-'));
+const write = (root, name, text) => { const file = path.join(root, name); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, text); };
+const git = (root, args) => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Source Fixture', '-c', 'user.email=fixture@example.invalid', ...args], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+const commit = root => { git(root, ['add', '--', '.']); git(root, ['commit', '-m', 'fixture']); };
+const version = (v, build) => JSON.stringify({ version: v, build, buildDate: '2026-01-01' });
+const note = build => `Build: ${build}\nDate: 2026-01-01\n`;
+try {
+  const original = path.join(temp, 'original');
+  fs.mkdirSync(original);
+  git(original, ['init', '-b', 'main']);
+  write(original, 'version.json', version('1.0.0', 'one'));
+  write(original, 'desktop/release-notes/0.5.0.md', note('unverified-import'));
+  write(original, 'desktop/release-notes/1.0.0.md', note('one'));
+  commit(original);
+  write(original, 'version.json', version('2.0.0', 'two'));
+  write(original, 'desktop/release-notes/2.0.0.md', note('two'));
+  commit(original);
+  const archive = createReleaseProvenance(original, git(original, ['rev-parse', 'HEAD']));
+  assert.equal(archive.notes.find(n => n.version === '0.5.0').status, 'imported-without-build-evidence');
+  const exported = path.join(temp, 'exported');
+  fs.mkdirSync(exported);
+  git(exported, ['init', '-b', 'main']);
+  for (const file of ['version.json', 'desktop/release-notes/0.5.0.md', 'desktop/release-notes/1.0.0.md', 'desktop/release-notes/2.0.0.md']) write(exported, file, fs.readFileSync(path.join(original, file)));
+  for (const file of ['test-desktop-release-notes.mjs', 'lib/release-provenance.mjs']) write(exported, `scripts/${file}`, fs.readFileSync(fileURLToPath(new URL(file, import.meta.url))));
+  const archivePath = 'desktop/release-notes/provenance.json';
+  write(exported, archivePath, JSON.stringify(archive));
+  commit(exported);
+  const run = () => spawnSync(process.execPath, ['scripts/test-desktop-release-notes.mjs'], { cwd: exported, encoding: 'utf8' });
+  assert.equal(run().status, 0, 'A clean new history must retain real historical evidence');
+  assert.match(run().stdout, /UNVERIFIED archival build claims/, 'Imported claims must not be presented as verified');
+  fs.unlinkSync(path.join(exported, 'desktop/release-notes/1.0.0.md'));
+  assert.match(run().stderr, /Archived release note 1\.0\.0 is missing/);
+  write(exported, 'desktop/release-notes/1.0.0.md', note('one'));
+  const malformed = structuredClone(archive);
+  delete malformed.notes.find(n => n.version === '1.0.0').recordedAt;
+  write(exported, archivePath, JSON.stringify(malformed));
+  assert.match(run().stderr, /Invalid or duplicate archived release note/);
+  write(exported, archivePath, JSON.stringify(archive));
+  write(exported, 'desktop/release-notes/1.0.0.md', note('invented'));
+  assert.match(run().stderr, /audited historical snapshot/);
+  write(exported, 'desktop/release-notes/1.0.0.md', note('one'));
+  write(exported, archivePath, JSON.stringify({ ...archive, notes: archive.notes.filter(n => n.version !== '1.0.0') }));
+  assert.notEqual(run().status, 0, 'An omitted historical record must fail, including equal introduction commits');
+  write(exported, archivePath, JSON.stringify(archive));
+  write(exported, 'version.json', version('2.1.0', 'three'));
+  write(exported, 'desktop/release-notes/2.1.0.md', note('three'));
+  assert.equal(run().status, 0, 'A pending release may match the working version metadata');
+  const gate = fs.readFileSync(new URL('verify-all.sh', import.meta.url), 'utf8');
+  const outputFunction = /^note_from_output\(\) \{[\s\S]*?^\}/m.exec(gate)?.[0];
+  assert.ok(outputFunction, 'The gate must retain its passing-note reporter');
+  const reported = spawnSync('bash', ['-c', `${outputFunction}\nnote_from_output "$1"`, 'gate-fixture', 'UNVERIFIED archival build claims\n15 archival notes not build-verified'], { encoding: 'utf8' });
+  assert.equal(reported.status, 0);
+  assert.match(reported.stdout, /note: UNVERIFIED archival build claims/);
+  assert.match(reported.stdout, /note: 15 archival notes not build-verified/);
+} finally { fs.rmSync(temp, { recursive: true, force: true }); }
+console.log('Release provenance survives a new history; changed notes and missing records fail.');
