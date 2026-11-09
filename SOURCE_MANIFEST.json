@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "658618b77144aaddbb76876b9bd5b42a624ba4b4",
+  "sourceRevision": "46e2ca0824583bddbb518772d05b352a84142d6f",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -888,23 +888,23 @@
     },
     {
       "path": "design/screens/guide-dark.png",
-      "bytes": 249548,
-      "sha256": "c9269aa3d3e5675d09a18796b6347e2f8b49cfdf348158aa365d4869b5e3ed80"
+      "bytes": 249659,
+      "sha256": "c05ce03161ff9df5123420b0c2133cc096c386084e7113be3268a25477a5c527"
     },
     {
       "path": "design/screens/guide-light.png",
-      "bytes": 217134,
-      "sha256": "3a005fb86570de6901b459672bc1f6474650afb9de2f3b0d722a13be9f30ef8d"
+      "bytes": 217202,
+      "sha256": "d2a27315efaa10236f082c1d70569b0310181e67f045fb7d364855196b893f57"
     },
     {
       "path": "design/screens/index-dark.png",
-      "bytes": 226021,
-      "sha256": "ff793ad4f4382212ae92f5c7b23597691a0c6aa8e39915b5a70908e09f3b66eb"
+      "bytes": 225579,
+      "sha256": "9caa9a0166367aef74d445c7e41b97aec1cf6c0b518c1c4e59737b6f92f60ff3"
     },
     {
       "path": "design/screens/index-light.png",
-      "bytes": 210638,
-      "sha256": "72a65c84e00bb011b47e22d398176b13496c00aab40382acd457743415111501"
+      "bytes": 210157,
+      "sha256": "b5e09fb12936305e477b97e85d0cad1a13088bf858605df2899316831172f5dd"
     },
     {
       "path": "design/screens/ltc-dark.png",
@@ -918,23 +918,23 @@
     },
     {
       "path": "design/screens/meters-dark.png",
-      "bytes": 53271,
-      "sha256": "e208dc83c1f50609b1a09c0b592af553adce7b2b58ea40b4bac23960d99d69a8"
+      "bytes": 53014,
+      "sha256": "37a6ce325b575358db65d0cf5ea3a283578d0ab194b874a9a49ebc87313d7c56"
     },
     {
       "path": "design/screens/meters-light.png",
-      "bytes": 47869,
-      "sha256": "24a515a29980198b7023f440ee2c937560c1de5bf1ed6c675f74b5e3785f4f78"
+      "bytes": 47727,
+      "sha256": "81390c038c30757bf5c98485ad50d660b46ecc1f6dc84ace1f4bb8f3c938dcb9"
     },
     {
       "path": "design/screens/timecode-dark.png",
-      "bytes": 32741,
-      "sha256": "ea810b65b3778909a427fc5256480c99cae9e6654e529349dc16e1c507fde449"
+      "bytes": 32471,
+      "sha256": "e1a5874536d2d6e036b1a67eb97b19cc7b77d7353e840aeedd82b8d2c142f9eb"
     },
     {
       "path": "design/screens/timecode-light.png",
-      "bytes": 30976,
-      "sha256": "95f434fe3bb83fabe930809075759a8d1f745ffde7e3dc1e32eb6da1045df65e"
+      "bytes": 30711,
+      "sha256": "66f2401c653b72955679af3fbb59428ac5ba2ca4046866bf113eab31605e112f"
     },
     {
       "path": "design/specimen.html",
@@ -3114,10 +3114,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "cd3170c793cb3b2658e5035d3ddb7344e8c387175b9acaa7a98ac53b5b994ef6"
+      "sha256": "ff6d6f7f4cda5d008e42787f97d84ef81be1e2955335729bb86e6f38ef2af069"
     }
   ],
-  "bytes": 21395706,
+  "bytes": 21394028,
   "excludedTrackedPaths": 1096,
   "potentialSecrets": 0,
   "reviewFindings": 228,
