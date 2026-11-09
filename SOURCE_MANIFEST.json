@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "0e8e8f19bed4e273a8cb133a4361bbf681b0bff7",
+  "sourceRevision": "3b3ab7a2f87d7b93ead919315a7d4f7429ab36e9",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -3293,13 +3293,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 14787,
-      "sha256": "8982bb08b61a992c77614adf8ae704874e8f05d7d06cba7b99bc3c37be05fa18"
+      "bytes": 14641,
+      "sha256": "a22811c4fd1dd5d3ba41ae74f2f6d77d99801764c0030fdc16900d138366f60b"
     },
     {
       "path": "README.es.md",
-      "bytes": 10378,
-      "sha256": "f33a552a3bfbcdc8ccbb9a62d933a06ec4cb3f375284c894156cdc2fc0f25313"
+      "bytes": 10225,
+      "sha256": "0302ebc1ed7e34fa830d53ccf14edc63451a2f33334764476745613079603e34"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -3333,8 +3333,8 @@
     },
     {
       "path": "docs/SHARING.md",
-      "bytes": 3408,
-      "sha256": "813f45bd2c9378b9118b74438d5b56123fc07aca7af85ff8e692c580144d3d76"
+      "bytes": 3633,
+      "sha256": "f953d369f3d898b6640583ba86ca39558ef6179ee1f757544a53d82c8a833fa2"
     },
     {
       "path": "docs/COMMUNITY_TESTING.md",
@@ -3358,8 +3358,8 @@
     },
     {
       "path": "docs/SITE.md",
-      "bytes": 2142,
-      "sha256": "672f4113b5e5239a39cb6c28fef2b7e5eb911476083e9c0d6ff8de979aa71990"
+      "bytes": 2484,
+      "sha256": "ec6ac06b01f818bb8fc957148a0c7a2de679120afdf06ad590e6f04f32d6584f"
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
@@ -3479,10 +3479,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "3d42b4980f0a2541b122900c1967a89d810a6cab38c46f2a9e6102246a76724f"
+      "sha256": "a28d4d9df26fee3347e9437adfcee4d09f3eb2019341f278545f52a20d897909"
     }
   ],
-  "bytes": 24882818,
+  "bytes": 24883086,
   "excludedTrackedPaths": 1107,
   "potentialSecrets": 0,
   "reviewFindings": 283,

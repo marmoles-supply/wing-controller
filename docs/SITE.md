@@ -1,9 +1,15 @@
 # Product website
 
-The product page is **https://marmoles-supply.github.io/wing-controller/**.
-Use `?lang=es` for Spanish. The repository remains the home for code, issues and
-pull requests; visitors do not need to scroll through its file list to download
-or learn about the application.
+The primary product link is the
+[rendered GitHub README](https://github.com/marmoles-supply/wing-controller/blob/main/README.md#wing-controller).
+This keeps the presentation inside GitHub without putting the root file table
+above it. Use the [Spanish README](https://github.com/marmoles-supply/wing-controller/blob/main/README.es.md#wing-controller)
+for Spanish readers.
+
+An optional static copy is available at
+https://marmoles-supply.github.io/wing-controller/ (`?lang=es` for Spanish).
+It is retained as an alternative, not the recommended sharing route. The owner
+prefers GitHub as the main public surface.
 
 ## Source and publishing
 
