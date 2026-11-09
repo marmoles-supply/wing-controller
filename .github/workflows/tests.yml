@@ -21,11 +21,14 @@ jobs:
       WING_VERIFY_LOG_DIR: ${{ github.workspace }}/test-results
       CARGO_TERM_COLOR: never
       TZ: Europe/Madrid
+      WING_SCREENSHOT_PROFILE: github-macos26
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Initialise diagnostics
+        run: mkdir -p "$WING_VERIFY_LOG_DIR"
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 26.8.2
@@ -65,6 +68,7 @@ jobs:
           set -o pipefail
           node scripts/mutation-check-ci.mjs 2>&1 | tee "$WING_VERIFY_LOG_DIR/mutations.log"
       - name: Synthetic runtime soak (loopback console, 20 seconds)
+        timeout-minutes: 2
         shell: bash
         run: |
           set -o pipefail

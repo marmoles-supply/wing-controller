@@ -15,12 +15,16 @@ const files = execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'ut
   /^(Cargo\.(toml|lock)|version\.json|LICENSE)$/.test(name)
   || /^(crates|desktop|scripts|design|native|assets)\//.test(name));
 const scratch = mkdtempSync(join(tmpdir(), 'wing-ci-mutations-'));
-const env = { ...process.env, CARGO_TARGET_DIR: process.env.CARGO_TARGET_DIR || join(root, 'target') };
+// Cargo can reuse a local-package test binary across source copies. Sharing the normal target
+// left a mutant binary in a later gate despite byte-identical restored source (measured 2026-11-09).
+// Keep mutation artefacts in their own namespace; never alter the regular gate's binaries.
+const regularTarget = resolve(root, process.env.CARGO_TARGET_DIR || 'target');
+const env = { ...process.env, CARGO_TARGET_DIR: join(regularTarget, 'ci-mutations') };
 let browser;
 let sequence = 0;
-async function run(command, args) {
+async function run(command, args, { cwd = scratch, childEnv = env } = {}) {
   return await new Promise(resolveRun => {
-    const child = spawn(command, args, { cwd: scratch, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(command, args, { cwd, env: childEnv, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
     let output = '', timedOut = false;
     child.stdout.on('data', chunk => { output += chunk; });
     child.stderr.on('data', chunk => { output += chunk; });
@@ -47,6 +51,8 @@ const steps = 'scripts/lib/verification-steps.sh';
 const cargo = (packageName, filter) => ['cargo', ['test', '-p', packageName, '--locked', '--quiet', ...(filter ? [filter] : [])]];
 const node = name => [process.execPath, [`scripts/${name}`]];
 const suite = node('test-desktop-library-lock-browser.mjs');
+const soakTest = ['cargo', ['test', '-p', 'wing-controller-desktop', '--locked', '--quiet',
+  'tests::a_runtime_soak_keeps_every_action_bounded_and_reports_its_latency', '--', '--ignored', '--exact']];
 const cases = [
   { name: 'dwell bypass', file: runtime, before: 'let dwell_elapsed = !hot', after: 'let dwell_elapsed = true || !hot',
     test: cargo('wing-runtime', 'transient_dwell_fires_at_its_boundary'), evidence: /transient_dwell_fires_at_its_boundary.*FAILED/ },
@@ -71,6 +77,10 @@ const cases = [
     test: suite, evidence: /LOCKED library-save-current:/ },
   { name: 'erased failure on browser restart', file: steps, before: '    if ! start_chrome; then', after: '    FAILED=()\n    if ! start_chrome; then',
     test: node('test-verification-gate.mjs'), evidence: /AssertionError/ },
+  { name: 'panicking soak worker', file: main,
+    before: '                        let dispatched_at = Instant::now();',
+    after: '                        if macro_index == 0 { panic!("injected worker panic"); }\n                        let dispatched_at = Instant::now();',
+    test: soakTest, evidence: /soak action worker must not panic/ },
 ];
 try {
   for (const name of files) {
@@ -84,7 +94,7 @@ try {
   browser = await startPrivateBrowser();
   env.WING_CHROME_PORT = String(browser.port);
   for (const [command, args] of [cargo('wing-runtime'), cargo('wing-controller-desktop', 'a_failed_'),
-    node('test-desktop-command-registry.mjs'), node('test-verification-gate.mjs'), suite]) {
+    node('test-desktop-command-registry.mjs'), node('test-verification-gate.mjs'), suite, soakTest]) {
     const result = await run(command, args);
     assert.equal(result.timedOut, false, 'baseline timed out: nothing established');
     assert.equal(result.code, 0, `baseline failed: ${result.output}`);
@@ -108,7 +118,12 @@ try {
       console.log(`CAUGHT: ${entry.name}`);
     } finally { writeFileSync(path, original); }
   }
-  console.log(`Mutation checks: ${cases.length}/${cases.length} deliberate defects caught; source files untouched.`);
+  // A postflight in the real workspace detects accidental contamination of its ordinary Cargo cache.
+  const normal = await run(...cargo('wing-runtime'), { cwd: root, childEnv: { ...env, CARGO_TARGET_DIR: regularTarget } });
+  assert.equal(normal.code, 0, `regular workspace must still pass after mutations: ${normal.output}`);
+  assert.equal(normal.timedOut, false);
+  assert.match(normal.output, /running [1-9]\d* tests?/, 'the cache-isolation control must execute tests');
+  console.log(`Mutation checks: ${cases.length}/${cases.length} deliberate defects caught; source files untouched; regular workspace control passed.`);
 } finally {
   if (browser) await browser.close();
   rmSync(scratch, { recursive: true, force: true });

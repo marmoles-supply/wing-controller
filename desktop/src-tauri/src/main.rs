@@ -24018,7 +24018,7 @@ mod tests {
         }
         // Let the runs still in flight finish (bounded by the macro's own duration).
         for runner in runners {
-            let _ = runner.join();
+            runner.join().expect("soak action worker must not panic");
         }
 
         let percentile = |samples: &Arc<std::sync::Mutex<Vec<f64>>>, p: f64| -> f64 {
@@ -24029,11 +24029,13 @@ mod tests {
                 .copied()
                 .unwrap_or(0.0)
         };
+        // Ok means the executor returned a report, which may contain unconfirmed results.
+        // This soak measures bounded dispatch and accounting, not per-action confirmation.
         let completed = completed.load(Ordering::Relaxed);
         let refused = refused.load(Ordering::Relaxed);
         let dropped = dropped.load(Ordering::Relaxed);
         println!(
-            "A2 soak: {hits} trigger hits, {completed} runs completed, {refused} refused, {dropped} \
+            "A2 soak: {hits} trigger hits, {completed} executor calls returned Ok, {refused} returned Err, {dropped} \
              dropped by the overlap policy; dispatch (frame→run) p50 {:.1} ms, p95 {:.1} ms, max {:.1} ms; \
              run duration p50 {:.1} ms, max {:.1} ms; over {:.1} s",
             percentile(&dispatch, 0.5),
@@ -24043,6 +24045,10 @@ mod tests {
             percentile(&duration, 1.0),
             started.elapsed().as_secs_f64()
         );
+        assert_eq!(hits, completed + refused + dropped, "every trigger must have one accounted terminal outcome");
+        assert!(in_flight.iter().all(|flag| !flag.load(Ordering::Relaxed)), "all action slots must be released");
+        assert_eq!(dispatch.lock().expect("dispatch samples").len(), completed + refused, "every executor call must record dispatch");
+        assert_eq!(duration.lock().expect("duration samples").len(), completed + refused, "every executor call must record duration");
         assert!(hits > 100, "the soak must really fire the triggers ({hits} hits)");
         assert!(completed > 0, "and the actions must really run ({completed} completed)");
         assert!(
@@ -24052,7 +24058,7 @@ mod tests {
         );
         assert!(
             console.writes().len() >= completed,
-            "every completed run wrote to the fake console ({} writes for {completed} runs)",
+            "aggregate writes must cover the count of Ok executor returns ({} writes for {completed} returns)",
             console.writes().len()
         );
         assert!(

@@ -1,11 +1,11 @@
 {
   "summary": {
-    "sourceRevision": "5c7c4b7f543475313458e246f399c95b4df52cc0",
-    "files": 704,
-    "bytes": 24940093,
-    "excludedTrackedPaths": 1110,
+    "sourceRevision": "ce8a8e6c180feea0813f1edf3dd78ca82f76dd98",
+    "files": 712,
+    "bytes": 25166303,
+    "excludedTrackedPaths": 1111,
     "potentialSecrets": 0,
-    "reviewFindings": 283,
+    "reviewFindings": 287,
     "transformations": 6,
     "privateIdentityFragmentsChecked": 1,
     "limits": [
@@ -411,6 +411,26 @@
     },
     {
       "file": "design/reference/specimen-type-and-space-both-themes.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/github-macos26/ltc-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/github-macos26/ltc-light.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/github-macos26/meters-dark.png",
+      "kind": "binary-human-review",
+      "severity": "review"
+    },
+    {
+      "file": "design/screens/github-macos26/meters-light.png",
       "kind": "binary-human-review",
       "severity": "review"
     },
@@ -896,25 +916,19 @@
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24541,
+      "line": 24547,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24542,
+      "line": 24548,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24543,
-      "kind": "lan-address",
-      "severity": "review"
-    },
-    {
-      "file": "desktop/src-tauri/src/main.rs",
-      "line": 24545,
+      "line": 24549,
       "kind": "lan-address",
       "severity": "review"
     },
@@ -926,13 +940,19 @@
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24551,
+      "line": 24557,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24558,
+      "line": 24557,
+      "kind": "lan-address",
+      "severity": "review"
+    },
+    {
+      "file": "desktop/src-tauri/src/main.rs",
+      "line": 24564,
       "kind": "lan-address",
       "severity": "review"
     },

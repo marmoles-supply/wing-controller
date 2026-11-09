@@ -70,6 +70,7 @@ async function evaluate(expression) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 await call('Page.enable');
+await call('Page.bringToFront');
 await call('Page.addScriptToEvaluateOnNewDocument', {
   source: `
     window.__INVOKES = [];
@@ -249,6 +250,10 @@ async function sweepBridge(label) {
   assert.ok(ids.length >= 12, `${label}: the bridge must expose its controls (only ${ids.length} found)`);
   const results = [];
   for (const id of ids) {
+    // Use the application's real reset handler so a previous control's pending dwell/content
+    // cannot satisfy this control's check. Poll after one move, never keep restarting dwell.
+    await evaluate(`document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' }))`);
+    assert.equal(await evaluate(`getComputedStyle(document.getElementById('win95-hover-tooltip')).display`), 'none', 'pointerdown must hide the previous tooltip');
     await evaluate(`(() => {
       const el = document.getElementById(${JSON.stringify(id)});
       const rect = el.getBoundingClientRect();
@@ -258,19 +263,27 @@ async function sweepBridge(label) {
         clientY: rect.top + Math.max(1, rect.height / 2),
       }));
     })()`);
-    // The ScreenTip only appears after the pointer rests (800 ms dwell) and every hop to another
-    // control restarts it, so each one needs the full wait.
-    await sleep(900);
-    results.push(await evaluate(`(() => {
-      const tip = document.getElementById('win95-hover-tooltip');
-      return {
-        id: ${JSON.stringify(id)},
-        visible: getComputedStyle(tip).display !== 'none',
-        title: tip.querySelector('.win95-hover-tooltip-title strong')?.textContent?.trim() || '',
-        desc: tip.querySelector('.win95-hover-tooltip-desc')?.textContent?.trim() || '',
-        cat: tip.querySelector('.win95-hover-tooltip-badge')?.textContent?.trim() || '',
-      };
-    })()`));
+    const started = Date.now();
+    let look;
+    do {
+      look = await evaluate(`(() => {
+        const tip = document.getElementById('win95-hover-tooltip');
+        const target = document.getElementById(${JSON.stringify(id)});
+        const rect = target.getBoundingClientRect();
+        return {
+          id: ${JSON.stringify(id)},
+          visible: getComputedStyle(tip).display !== 'none' && getComputedStyle(tip).visibility !== 'hidden',
+          title: tip.querySelector('.win95-hover-tooltip-title strong')?.textContent?.trim() || '',
+          desc: tip.querySelector('.win95-hover-tooltip-desc')?.textContent?.trim() || '',
+          cat: tip.querySelector('.win95-hover-tooltip-badge')?.textContent?.trim() || '',
+          visibility: document.visibilityState, focus: document.hasFocus(),
+          geometry: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+        };
+      })()`);
+      if (look.visible && look.title && look.desc.length >= 20) break;
+      await sleep(100);
+    } while (Date.now() - started < 5_000);
+    results.push({ ...look, elapsedMs: Date.now() - started });
   }
   const silent = results.filter((entry) => !entry.visible || !entry.title || entry.desc.length < 20);
   assert.deepEqual(silent, [], `${label}: every control must show a real tooltip, these did not: ${JSON.stringify(silent)}`);

@@ -1,0 +1,38 @@
+name: Capture visual reference for review
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      TZ: Europe/Madrid
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 26.8.2
+      - run: npm ci --no-audit --no-fund
+      - name: Record renderer
+        run: |
+          mkdir -p capture-evidence
+          {
+            git rev-parse HEAD
+            sw_vers
+            uname -m
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --version
+          } > capture-evidence/environment.log
+      - name: Generate deterministic captures for review
+        run: node scripts/test-design-screens.mjs --write
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: reviewed-renderer-candidate
+          path: |
+            design/screens/*.png
+            capture-evidence/environment.log
+          retention-days: 7
+          if-no-files-found: error

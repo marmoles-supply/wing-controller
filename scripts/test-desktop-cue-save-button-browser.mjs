@@ -94,6 +94,11 @@ async function openTab(url, preload) {
   };
   await call('Page.enable');
   await call('Runtime.enable');
+  const originalMotion = await evaluate(`matchMedia('(prefers-reduced-motion: reduce)').matches`);
+  console.log(`Host reduced-motion preference before emulation: ${originalMotion}`);
+  await call('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
+  assert.equal(await evaluate(`matchMedia('(prefers-reduced-motion: no-preference)').matches`), true,
+    'normal-animation cases must run with an explicit normal-motion preference');
   if (preload) {
     await call('Page.addScriptToEvaluateOnNewDocument', { source: preload });
     await call('Page.navigate', { url });

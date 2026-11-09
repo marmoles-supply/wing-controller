@@ -31,6 +31,8 @@
 // `design/reference/` beside it, and then refresh. A refreshed image is a claim that the window is right, not
 // evidence that it is.
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -49,6 +51,7 @@ import {
   startPrivateBrowser,
   windowsByName,
 } from './lib/design-screens.mjs';
+import { selectRendererProfile } from './lib/design-renderer-profiles.mjs';
 
 const argv = process.argv.slice(2);
 const flag = (name) => {
@@ -60,6 +63,8 @@ const has = (name) => argv.includes(name);
 const repo = resolve(flag('--repo') || REPO_ROOT);
 const screensDir = resolve(repo, 'design/screens');
 const write = has('--write');
+const profileName = process.env.WING_SCREENSHOT_PROFILE || 'local';
+assert.ok(!write || profileName === 'local', 'hosted references must be captured for review, never rewritten by the checking job');
 const only = flag('--only') ? flag('--only').split(',').map((name) => name.trim()).filter(Boolean) : null;
 const windows = windowsByName(only);
 const themes = THEMES;
@@ -141,9 +146,13 @@ console.log(
   `(the window as it opens), from ${repo}`,
 );
 
-const scratch = await scratchDirectory('wing-screens-test');
+const scratch = process.env.WING_VERIFY_LOG_DIR
+  ? resolve(process.env.WING_VERIFY_LOG_DIR, 'visual-current')
+  : await scratchDirectory('wing-screens-test');
+await mkdir(scratch, { recursive: true });
 let browser;
 let results;
+let renderer = { name: 'local', images: {} };
 try {
   try {
     browser = await startPrivateBrowser({ log: (line) => console.log(line) });
@@ -151,6 +160,16 @@ try {
     console.error(`design-screens: could not start a private Chrome (${error.code || 'ERROR'}): ${error.message}`);
     process.exit(3);
   }
+    const catalog = profileName === 'local' ? {} : JSON.parse(readFileSync(join(screensDir, 'renderer-profiles.json'), 'utf8'));
+    const observed = { platform: process.platform, arch: process.arch,
+      osVersion: process.platform === 'darwin' ? execFileSync('sw_vers', ['-productVersion'], { encoding: 'utf8' }).trim() : '',
+      chromeVersion: String(browser.version.Browser).split('/')[1] };
+    renderer = selectRendererProfile(catalog, profileName, observed);
+    console.log(`Visual renderer profile: ${renderer.name}; environment ${JSON.stringify(observed)}`);
+    for (const [name, hash] of Object.entries(renderer.images)) {
+      const bytes = readFileSync(join(screensDir, renderer.name, name));
+      assert.equal(createHash('sha256').update(bytes).digest('hex'), hash, `reviewed reference ${name} must retain its recorded hash`);
+    }
   results = await renderScreens({
     outDir: scratch,
     names: only,
@@ -172,7 +191,9 @@ await browser.close();
 const failures = [];
 const summaries = [];
 for (const result of results) {
-  const committedPath = join(screensDir, `${result.window}-${result.theme}.png`);
+  const fileName = `${result.window}-${result.theme}.png`;
+  const committedPath = renderer.images[fileName]
+    ? join(screensDir, renderer.name, fileName) : join(screensDir, fileName);
   const where = `${result.window} window, ${result.theme} theme`;
   if (!existsSync(committedPath)) {
     failures.push(

@@ -21,6 +21,8 @@ coverage percentage has been measured.
 | Atomic writer tests omitted two refused-save paths | **DOCUMENTED:** successful saves were covered; recovery-copy/rename failures were not | Block destinations with nonempty directories; assert error, unchanged previous contents and temporary cleanup |
 | Design screenshot test passed when Chrome was missing | **DOCUMENTED:** early `process.exit(0)` | Exit 3; test that absence cannot emit a completion marker |
 | Shared browser stub silently accepted unknown IPC; uncaught exceptions were discarded | **DOCUMENTED:** generic `{}` fallback and discarded CDP events | Add opt-in strict fixtures, unknown-call recording and page-exception collection; new lock suite enforces both. Older suites still need migration |
+| Synthetic soak swallowed worker panics and did not reconcile outcomes | **DOCUMENTED**, then **MEASURED** with one worker deliberately panicking while the others run | Join errors fail; every hit must equal returned-Ok + returned-Err + dropped, every slot must release and sample counts must match. Ok is labelled as a returned report, not console confirmation |
+| Sharing Cargo artefacts with mutation copies contaminated a later ordinary test run | **MEASURED:** the regular stale-boundary test failed using a mutant binary; touching source without changing its SHA-256 restored the expected pass | Mutations use a separate `target/ci-mutations` namespace and a final normal-workspace control. Extra disk/build cost is deliberate |
 | LTC round-trip comment claimed it was the only software proof possible | **DOCUMENTED:** generator and decoder shared the implementation | Correct the comment. Independent fixtures remain pending; self-consistency is not interoperability |
 
 There are meaningful existing tests too: replacing the real library deletion with
@@ -50,7 +52,7 @@ runner choice; it would not justify silently marking that contract passed.
 **MEASURED:** the original registry and lock guards accepted concrete broken code
 (`scripts/test-desktop-command-registry.mjs:20` and
 `scripts/test-desktop-live-safety-contracts.mjs:216`, before repair).
-Consequence: nine targeted mutation probes add runtime and need maintenance when
+Consequence: ten targeted mutation probes add runtime and need maintenance when
 their intended implementation changes.
 Rejected alternative: another count/badge would not establish detection. Replace a
 probe when a stronger executable test or a changed implementation makes its
@@ -89,3 +91,55 @@ in the project's own verification and corrects that record explicitly.
   green because the underlying assertions had passed.
 - Actionlint accepted the workflow. Gitleaks reported no detected secrets in
   the source candidate or the scanned public history; this is pattern-based evidence.
+
+The strengthened mutation pass caught **10/10** intended defects, including a
+single panicking soak worker while other workers can still complete. Its
+unmodified soak baseline passed before injection. The regular runtime suite then
+passed all ten tests after the isolated mutation run.
+
+The same runtime policy under test is called by the live subscription at
+`desktop/src-tauri/src/main.rs:7118` and `:7508`, not a test-only duplicate.
+The atomic writers serve the actual macro-library and station-backup commands.
+These are source-wiring facts, not physical-console acceptance.
+
+The second full local pass completed every Node/browser suite, then failed on
+that contaminated Rust cache. It remains a failed gate. The source SHA-256 was
+identical before and after the timestamp-only rebuild. Subsequent verification
+uses isolated mutation artefacts and an ordinary-workspace control; it does not
+reinterpret a stale binary as a new application defect.
+
+### Hosted evidence and portability repairs
+
+[Hosted run 42700801637](https://github.com/marmoles-supply/wing-controller/actions/runs/42700801637)
+completed a clean dependency install, pinned protocol acquisition/extraction and
+Rust tests, but failed four frontend/visual suites. It is a failed run, not cloud
+acceptance. macOS26.7.2 arm64, Chrome156.0.8078.80, Node26.8.2, Rust1.98.1 and
+Poppler26.10.0 were recorded in its artefact.
+
+- Bridge reloads guessed1800ms and could read the previous booted document.
+  They now wait for a changed document token plus independent boot/listener
+  completion, then retain the original session/model/health assertions.
+- Tooltip tests guessed900ms for an800ms dwell and could read retained content
+  while hidden. They now bring the tab forward, reset through the actual pointer
+  handler and poll boundedly for the new tooltip. Early-dwell and content checks remain.
+- Cue-save tests inherited the host motion preference before demanding animation.
+  Normal and reduced-motion branches are now explicitly selected and asserted;
+  the original host preference is logged. The original cloud preference was not captured.
+- Four visual differences were reproduced by a separate deterministic capture,
+  [run42705465503](https://github.com/marmoles-supply/wing-controller/actions/runs/42705465503).
+  The app UI source bytes were identical. Six images were byte-identical. Meter
+  light/dark differed only123/126pixels inside the filtered logo (18×16 region);
+  LTC light/dark differed42pixels in a native numeric input (9×7 region). Full
+  captures were inspected and four exact variants approved with their hashes.
+
+**D04 — Keep separate explicitly selected visual records for these renderers.**
+**MEASURED:** the ten-image local record passes unchanged; the hosted capture
+reproduces precisely the four bounded differences above. Consequence: four extra
+images and recorded renderer provenance need maintenance. All ten images still
+undergo exact byte/pixel checks; nothing is masked and no tolerance is added.
+Rejected alternative: replacing local images moves the failure to the other
+machine; tolerances or masks stop checking the affected logo/value. Strict
+version-string rejection also rejects unchanged pictures after a renderer update;
+versions are therefore logged, while platform family and exact images remain enforced.
+A common reproducible renderer proven on both machines would overturn the need
+for separate records. Wider or unexplained differences require another review.

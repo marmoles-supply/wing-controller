@@ -169,20 +169,40 @@ const STUB = `
 `;
 
 await call('Page.enable');
+await call('Page.bringToFront');
 await call('Page.addScriptToEvaluateOnNewDocument', { source: STUB });
 await call('Page.navigate', { url: BRIDGE });
-// `boot()` is async and not awaited: wait for the listeners the contracts need *and* for the boot to
-// have finished (its state query and its announcement), instead of for a fixed guess.
-let booted = false;
-for (let attempt = 0; attempt < 80 && !booted; attempt += 1) {
-  booted = await evaluate(`Boolean(window.__wingBridgeBooted
-    && window.__wingListeners
-    && window.__wingListeners['usb-meter-stream-status']
-    && window.__wingListeners['meter-stream-health']
-    && window.__wingListeners['usb-meter-stream-finished'])`);
-  if (!booted) await sleep(100);
+// Boot completion and a fresh document are independent of the state value under test.
+// A fixed delay could sample the old, already-booted idle document after Page.reload.
+async function waitForBridgeBoot(previousToken = null) {
+  const deadline = Date.now() + 10_000;
+  let observed = null;
+  while (Date.now() < deadline) {
+    try {
+      observed = await evaluate(`(() => ({
+        token: window.__wingTestDocument || null,
+        booted: window.__wingBridgeBooted === true,
+        listeners: Boolean(window.__wingListeners
+          && window.__wingListeners['usb-meter-stream-status']
+          && window.__wingListeners['meter-stream-health']
+          && window.__wingListeners['usb-meter-stream-finished']),
+        calls: (window.__wingStateCalls || []).length,
+        readyWrites: (window.__wingReadyWrites || []).length,
+      }))()`);
+      if (observed.token && observed.token !== previousToken && observed.booted && observed.listeners) return;
+    } catch (error) {
+      if (!/context.*destroyed|Cannot find context|Inspected target navigated/i.test(String(error))) throw error;
+    }
+    await sleep(100);
+  }
+  throw new Error(`fresh Meter Bridge document must finish boot: ${JSON.stringify(observed)}`);
 }
-assert(booted, 'the Meter Bridge must register its stream listeners and finish its boot');
+async function reloadBridge() {
+  const previousToken = await evaluate('window.__wingTestDocument');
+  await call('Page.reload');
+  await waitForBridgeBoot(previousToken);
+}
+await waitForBridgeBoot();
 
 // Seeds the answer the backend would give, surviving the reload the contract then performs. The state
 // a window is handed at start-up is a backend fact, not a document one: the stub re-injects on every
@@ -356,8 +376,7 @@ try {
     return true;
   })()`);
   await seedGeometry(9000, 9000);
-  await call('Page.reload');
-  await sleep(1800);
+  await reloadBridge();
   let placement = await evaluate(`({ positions: window.__wingPositions.slice(), sizes: window.__wingSizes.slice() })`);
   assert(placement.sizes.length === 1, `the saved size is still restored first (got ${JSON.stringify(placement.sizes)})`);
   assert(placement.positions.length >= 1, 'the saved position must be placed');
@@ -371,8 +390,7 @@ try {
   // A geometry that is still on a screen is left exactly where it was: validating must not recentre
   // the window every time it opens.
   await seedGeometry(320, 180);
-  await call('Page.reload');
-  await sleep(1800);
+  await reloadBridge();
   placement = await evaluate(`({ positions: window.__wingPositions.slice(), stored: JSON.parse(localStorage.getItem('wing_meters_geom')) })`);
   const kept = placement.positions[placement.positions.length - 1];
   assert(kept.x === 320 && kept.y === 180,
@@ -464,8 +482,7 @@ try {
     metersWindowOpen: true,
     lastAlert: null,
   });
-  await call('Page.reload');
-  await sleep(1800);
+  await reloadBridge();
   const fromState = await evaluate(`(() => ({
     stateCalls: window.__wingStateCalls.length,
     readyWrites: window.__wingReadyWrites.length,
@@ -505,8 +522,7 @@ try {
     deskModel: 'WING Rack', deskModelKnown: true, liveSafeMode: false,
     health: null, meterSources: [], metersWindowOpen: true, lastAlert: null,
   });
-  await call('Page.reload');
-  await sleep(1800);
+  await reloadBridge();
   const afterDrop = await evaluate(`({
     badge: document.getElementById('bridge-status-badge').textContent,
     message: document.getElementById('status-center').textContent,
@@ -528,8 +544,7 @@ try {
       triggerLatencySamples: 0, droppedMeterCount: 0 },
     meterSources: ['meter-popup'], metersWindowOpen: true, lastAlert: null,
   });
-  await call('Page.reload');
-  await sleep(1800);
+  await reloadBridge();
   const frameSession = await evaluate(`(() => {
     const frames = (window.__wingListeners || {})['usb-meter-frame'];
     const before = packetCount;
@@ -578,8 +593,7 @@ try {
     meterSources: ['meter-popup'], metersWindowOpen: true,
     lastAlert: recordedAlert,
   });
-  await call('Page.reload');
-  await sleep(1800);
+  await reloadBridge();
   const missedAlert = await evaluate(`({
     overlay: document.getElementById('hud-alert-overlay').classList.contains('active'),
     title: document.getElementById('hud-overlay-title')?.textContent || '',

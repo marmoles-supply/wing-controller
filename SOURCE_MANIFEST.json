@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "5c7c4b7f543475313458e246f399c95b4df52cc0",
+  "sourceRevision": "ce8a8e6c180feea0813f1edf3dd78ca82f76dd98",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -32,9 +32,14 @@
       "sha256": "c899be85c62b16c3fb834eeb27f577e9dd92bb2f4fc633c3ad9d6f01444bbe10"
     },
     {
+      "path": ".github/workflows/capture-visual-reference.yml",
+      "bytes": 1195,
+      "sha256": "85fa0ca4f9a443ea12b1e5d57b6f589b8154076471e4e460a8ab435cdb23d1a5"
+    },
+    {
       "path": ".github/workflows/tests.yml",
-      "bytes": 3034,
-      "sha256": "22ce68c6287ccb07e3540b10b2879f1a81edcb2088530d1c3ed14cfea6e0b316"
+      "bytes": 3189,
+      "sha256": "95923478845bd2458bb58bae7f17e0d292be86a3023ba3a0a5bb2461f78a5286"
     },
     {
       "path": "CHANGELOG.md",
@@ -1132,6 +1137,26 @@
       "sha256": "33bdc898c455f6015773d2b60f69ae0c9240b7ef20c3ee7dd1844198425677f6"
     },
     {
+      "path": "design/screens/github-macos26/ltc-dark.png",
+      "bytes": 56286,
+      "sha256": "2b49e20a5a4837a52dd12c6d7c8c0e8c81cdb26cc23d1adddfc3368f209c0e38"
+    },
+    {
+      "path": "design/screens/github-macos26/ltc-light.png",
+      "bytes": 52097,
+      "sha256": "06405acc5b219ab19dc9a9a6262ce48e1bb77b27f875778e7227199d097b9a47"
+    },
+    {
+      "path": "design/screens/github-macos26/meters-dark.png",
+      "bytes": 53009,
+      "sha256": "d28b2c045c0e755f2362c415b34bffe45be5cd3105e73a4991dcb9576e49fd4a"
+    },
+    {
+      "path": "design/screens/github-macos26/meters-light.png",
+      "bytes": 47723,
+      "sha256": "68e308feccc3c9ce53fc4215888c1d34e524e7319efbe85cbdb922f55d9012c8"
+    },
+    {
       "path": "design/screens/guide-dark.png",
       "bytes": 249659,
       "sha256": "c05ce03161ff9df5123420b0c2133cc096c386084e7113be3268a25477a5c527"
@@ -1170,6 +1195,11 @@
       "path": "design/screens/meters-light.png",
       "bytes": 47727,
       "sha256": "81390c038c30757bf5c98485ad50d660b46ecc1f6dc84ace1f4bb8f3c938dcb9"
+    },
+    {
+      "path": "design/screens/renderer-profiles.json",
+      "bytes": 1047,
+      "sha256": "3309aebc2445543b255015765fd6e36a2db97e32fca623b402081a3beb8dcc4e"
     },
     {
       "path": "design/screens/timecode-dark.png",
@@ -2108,8 +2138,8 @@
     },
     {
       "path": "desktop/src-tauri/src/main.rs",
-      "bytes": 1196355,
-      "sha256": "2a925fde11041d338d30fe319c019d919b1d5558f51b3edd32d9512007581bfd"
+      "bytes": 1197108,
+      "sha256": "509c91b4147154aac8b0bbe81de60ac672e38b0b2817593626ab4b95b0e0d758"
     },
     {
       "path": "desktop/src-tauri/src/mtc_forward.rs",
@@ -2432,6 +2462,11 @@
       "sha256": "b19213bde7d174c3618cbebd5b96c84dca25090423757c1871ac77ed1a5ac78d"
     },
     {
+      "path": "scripts/lib/design-renderer-profiles.mjs",
+      "bytes": 1044,
+      "sha256": "87f5e92343a6dd1d114bf55c71c654a4e19b86d812ae28e13beaae1fcdd06788"
+    },
+    {
       "path": "scripts/lib/design-screens.mjs",
       "bytes": 33371,
       "sha256": "76f5170d0b4bbde20339258da089cfc48af71fe70c68e5224cca881e72b03e00"
@@ -2493,8 +2528,8 @@
     },
     {
       "path": "scripts/mutation-check-ci.mjs",
-      "bytes": 7856,
-      "sha256": "078c5274c2717b724b3183e558ca1849e257c69837295c26287e934d5c31f46c"
+      "bytes": 9318,
+      "sha256": "6cf3aec90a72a81babfcae22d0d8a9f7aeb83ede2bbdfa7ec494c5f667c45611"
     },
     {
       "path": "scripts/mutation-check-courtesy-notice.mjs",
@@ -2712,9 +2747,14 @@
       "sha256": "d6749d6138418e8f53e93f64a2eb51e828072a09e6dddce4413ace5850f29922"
     },
     {
+      "path": "scripts/test-design-renderer-profiles.mjs",
+      "bytes": 2092,
+      "sha256": "ddb8a6f81c038d12813dd7100c1fb605d95c83d387ba7ec2b4ae27bd7a1bf461"
+    },
+    {
       "path": "scripts/test-design-screens.mjs",
-      "bytes": 14457,
-      "sha256": "d6911439e1fd6540f2e0672ec60a5bda57ddb2dbd5d01c26f949907246406c02"
+      "bytes": 15972,
+      "sha256": "b510af66acc6fa3cbac9ab9089fe96439f93fb322775edfade7c819853dd7840"
     },
     {
       "path": "scripts/test-design-surfaces.mjs",
@@ -2798,8 +2838,8 @@
     },
     {
       "path": "scripts/test-desktop-cue-save-button-browser.mjs",
-      "bytes": 24398,
-      "sha256": "f72224f507695168a52c1c20f3bed2d7fa24e2db906ad65d25a90b71be4e33ac"
+      "bytes": 24886,
+      "sha256": "df40c3038818db2aebfe8c0535b634738bdfb1a8a5337d69e845e0c09132c544"
     },
     {
       "path": "scripts/test-desktop-diagnostics-blocks-browser.mjs",
@@ -2858,8 +2898,8 @@
     },
     {
       "path": "scripts/test-desktop-inspector-hints-browser.mjs",
-      "bytes": 23318,
-      "sha256": "ba6529975ce9a778541ea90198415c5cbf902374a733ff559891aaaf64b1c8ff"
+      "bytes": 24248,
+      "sha256": "c14f89cc2f7a1bcbfa8d3b4ef8abbf1cc9f592614a454ca5bf2b986be465532b"
     },
     {
       "path": "scripts/test-desktop-interapp-smoke-browser.mjs",
@@ -2933,8 +2973,8 @@
     },
     {
       "path": "scripts/test-desktop-meter-bridge-status-browser.mjs",
-      "bytes": 36424,
-      "sha256": "92ad85d61023bd0bc1b8665a5c0e75bfc6fdcea81dc7a12cb0a15857a8b6059d"
+      "bytes": 37071,
+      "sha256": "32c95e82f04202fa83c5c7ef0b45b57a314d4c804c7f17e8d3693b043589695e"
     },
     {
       "path": "scripts/test-desktop-meter-bridge-ui.mjs",
@@ -3413,18 +3453,18 @@
     },
     {
       "path": "docs/TESTING.md",
-      "bytes": 4649,
-      "sha256": "20dd0150a9ab4788d62b9b608f27fe83ce1b07b8e29c5370f28a5c3392f71003"
+      "bytes": 6194,
+      "sha256": "b1ffb3084cd826fefac73d11b83e43f949e856a87124c88bd5172690e5b24dbd"
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 7125,
-      "sha256": "a77e08444bb90043b12b0b92f46d238493f163ca95b2e72ee950dd1680f93dd3"
+      "bytes": 11348,
+      "sha256": "f3f982fc00d9be64f75042288d3020422a34bfbb16beaedfd1b6d003e42299ad"
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 8963,
-      "sha256": "beee0ea95c7852b655955b7e7134400a90db4016db8bc47ce40ff43031e4cfb3"
+      "bytes": 8962,
+      "sha256": "78ee8a181bd8e95d81094c464c992669411c9da78e100c15d0ef3d0c5f6e5a68"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
@@ -3519,13 +3559,13 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "86016907f546b893d4d7ee61e3a83d6e3e8627df8440d0f958ddad3cddf35aef"
+      "sha256": "0dbe1a974b735718ecfe2f617b8aeb87fc3b535a488e4cd714e558881fe4b3a5"
     }
   ],
-  "bytes": 24940093,
-  "excludedTrackedPaths": 1110,
+  "bytes": 25166303,
+  "excludedTrackedPaths": 1111,
   "potentialSecrets": 0,
-  "reviewFindings": 283,
+  "reviewFindings": 287,
   "transformations": [
     {
       "file": "crates/wing-core/src/lib.rs",
