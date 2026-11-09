@@ -79,6 +79,9 @@ this source checkout.
 
 ## Verification
 
+See the [dated verification record](docs/VALIDATION.md) for measured results,
+environment, dependency-cache use and what was not established.
+
 ```sh
 ./scripts/verify-all.sh --quick   # Everyday checks; omits named browser suites
 ./scripts/verify-all.sh           # Complete source gate, including browser suites
