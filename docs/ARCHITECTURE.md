@@ -6,11 +6,11 @@ mobile/development work, but is not a Node runtime inside the shipped desktop ap
 
 ```mermaid
 flowchart LR
-  UI[Workstation and auxiliary windows] -->|Tauri commands and events| Desktop[Desktop backend]
-  Desktop --> Runtime[wing-runtime: admission and execution]
-  Runtime --> Transport[wing-transport: session-bound dispatch]
-  Transport --> Core[wing-core: protocol encoding and decoding]
-  Core <-->|OSC and native meters| Wing[WING console]
+  UI[Workstation and auxiliary windows] <-->|Tauri commands and events| Desktop[Desktop backend]
+  Desktop --> Runtime[wing-runtime: meter trigger primitives]
+  Desktop --> Core[wing-core: protocol contracts]
+  Desktop <--> Transport[wing-transport: UDP and TCP sockets]
+  Transport <-->|OSC and native meters| Wing[WING console]
   Desktop <--> Timecode[Audio LTC and CoreMIDI MTC]
   Desktop <--> Storage[Files and recovery copies]
   UI <--> Local[UI localStorage]
@@ -22,7 +22,7 @@ flowchart LR
 | Workstation and station restore UI | `desktop/ui/index.html` |
 | Native input and LTC codec | `desktop/src-tauri/src/ltc_device.rs`, `ltc.rs` |
 | Timecode ownership/cues and MIDI | `timecode.rs`, `inter_app_midi.rs` in the desktop source |
-| Runtime policies and transport | `crates/wing-runtime/`, `crates/wing-transport/` |
+| Meter trigger primitives and transport sockets | `crates/wing-runtime/`, `crates/wing-transport/` |
 | WING native/OSC data structures | `crates/wing-core/`, retained `src/osc/` mobile source |
 | Visual system and recorded renders | `design/` |
 | Gates, fixtures and packaging | `scripts/`, `desktop/build-dist.sh` |
@@ -30,6 +30,8 @@ flowchart LR
 
 The central backend/UI files are large. Follow callers into the live path and
 read its tests; a dead helper, old release note or comment is not runtime proof.
+Session admission and action dispatch currently live in the desktop backend;
+the shared core defines protocol data and has no socket dependency.
 Extract one responsibility at a time rather than creating competing state paths.
 
 ## Protocol authority and change contract

@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "46e2ca0824583bddbb518772d05b352a84142d6f",
+  "sourceRevision": "434174e0a7846a1b001ded7a8aa79fdd24942874",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -3093,13 +3093,13 @@
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
-      "bytes": 7567,
-      "sha256": "9334216dad8e27be15fba38c123defed694ea148726f971c0fb0e363a6aecb0e"
+      "bytes": 7694,
+      "sha256": "9c9cb8dcf45403c9e20f91265c24fcfe6c3531562c3fee38505b607fe7713357"
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 3597,
-      "sha256": "54a88c1e228e5ba732ad077d3d3d616d19fb6d217ab069f4dd4314d86fcb7d7e"
+      "bytes": 3749,
+      "sha256": "6997282c0600a2c5808ac402eba8375503dca76a9590b5f3071ae6d08a26ecaa"
     },
     {
       "path": "docs/dependency-audit-2026-11-09.json",
@@ -3114,10 +3114,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "ff6d6f7f4cda5d008e42787f97d84ef81be1e2955335729bb86e6f38ef2af069"
+      "sha256": "e4a7be7e0928ce9bb21f1aaaedcd988e6abd40bb61fd419a9194722881d67245"
     }
   ],
-  "bytes": 21394028,
+  "bytes": 21394307,
   "excludedTrackedPaths": 1096,
   "potentialSecrets": 0,
   "reviewFindings": 228,
