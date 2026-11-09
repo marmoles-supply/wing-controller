@@ -7,13 +7,14 @@ permissions:
 jobs:
   capture:
     runs-on: macos-26
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       TZ: Europe/Madrid
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
+          ref: c03deee5d666c4d42cd5483ba859f5d27fec0750
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: 26.8.2
@@ -27,13 +28,28 @@ jobs:
             uname -m
             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --version
           } > capture-evidence/environment.log
-      - name: Generate deterministic captures for review
-        run: node scripts/test-design-screens.mjs --write
+      - name: Compare fresh browser processes for renderer stability
+        shell: bash
+        run: |
+          mkdir -p capture-evidence/samples
+          printf '%s\n' '#!/bin/sh' 'exec "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --disable-gpu "$@"' > "$RUNNER_TEMP/software-chrome"
+          chmod +x "$RUNNER_TEMP/software-chrome"
+          for renderer in normal software; do
+            for sample in 1 2 3 4 5; do
+              out="capture-evidence/samples/$renderer-$sample"
+              mkdir -p "$out"
+              if [ "$renderer" = software ]; then
+                WING_CHROME_BIN="$RUNNER_TEMP/software-chrome" node scripts/test-design-screens.mjs --only index --write > "$out/capture.log" 2>&1
+              else
+                node scripts/test-design-screens.mjs --only index --write > "$out/capture.log" 2>&1
+              fi
+              cp design/screens/index-*.png "$out/"
+            done
+          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: reviewed-renderer-candidate
+          name: renderer-stability-candidate
           path: |
-            design/screens/*.png
-            capture-evidence/environment.log
+            capture-evidence/
           retention-days: 7
           if-no-files-found: error
