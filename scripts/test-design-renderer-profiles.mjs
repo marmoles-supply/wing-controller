@@ -7,13 +7,14 @@ import { selectRendererProfile } from './lib/design-renderer-profiles.mjs';
 const catalog = JSON.parse(readFileSync(new URL('../design/screens/renderer-profiles.json', import.meta.url), 'utf8'));
 const name = 'github-macos26';
 const record = catalog.profiles[name];
-const observed = { ...record.capturedOn, platform: record.target.platform, arch: record.target.arch };
+const observed = { ...record.capturedOn, platform: record.target.platform, arch: record.target.arch,
+  renderMode: record.target.renderMode };
 const good = selectRendererProfile(catalog, name, observed);
 assert.equal(good.name, name);
-assert.equal(Object.keys(good.images).length, 4, 'exactly four reviewed native-rendering variants');
-assert.deepEqual(selectRendererProfile({}, 'local', {}).images, {}, 'default local references remain unchanged');
+assert.equal(Object.keys(good.images).length, 2, 'exactly two reviewed native number-input variants');
+assert.deepEqual(selectRendererProfile({}, 'local', {}).images, {}, 'local mode uses the shared reference paths');
 assert.throws(() => selectRendererProfile(catalog, '../../other', observed), /Unknown visual/);
-for (const field of ['platform', 'arch', 'osVersion']) {
+for (const field of ['platform', 'arch', 'osVersion', 'renderMode']) {
   assert.throws(() => selectRendererProfile(catalog, name, { ...observed, [field]: 'unreviewed' }), /capture and review/, `${field} changes must refuse the old host family`);
 }
 assert.equal(selectRendererProfile(catalog, name, { ...observed, chromeVersion: '157.0.0.0', osVersion: '26.8.0' }).name, name,
@@ -25,4 +26,4 @@ for (const [file, expected] of Object.entries(good.images)) {
   const actual = readFileSync(new URL(`../design/screens/${name}/${file}`, import.meta.url));
   assert.equal(createHash('sha256').update(actual).digest('hex'), expected, `${file} must match the explicitly reviewed capture`);
 }
-console.log('Renderer profiles: explicit platform family, bounded paths and four reviewed image hashes verified.');
+console.log('Renderer profiles: explicit platform family/render mode, bounded paths and two reviewed image hashes verified.');

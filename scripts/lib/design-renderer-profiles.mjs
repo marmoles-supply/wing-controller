@@ -6,7 +6,7 @@ export function selectRendererProfile(catalog, name, observed) {
   }
   const profile = catalog.profiles[name];
   const actual = { ...observed, osMajor: String(observed.osVersion).split('.')[0] };
-  for (const key of ['platform', 'arch', 'osMajor']) {
+  for (const key of ['platform', 'arch', 'osMajor', 'renderMode']) {
     if (profile.target[key] !== actual[key]) {
       throw new Error(`Visual profile ${name} requires ${key}=${profile.target[key]}, observed ${actual[key]}; capture and review a new reference explicitly`);
     }

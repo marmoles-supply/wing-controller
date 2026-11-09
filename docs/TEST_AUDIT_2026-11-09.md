@@ -52,7 +52,7 @@ runner choice; it would not justify silently marking that contract passed.
 **MEASURED:** the original registry and lock guards accepted concrete broken code
 (`scripts/test-desktop-command-registry.mjs:20` and
 `scripts/test-desktop-live-safety-contracts.mjs:216`, before repair).
-Consequence: ten targeted mutation probes add runtime and need maintenance when
+Consequence: targeted mutation probes add runtime and need maintenance when
 their intended implementation changes.
 Rejected alternative: another count/badge would not establish detection. Replace a
 probe when a stronger executable test or a changed implementation makes its
@@ -134,6 +134,8 @@ Poppler26.10.0 were recorded in its artefact.
   captures were inspected and four exact variants approved with their hashes.
 
 **D04 — Keep separate explicitly selected visual records for these renderers.**
+This initial decision's four automatic-renderer variants were later narrowed to
+two software-renderer variants by D06 below; its original evidence is retained.
 **MEASURED:** the ten-image local record passes unchanged; the hosted capture
 reproduces precisely the four bounded differences above. Consequence: four extra
 images and recorded renderer provenance need maintenance. All ten images still
@@ -181,3 +183,108 @@ The test now observes the real native close event and waits boundedly for closed
 state plus exact opener focus, retaining both final assertions. It never focuses
 the opener or dispatches a synthetic close event itself. **INFERRED:** task ordering
 caused the hosted failure; no runtime focus defect was established by that run.
+
+The repaired workstation suite passed locally. A separate temporary copy then
+removed only the real opener-focus handler: the same suite failed with its
+focus-return assertion, the active element was `body`, and no completion marker
+was emitted. This additional negative control is separate from the initial ten CI probes.
+The subsequent local quick gate passed51 checks and explicitly omitted35 named
+browser suites. Its screenshot check still ran; Rust again passed561/ignored15.
+
+The audit also corrected the contributor setup text: the old Node20.19 minimum
+conflicted with the suite's use of `node:fs.globSync` in
+`scripts/test-design-app-agreement-live.mjs:83`. Setup now names the actually
+measured Node26.8.2 and Rust1.98.1 instead of asserting an untested older range.
+
+### Main-branch policy
+
+**D05 — Require the GitHub Actions desktop test check before main advances.**
+**MEASURED:** a temporary protected branch rejected a ref update to failed
+commit `acc061375843031c7f6d84bf94900a8cc7a31767`, using the same publishing App.
+The server named the failing required check and the branch stayed unchanged.
+The temporary rule and branch were then removed.
+
+The chosen policy binds `Desktop tests (macOS arm64)` to GitHub Actions App15368,
+requires an up-to-date branch, applies to admins and disallows force pushes and
+branch deletion. Consequence: source changes need the passing check before
+integration; the maintainer still reviews the meaning and scope of a change.
+Rejected alternative: a displayed badge alone cannot prevent a failed change
+being integrated. A mandatory approving reviewer was not added for a sole-owner
+project; the contributor PR/review process remains documented in CONTRIBUTING.
+Changing the workflow's job name requires deliberately updating this policy.
+
+This is enforcement of a named check, not independent review of the test code.
+[GitHub documents](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging)
+that skipped/neutral conclusions can satisfy required checks; the configured
+desktop job has no skip condition or `continue-on-error`. Future workflow/test
+changes still require scrutiny. Main protection is recorded as applied only
+after its actual settings have been read back.
+
+### Failure diagnostics
+
+The first24lines-only reporter hid the visual check's explanation behind its
+successful capture listing in run42715636039. **MEASURED:** executing the old
+helper with60setup lines and a final assertion omitted that assertion from console
+output. The shared helper now prints bounded context from both ends and preserves
+the complete log. Its executable fixture requires the final assertion to remain
+visible. The workstation focus timeout also reports only the active tag/id,
+avoiding a full `body.outerHTML` dump with an embedded background image.
+
+### Bridge backend fixture and the second hosted rejection
+
+Run42715636039 also rejected bridge startup-state adoption (session0 rather than77).
+The earlier fresh-document barrier was insufficient to explain this: boot awaits
+`syncBridgeState()` before setting its completion flag (`meters.html:7043–7058`).
+A longer wait was therefore rejected as a repair.
+
+**DOCUMENTED:** the old fixture silently restored an idle answer when file-URL
+session storage was absent or unreadable. **COULD NOT ESTABLISH:** which response
+that hosted run actually returned; it was not logged. The replacement keeps the
+backend snapshot in the Node process and embeds the selected revision in the
+single preload script before reload. It records the returned snapshot and checks
+the intended fixture independently before the existing adoption/health/ready-order
+assertions. No application state-adoption function is invoked to fix startup.
+
+The repaired suite passed locally. Removing only `applyBackendStreamState(snapshot)`
+in a temporary app copy then failed the original session-adoption assertion,
+after the intended fixture had been verified. This becomes an eleventh CI mutation
+probe; the earlier10/10 evidence above refers to the preceding implementation.
+
+### Exact screenshot repeatability — 10 November follow-up
+
+Run42715636039 rejected66 pixels on one Inspector-header row in the dark main
+window, x1325..1494/y88. Local instrumentation reproduced both complete image
+hashes. The header's rectangle was identical (1139,71.09375,402,35), as were DPR1,
+its CSS and the generated background PNG SHA-256
+`102bcbca003173a33df8626dd3dcc08435602e5ac4c8128a9dd43fcf80db6da7`.
+**MEASURED:** final composition differed despite identical bitmap and geometry.
+**COULD NOT ESTABLISH:** the precise internal browser/driver cause.
+
+Lesson retained: five targeted samples with `--disable-accelerated-2d-canvas`
+suggested a remedy; three full captures disproved it by producing both hashes.
+That flag was not adopted. Its apparent early success was not repeatability proof.
+
+**D06 — Pin software compositing for the exact screenshot test only.**
+**MEASURED:** [capture run42719049204](https://github.com/marmoles-supply/wing-controller/actions/runs/42719049204)
+and the matching local experiment each produced five byte-identical full ten-image
+sets with `--disable-gpu`:100 captures total. Eight images match between machines;
+two LTC images differ only42 pixels in the previously identified native input.
+Full images were visually reviewed. The changed renderer also changes other
+pixels (up to132149/1600000 in the dark main window), so references were deliberately
+updated with source, flags and old/new hashes, not treated as an invisible switch.
+See `design/screens/SOFTWARE_RENDERER_REVIEW_2026-11-10.json` for all counts.
+
+Consequence: the screenshot caller explicitly opts in, the actual launch arguments
+identify its render mode, and the host profile enforces it. Other browser callers,
+product-media generation and application rendering keep their normal behaviour.
+The two unnecessary meter variants are removed; two native-input variants remain.
+The comparison stays exact. A twelfth mutation adds one rendered red pixel and
+requires the real screenshot check to reject it after a passing baseline.
+
+Rejected alternatives: accepting either automatic image, masking the row, adding
+tolerance or retrying until an expected image appears would weaken the oracle.
+Changing production CSS solely for this test would affect operators. The narrower
+Canvas2D flag did not fix repeatability. Software rendering does not establish
+GPU-driver or native WebKit correctness; that is an explicit acceptance limit.
+A reproducible normal-renderer record measured across both environments would
+overturn this choice. Future software-renderer differences still fail for review.

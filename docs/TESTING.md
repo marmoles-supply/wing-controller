@@ -28,14 +28,16 @@ Fork runs may require GitHub's first-time contributor approval.
 | Browser interaction | `scripts/test-*-browser.mjs` | Real HTML/JavaScript in Chrome with synthetic state and stubbed native IPC |
 | Visual record | `scripts/test-design-screens.mjs` | Fresh light/dark captures match exact reviewed renderer references; no pixel tolerance or masked areas |
 | Static checks | `scripts/verify-all.sh` | TypeScript, window-script syntax and strict Maillot path/model audit |
-| Mutation checks | `scripts/mutation-check-ci.mjs` | Selected tests reject ten deliberately reintroduced defects after a passing baseline |
+| Mutation checks | `scripts/mutation-check-ci.mjs` | Selected tests reject twelve deliberately reintroduced defects after a passing baseline |
 
 Mutation checks use a temporary source copy, never edit production files, and
 reject timeouts, compilation errors, missing mutation targets and zero-test
 runs as evidence. They cover dwell/cooldown/stale boundaries, refused saves,
 temporary-file cleanup, registration, locked New/Save handlers, gate retries
-and a panicking soak worker. A final normal-workspace run checks cache isolation.
-Ten detected mutations are ten examples of sensitivity, not a coverage score.
+bridge startup-state adoption, a single changed screenshot pixel and a panicking
+soak worker. A final normal-workspace
+run checks cache isolation. Detected mutations are examples of sensitivity,
+not a coverage score.
 
 ## Run locally
 
@@ -61,6 +63,29 @@ add new test files to Git before running it. Its Cargo artefacts use the separat
 Set `WING_VERIFY_LOG_DIR` to retain all
 suite output. The CI workflow does this automatically.
 
+## Adding a useful regression
+
+Start from a reproducible failure and exercise the function or control that the
+application actually uses. Check its observable result: saved contents, unchanged
+state after refusal, dispatched values, visible feedback or returned error. A test
+that only repeats the implementation's wording cannot establish that behaviour.
+
+Run the test before the repair and retain the expected failure; after the repair,
+require it to pass. When practical, reintroduce the defect in a temporary copy to
+check that the test still rejects it. A timeout, compile error or empty test filter
+does not demonstrate detection. Include a positive control alongside a refusal
+case so a broken path cannot pass by doing nothing.
+
+Use explicit clocks/Instants for timing boundaries. In browser tests, wait
+boundedly for a fresh document and the actual state/event being asserted; fixed
+delays are not evidence that startup, polling or a native event has completed.
+IPC fixtures should reject unexpected calls and tests should check uncaught page
+exceptions. A new named browser suite must close its own resources and finish
+with `WING_BROWSER_SUITE_OK` only after every assertion passes.
+
+Changed reference images need a separate visual review and recorded provenance.
+Changing an expected image or adding a longer delay alone is not a diagnosis.
+
 ## Limits and next useful contributions
 
 Passing tests do not guarantee the absence of regressions. No measured overall
@@ -81,17 +106,28 @@ suites, and packaged-app frontend/backend acceptance. Track these in the
 
 ## Reviewed visual renderer records
 
-The local ten-image record stays unchanged. Hosted macOS uses the explicitly
-selected `github-macos26` profile: four reviewed variants for the filtered meter
-logo and native numeric-input inset; the other six images are byte-identical and
-shared. The capture environment, source and image SHA-256 values are recorded in
-`design/screens/renderer-profiles.json`. Every pixel is still compared exactly.
+The screenshot test opts into software compositing (`--disable-gpu`) in its own
+private Chrome. The same bitmap and geometry intermittently produced two drawings
+under automatic compositing; the capture record documents that investigation and
+the rejected alternatives. This option applies to this test, not the application
+or the other private-browser callers.
 
-The profile requires the recorded platform/architecture/OS family. OS patch and
+All ten reviewed images repeated exactly across five fresh browsers on each of
+the local and hosted Macs:100 captures. Eight images also match between machines.
+The explicitly selected `github-macos26` profile supplies two reviewed variants
+for the native numeric-input inset. Source, environment, flags, hashes and
+before/after pixel counts are recorded in `design/screens/renderer-profiles.json`
+and `design/screens/SOFTWARE_RENDERER_REVIEW_2026-11-10.json`. Every pixel is still
+compared exactly, with no masks or tolerance. A one-pixel mutation verifies that
+the check detects an actual rendered change.
+
+The profile requires the recorded platform/architecture/OS family and render mode. OS patch and
 Chrome updates are logged, then checked against the same exact pixels: a changed
 version string alone does not change the expected image. A changed rendering
 fails until explicitly reviewed. There is no automatic choice of a passing
 baseline and the test job never regenerates its expected files.
+Software-rendered Chrome pictures do not establish graphics-driver or packaged
+WebKit correctness; those remain separate acceptance boundaries.
 
 To propose updated references, manually run **Capture visual reference for
 review** in Actions on the intended branch. It creates deterministic candidate

@@ -34,7 +34,7 @@ try {
     const start = Date.now();
     const tick = () => {
       if (window.__SAMPLE_DIALOG_CLOSED && !document.getElementById('sample-settings').open && document.activeElement?.dataset.wcDialog === 'sample-settings') return resolve(true);
-      if (Date.now() - start > 5000) return reject(new Error('Escape must close Properties and restore focus to its opener; active=' + document.activeElement?.outerHTML));
+      if (Date.now() - start > 5000) return reject(new Error('Escape must close Properties and restore focus to its opener; active=' + document.activeElement?.tagName + '#' + document.activeElement?.id));
       setTimeout(tick, 25);
     }; tick();
   })`);

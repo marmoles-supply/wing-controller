@@ -247,10 +247,10 @@ identify compatibility and grant no affiliation or endorsement.
 <details>
 <summary>Set up the source, run checks and find your way around the repository</summary>
 
-Use an Apple Silicon Mac with Xcode Command Line Tools, Node.js **20.19 or later**
-with npm, Rust/Cargo and Poppler (`pdftotext`). Chrome is needed for the complete
-verification gate. Initial checks use Rust 1.98.1 and Node 26.8.2; this does not
-establish that every earlier combination works.
+Use an Apple Silicon Mac with Xcode Command Line Tools, Node.js **26.8.2** with
+npm, Rust/Cargo **1.98.1** and Poppler (`pdftotext`). Chrome is needed for the
+complete verification gate. These are the measured development/CI versions;
+compatibility with earlier versions has not been established.
 
 ```sh
 git clone https://github.com/marmoles-supply/wing-controller.git

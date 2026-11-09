@@ -51,6 +51,7 @@ const steps = 'scripts/lib/verification-steps.sh';
 const cargo = (packageName, filter) => ['cargo', ['test', '-p', packageName, '--locked', '--quiet', ...(filter ? [filter] : [])]];
 const node = name => [process.execPath, [`scripts/${name}`]];
 const suite = node('test-desktop-library-lock-browser.mjs');
+const visual = [process.execPath, ['scripts/test-design-screens.mjs', '--only', 'index']];
 const soakTest = ['cargo', ['test', '-p', 'wing-controller-desktop', '--locked', '--quiet',
   'tests::a_runtime_soak_keeps_every_action_bounded_and_reports_its_latency', '--', '--ignored', '--exact']];
 const cases = [
@@ -75,6 +76,12 @@ const cases = [
     test: suite, evidence: /LOCKED library-new:/ },
   { name: 'disabled Save guard', file: ui, before: 'if (liveLockBlocks("saving the draft")) return false;', after: 'if (false && liveLockBlocks("saving the draft")) return false;',
     test: suite, evidence: /LOCKED library-save-current:/ },
+  { name: 'discarded bridge startup state', file: 'desktop/ui/meters.html',
+    before: '          applyBackendStreamState(snapshot);', after: '          // Mutation probe: discard the queried backend state.',
+    test: node('test-desktop-meter-bridge-status-browser.mjs'), evidence: /the answer's session must be adopted/ },
+  { name: 'one changed screenshot pixel', file: ui, before: '</body>',
+    after: '<div style="position:fixed;left:0;top:0;width:1px;height:1px;background:#ff0000;z-index:2147483647;pointer-events:none"></div></body>',
+    test: visual, evidence: /1 of 1600000 pixels differ/ },
   { name: 'erased failure on browser restart', file: steps, before: '    if ! start_chrome; then', after: '    FAILED=()\n    if ! start_chrome; then',
     test: node('test-verification-gate.mjs'), evidence: /AssertionError/ },
   { name: 'panicking soak worker', file: main,
@@ -94,7 +101,8 @@ try {
   browser = await startPrivateBrowser();
   env.WING_CHROME_PORT = String(browser.port);
   for (const [command, args] of [cargo('wing-runtime'), cargo('wing-controller-desktop', 'a_failed_'),
-    node('test-desktop-command-registry.mjs'), node('test-verification-gate.mjs'), suite, soakTest]) {
+    node('test-desktop-command-registry.mjs'), node('test-verification-gate.mjs'),
+    node('test-desktop-meter-bridge-status-browser.mjs'), suite, visual, soakTest]) {
     const result = await run(command, args);
     assert.equal(result.timedOut, false, 'baseline timed out: nothing established');
     assert.equal(result.code, 0, `baseline failed: ${result.output}`);

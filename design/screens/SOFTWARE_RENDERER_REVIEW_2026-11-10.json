@@ -1,0 +1,443 @@
+{
+  "sourceRevision": "c03deee5d666c4d42cd5483ba859f5d27fec0750",
+  "workflowRevision": "9cc4f4342282383249ddaf12cb042337273d9096",
+  "captureRun": "https://github.com/marmoles-supply/wing-controller/actions/runs/42719049204",
+  "flags": [
+    "--disable-gpu"
+  ],
+  "freshBrowserRepeatsPerMachine": 5,
+  "totalImages": 100,
+  "scope": "Exact screenshot test only. Application rendering and other private-browser callers unchanged.",
+  "images": {
+    "guide-dark.png": {
+      "oldAutomaticHash": "c05ce03161ff9df5123420b0c2133cc096c386084e7113be3268a25477a5c527",
+      "softwareLocalHash": "62362e2c6da964b39545a413ea95b33c26af85d1f249947752110eceddaf874d",
+      "softwareHostedHash": "62362e2c6da964b39545a413ea95b33c26af85d1f249947752110eceddaf874d",
+      "automaticToSoftware": {
+        "pixels": 72076,
+        "bounds": {
+          "x": 8,
+          "y": 8,
+          "width": 1584,
+          "height": 984
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "72076 of 1600000 pixels differ (4.505%), in the region x 8..1591, y 8..991 (1584x984)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "guide-light.png": {
+      "oldAutomaticHash": "d2a27315efaa10236f082c1d70569b0310181e67f045fb7d364855196b893f57",
+      "softwareLocalHash": "9cbfe2824df23740571be0728ff7f66924600cf118ec08fe0f5c19f4e2330a73",
+      "softwareHostedHash": "9cbfe2824df23740571be0728ff7f66924600cf118ec08fe0f5c19f4e2330a73",
+      "automaticToSoftware": {
+        "pixels": 4087,
+        "bounds": {
+          "x": 15,
+          "y": 8,
+          "width": 1577,
+          "height": 980
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "4087 of 1600000 pixels differ (0.255%), in the region x 15..1591, y 8..987 (1577x980)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "index-dark.png": {
+      "oldAutomaticHash": "9caa9a0166367aef74d445c7e41b97aec1cf6c0b518c1c4e59737b6f92f60ff3",
+      "softwareLocalHash": "c61b573cf7474695c8c29de5d21798ac8dcb24fee153124ff09f3dee5c90148f",
+      "softwareHostedHash": "c61b573cf7474695c8c29de5d21798ac8dcb24fee153124ff09f3dee5c90148f",
+      "automaticToSoftware": {
+        "pixels": 132149,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1600,
+          "height": 1000
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "132149 of 1600000 pixels differ (8.259%), in the region x 0..1599, y 0..999 (1600x1000)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "index-light.png": {
+      "oldAutomaticHash": "b5e09fb12936305e477b97e85d0cad1a13088bf858605df2899316831172f5dd",
+      "softwareLocalHash": "115555dfcccbfdf71842ab99efa10436d3bb1636b7be2cfae86d2c8c64f10b8c",
+      "softwareHostedHash": "115555dfcccbfdf71842ab99efa10436d3bb1636b7be2cfae86d2c8c64f10b8c",
+      "automaticToSoftware": {
+        "pixels": 36020,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1600,
+          "height": 993
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "36020 of 1600000 pixels differ (2.251%), in the region x 0..1599, y 0..992 (1600x993)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "ltc-dark.png": {
+      "oldAutomaticHash": "4c2d4483ba8e35be24cd5e7e55d7654aba952200f8d8daada50a2607eebae4cd",
+      "softwareLocalHash": "fc3f60dee845392f10ff2472fee8b844a2c93ad6ec694d16016a6ffa026663ae",
+      "softwareHostedHash": "e98d0f234de5cd469487378a7877b77afdabf216db66bdb5b6ab1803356c51a8",
+      "automaticToSoftware": {
+        "pixels": 28899,
+        "bounds": {
+          "x": 8,
+          "y": 8,
+          "width": 1584,
+          "height": 984
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "28899 of 1600000 pixels differ (1.806%), in the region x 8..1591, y 8..991 (1584x984)"
+      },
+      "localToHosted": {
+        "pixels": 42,
+        "bounds": {
+          "x": 93,
+          "y": 198,
+          "width": 9,
+          "height": 7
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "42 of 1600000 pixels differ (0.003%), in the region x 93..101, y 198..204 (9x7)"
+      }
+    },
+    "ltc-light.png": {
+      "oldAutomaticHash": "6f217d6c9058396b703f86a7a0b071c106ffd960390fa30e60f64cee343ee47d",
+      "softwareLocalHash": "60ca776ce6edeecfb5c3e3bcfdc8f576fb162cd88dcaaf817e7e1f1d23f95666",
+      "softwareHostedHash": "e7269f0fd3da2d0ba392baa1ad0226c56d4b96ef0472dae674c15fbaedf16657",
+      "automaticToSoftware": {
+        "pixels": 5841,
+        "bounds": {
+          "x": 17,
+          "y": 8,
+          "width": 1575,
+          "height": 976
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "5841 of 1600000 pixels differ (0.365%), in the region x 17..1591, y 8..983 (1575x976)"
+      },
+      "localToHosted": {
+        "pixels": 42,
+        "bounds": {
+          "x": 93,
+          "y": 198,
+          "width": 9,
+          "height": 7
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "42 of 1600000 pixels differ (0.003%), in the region x 93..101, y 198..204 (9x7)"
+      }
+    },
+    "meters-dark.png": {
+      "oldAutomaticHash": "37a6ce325b575358db65d0cf5ea3a283578d0ab194b874a9a49ebc87313d7c56",
+      "softwareLocalHash": "e95dcaac6ce6e2664417bd4644545de9975af879686488b78d7d5f3cb3edd91f",
+      "softwareHostedHash": "e95dcaac6ce6e2664417bd4644545de9975af879686488b78d7d5f3cb3edd91f",
+      "automaticToSoftware": {
+        "pixels": 21285,
+        "bounds": {
+          "x": 8,
+          "y": 8,
+          "width": 1584,
+          "height": 984
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "21285 of 1600000 pixels differ (1.330%), in the region x 8..1591, y 8..991 (1584x984)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "meters-light.png": {
+      "oldAutomaticHash": "81390c038c30757bf5c98485ad50d660b46ecc1f6dc84ace1f4bb8f3c938dcb9",
+      "softwareLocalHash": "ea40c9b0c05cafd41b18a2055ba1b9f034eacd3cfe200e5cc090dfc40239680d",
+      "softwareHostedHash": "ea40c9b0c05cafd41b18a2055ba1b9f034eacd3cfe200e5cc090dfc40239680d",
+      "automaticToSoftware": {
+        "pixels": 5242,
+        "bounds": {
+          "x": 15,
+          "y": 8,
+          "width": 1577,
+          "height": 978
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "5242 of 1600000 pixels differ (0.328%), in the region x 15..1591, y 8..985 (1577x978)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "timecode-dark.png": {
+      "oldAutomaticHash": "e1a5874536d2d6e036b1a67eb97b19cc7b77d7353e840aeedd82b8d2c142f9eb",
+      "softwareLocalHash": "e3397f84fe68a89e2ba41e8b6af303466ef100c4275440d10b3c609bbca48e32",
+      "softwareHostedHash": "e3397f84fe68a89e2ba41e8b6af303466ef100c4275440d10b3c609bbca48e32",
+      "automaticToSoftware": {
+        "pixels": 9669,
+        "bounds": {
+          "x": 6,
+          "y": 6,
+          "width": 1588,
+          "height": 987
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "9669 of 1600000 pixels differ (0.604%), in the region x 6..1593, y 6..992 (1588x987)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    },
+    "timecode-light.png": {
+      "oldAutomaticHash": "66f2401c653b72955679af3fbb59428ac5ba2ca4046866bf113eab31605e112f",
+      "softwareLocalHash": "38067f73f4c150b0d0aee264a0d67105d38d63a6db08b1667d01ca27836d9530",
+      "softwareHostedHash": "38067f73f4c150b0d0aee264a0d67105d38d63a6db08b1667d01ca27836d9530",
+      "automaticToSoftware": {
+        "pixels": 1145,
+        "bounds": {
+          "x": 6,
+          "y": 6,
+          "width": 1588,
+          "height": 988
+        },
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "1145 of 1600000 pixels differ (0.072%), in the region x 6..1593, y 6..993 (1588x988)"
+      },
+      "localToHosted": {
+        "pixels": 0,
+        "bounds": null,
+        "wholeImage": false,
+        "sizes": [
+          [
+            1600,
+            1000
+          ],
+          [
+            1600,
+            1000
+          ]
+        ],
+        "sentence": "no pixel differs"
+      }
+    }
+  }
+}

@@ -2,24 +2,39 @@
   "schemaVersion": 1,
   "profiles": {
     "github-macos26": {
-      "captureRun": "https://github.com/marmoles-supply/wing-controller/actions/runs/42705465503",
-      "captureSourceRevision": "2faa3d529ed0055c502a3547ff91f835df6830dc",
-      "review": "Same application UI bytes. Six captures byte-identical; four differ only in the filtered meter logo and native number-input inset. Reviewed without masks or tolerance.",
+      "captureRun": "https://github.com/marmoles-supply/wing-controller/actions/runs/42719049204",
+      "captureSourceRevision": "c03deee5d666c4d42cd5483ba859f5d27fec0750",
+      "captureWorkflowRevision": "9cc4f4342282383249ddaf12cb042337273d9096",
+      "flags": [
+        "--disable-gpu"
+      ],
+      "freshBrowserRepeats": 5,
+      "review": "Software compositing: all ten images repeat exactly across five fresh browsers on each machine. Eight images also match between machines; two native number-input variants are reviewed separately. No masks or tolerance.",
       "images": {
-        "meters-light.png": "68e308feccc3c9ce53fc4215888c1d34e524e7319efbe85cbdb922f55d9012c8",
-        "meters-dark.png": "d28b2c045c0e755f2362c415b34bffe45be5cd3105e73a4991dcb9576e49fd4a",
-        "ltc-light.png": "06405acc5b219ab19dc9a9a6262ce48e1bb77b27f875778e7227199d097b9a47",
-        "ltc-dark.png": "2b49e20a5a4837a52dd12c6d7c8c0e8c81cdb26cc23d1adddfc3368f209c0e38"
+        "ltc-dark.png": "e98d0f234de5cd469487378a7877b77afdabf216db66bdb5b6ab1803356c51a8",
+        "ltc-light.png": "e7269f0fd3da2d0ba392baa1ad0226c56d4b96ef0472dae674c15fbaedf16657"
       },
       "target": {
         "platform": "darwin",
         "arch": "arm64",
-        "osMajor": "26"
+        "osMajor": "26",
+        "renderMode": "software-compositor"
       },
       "capturedOn": {
         "osVersion": "26.7.2",
         "chromeVersion": "156.0.8078.80"
       }
     }
+  },
+  "localReference": {
+    "captureSourceRevision": "c03deee5d666c4d42cd5483ba859f5d27fec0750",
+    "flags": [
+      "--disable-gpu"
+    ],
+    "capturedOn": {
+      "osVersion": "26.6.2",
+      "chromeVersion": "157.0.8103.40"
+    },
+    "freshBrowserRepeats": 5
   }
 }

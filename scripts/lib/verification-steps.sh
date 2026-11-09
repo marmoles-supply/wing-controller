@@ -28,7 +28,7 @@ step() {
   else
     printf 'FAIL (%ss)\n' "$((SECONDS - started))"
     FAILED+=("$label")
-    # The head carries the failing addresses; the tail used to be all the operator saw (S9).
+    # Retain the context and final assertion; verbose render logs can put either at the end.
     show_failure_output "$output"
     save_step_output "$label" "$output"
     return 1
@@ -41,18 +41,27 @@ note_from_output() {
   echo "$output" | grep -iE 'skipp|unverified|not build-verified|not landed|no chrome|not checked|no browser|[1-9][0-9]* ignored' | head -n 5 | sed 's/^/    note: /' || true
 }
 
-# A failure's first lines, in full in a log file, because a suite prints its failures before its summary.
+# Keep both ends: assertions can follow a verbose successful setup/capture listing.
+# Read the complete stream so truncating diagnostics cannot cause a producer SIGPIPE.
 show_failure_output() {
   local output="$1"
   local log_file
   log_file="$(mktemp -t wing-gate-failure)" || log_file=""
   if [ -n "$log_file" ]; then
     printf '%s\n' "$output" >"$log_file"
-    echo "$output" | head -n 24 | sed 's/^/    /'
-    echo "    (full output: $log_file)"
-  else
-    echo "$output" | head -n 24 | sed 's/^/    /'
   fi
+  printf '%s\n' "$output" | awk '
+    { lines[NR] = $0 }
+    END {
+      if (NR <= 36) {
+        for (i = 1; i <= NR; i++) print "    " lines[i]
+      } else {
+        for (i = 1; i <= 12; i++) print "    " lines[i]
+        printf "    ... %d diagnostic lines omitted ...\n", NR - 36
+        for (i = NR - 23; i <= NR; i++) print "    " lines[i]
+      }
+    }'
+  if [ -n "$log_file" ]; then echo "    (full output: $log_file)"; fi
 }
 
 # A browser test that hangs (a native dialog waiting for input, a moved element) must fail the

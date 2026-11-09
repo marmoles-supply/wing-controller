@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "31901449ef8ab2763c4f9d5630587277669f2454",
+  "sourceRevision": "264c66098f6cc1db3655b91a35c3e66509cc3b18",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -1137,79 +1137,74 @@
       "sha256": "33bdc898c455f6015773d2b60f69ae0c9240b7ef20c3ee7dd1844198425677f6"
     },
     {
+      "path": "design/screens/SOFTWARE_RENDERER_REVIEW_2026-11-10.json",
+      "bytes": 11550,
+      "sha256": "6a0e218b5e0a28637b8750c22218d7bd5c35b7a4ec94cf4e9b37bb8504f98d07"
+    },
+    {
       "path": "design/screens/github-macos26/ltc-dark.png",
-      "bytes": 56286,
-      "sha256": "2b49e20a5a4837a52dd12c6d7c8c0e8c81cdb26cc23d1adddfc3368f209c0e38"
+      "bytes": 57084,
+      "sha256": "e98d0f234de5cd469487378a7877b77afdabf216db66bdb5b6ab1803356c51a8"
     },
     {
       "path": "design/screens/github-macos26/ltc-light.png",
-      "bytes": 52097,
-      "sha256": "06405acc5b219ab19dc9a9a6262ce48e1bb77b27f875778e7227199d097b9a47"
-    },
-    {
-      "path": "design/screens/github-macos26/meters-dark.png",
-      "bytes": 53009,
-      "sha256": "d28b2c045c0e755f2362c415b34bffe45be5cd3105e73a4991dcb9576e49fd4a"
-    },
-    {
-      "path": "design/screens/github-macos26/meters-light.png",
-      "bytes": 47723,
-      "sha256": "68e308feccc3c9ce53fc4215888c1d34e524e7319efbe85cbdb922f55d9012c8"
+      "bytes": 52167,
+      "sha256": "e7269f0fd3da2d0ba392baa1ad0226c56d4b96ef0472dae674c15fbaedf16657"
     },
     {
       "path": "design/screens/guide-dark.png",
-      "bytes": 249659,
-      "sha256": "c05ce03161ff9df5123420b0c2133cc096c386084e7113be3268a25477a5c527"
+      "bytes": 253846,
+      "sha256": "62362e2c6da964b39545a413ea95b33c26af85d1f249947752110eceddaf874d"
     },
     {
       "path": "design/screens/guide-light.png",
-      "bytes": 217202,
-      "sha256": "d2a27315efaa10236f082c1d70569b0310181e67f045fb7d364855196b893f57"
+      "bytes": 217991,
+      "sha256": "9cbfe2824df23740571be0728ff7f66924600cf118ec08fe0f5c19f4e2330a73"
     },
     {
       "path": "design/screens/index-dark.png",
-      "bytes": 225579,
-      "sha256": "9caa9a0166367aef74d445c7e41b97aec1cf6c0b518c1c4e59737b6f92f60ff3"
+      "bytes": 228253,
+      "sha256": "c61b573cf7474695c8c29de5d21798ac8dcb24fee153124ff09f3dee5c90148f"
     },
     {
       "path": "design/screens/index-light.png",
-      "bytes": 210157,
-      "sha256": "b5e09fb12936305e477b97e85d0cad1a13088bf858605df2899316831172f5dd"
+      "bytes": 209799,
+      "sha256": "115555dfcccbfdf71842ab99efa10436d3bb1636b7be2cfae86d2c8c64f10b8c"
     },
     {
       "path": "design/screens/ltc-dark.png",
-      "bytes": 56285,
-      "sha256": "4c2d4483ba8e35be24cd5e7e55d7654aba952200f8d8daada50a2607eebae4cd"
+      "bytes": 57084,
+      "sha256": "fc3f60dee845392f10ff2472fee8b844a2c93ad6ec694d16016a6ffa026663ae"
     },
     {
       "path": "design/screens/ltc-light.png",
-      "bytes": 52097,
-      "sha256": "6f217d6c9058396b703f86a7a0b071c106ffd960390fa30e60f64cee343ee47d"
+      "bytes": 52166,
+      "sha256": "60ca776ce6edeecfb5c3e3bcfdc8f576fb162cd88dcaaf817e7e1f1d23f95666"
     },
     {
       "path": "design/screens/meters-dark.png",
-      "bytes": 53014,
-      "sha256": "37a6ce325b575358db65d0cf5ea3a283578d0ab194b874a9a49ebc87313d7c56"
+      "bytes": 53859,
+      "sha256": "e95dcaac6ce6e2664417bd4644545de9975af879686488b78d7d5f3cb3edd91f"
     },
     {
       "path": "design/screens/meters-light.png",
-      "bytes": 47727,
-      "sha256": "81390c038c30757bf5c98485ad50d660b46ecc1f6dc84ace1f4bb8f3c938dcb9"
+      "bytes": 47869,
+      "sha256": "ea40c9b0c05cafd41b18a2055ba1b9f034eacd3cfe200e5cc090dfc40239680d"
     },
     {
       "path": "design/screens/renderer-profiles.json",
-      "bytes": 1047,
-      "sha256": "3309aebc2445543b255015765fd6e36a2db97e32fca623b402081a3beb8dcc4e"
+      "bytes": 1379,
+      "sha256": "fbc113e676cfb6a4f74b10b69e3708a68f411307ca42bd47d414b4dde4507e56"
     },
     {
       "path": "design/screens/timecode-dark.png",
-      "bytes": 32471,
-      "sha256": "e1a5874536d2d6e036b1a67eb97b19cc7b77d7353e840aeedd82b8d2c142f9eb"
+      "bytes": 32593,
+      "sha256": "e3397f84fe68a89e2ba41e8b6af303466ef100c4275440d10b3c609bbca48e32"
     },
     {
       "path": "design/screens/timecode-light.png",
-      "bytes": 30711,
-      "sha256": "66f2401c653b72955679af3fbb59428ac5ba2ca4046866bf113eab31605e112f"
+      "bytes": 30662,
+      "sha256": "38067f73f4c150b0d0aee264a0d67105d38d63a6db08b1667d01ca27836d9530"
     },
     {
       "path": "design/specimen.html",
@@ -2463,13 +2458,13 @@
     },
     {
       "path": "scripts/lib/design-renderer-profiles.mjs",
-      "bytes": 1044,
-      "sha256": "87f5e92343a6dd1d114bf55c71c654a4e19b86d812ae28e13beaae1fcdd06788"
+      "bytes": 1058,
+      "sha256": "8acde3fcd35dc548691ba6a268f6dec7fe1924b0e0cda80c7150b42d19a5c134"
     },
     {
       "path": "scripts/lib/design-screens.mjs",
-      "bytes": 33371,
-      "sha256": "76f5170d0b4bbde20339258da089cfc48af71fe70c68e5224cca881e72b03e00"
+      "bytes": 34298,
+      "sha256": "fa796a8e2b04e4e0564e094b46dadf19447c7c9ca53c494e4090e02dd170acf5"
     },
     {
       "path": "scripts/lib/design-tokens.mjs",
@@ -2513,8 +2508,8 @@
     },
     {
       "path": "scripts/lib/verification-steps.sh",
-      "bytes": 6135,
-      "sha256": "7360967b0f2aa6388dfaf692a39cd6e88e637884f605b65ac729650818cdb18f"
+      "bytes": 6483,
+      "sha256": "0b0c63540fc83c3ba00535e4e0b259b60b659d58f7c379fa694f9b732d608160"
     },
     {
       "path": "scripts/licence-keygen.mjs",
@@ -2528,8 +2523,8 @@
     },
     {
       "path": "scripts/mutation-check-ci.mjs",
-      "bytes": 9318,
-      "sha256": "6cf3aec90a72a81babfcae22d0d8a9f7aeb83ede2bbdfa7ec494c5f667c45611"
+      "bytes": 10080,
+      "sha256": "0abe63e190129ea78dd59f2ab79a7d4c0499a8eb579e73227572935afb276180"
     },
     {
       "path": "scripts/mutation-check-courtesy-notice.mjs",
@@ -2748,13 +2743,13 @@
     },
     {
       "path": "scripts/test-design-renderer-profiles.mjs",
-      "bytes": 2092,
-      "sha256": "ddb8a6f81c038d12813dd7100c1fb605d95c83d387ba7ec2b4ae27bd7a1bf461"
+      "bytes": 2160,
+      "sha256": "f9feb507d41f261139e8d03fa4b8f0ac3d92f81a62cc0429862d3c63912d2f91"
     },
     {
       "path": "scripts/test-design-screens.mjs",
-      "bytes": 15972,
-      "sha256": "b510af66acc6fa3cbac9ab9089fe96439f93fb322775edfade7c819853dd7840"
+      "bytes": 16106,
+      "sha256": "d32e28fd952a6acf076cf89cb217efd71e77ba4be6bee9aabe4ef32f71b31783"
     },
     {
       "path": "scripts/test-design-surfaces.mjs",
@@ -2778,8 +2773,8 @@
     },
     {
       "path": "scripts/test-design-workstation-browser.mjs",
-      "bytes": 7308,
-      "sha256": "86d91536e050106fc009f6c5204ca169540c741b6d165772adaa8a5d6d608f38"
+      "bytes": 7341,
+      "sha256": "6ae3a4f6b08c9a1e1193ec6b7e80c2db90955d3c2160fdb20c5d10f3670ec805"
     },
     {
       "path": "scripts/test-desktop-action-target-browser.mjs",
@@ -2973,8 +2968,8 @@
     },
     {
       "path": "scripts/test-desktop-meter-bridge-status-browser.mjs",
-      "bytes": 37071,
-      "sha256": "32c95e82f04202fa83c5c7ef0b45b57a314d4c804c7f17e8d3693b043589695e"
+      "bytes": 37537,
+      "sha256": "5ad0f9630affbecbc49c80d77033515248ede3292159f98a5c76ed73e4e7fb30"
     },
     {
       "path": "scripts/test-desktop-meter-bridge-ui.mjs",
@@ -3093,8 +3088,8 @@
     },
     {
       "path": "scripts/test-verification-gate.mjs",
-      "bytes": 3341,
-      "sha256": "3e2020699ddf40a1671c5171301ee3b7ebed2bcba314e1f1435f31ae562b1dea"
+      "bytes": 3797,
+      "sha256": "476a7b6a0954b7abccbf81d3d2b2138b1f426e0829c301aeb869cad683c1683f"
     },
     {
       "path": "scripts/test-x32-protocol.mjs",
@@ -3363,8 +3358,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17931,
-      "sha256": "94be9ad29e73d60c4be0c3f4cf41bc7c7abd54da7694d1538140d6867db69b1b"
+      "bytes": 17934,
+      "sha256": "473e4cb4e455e243f15dde2c6468c869bdb252ed3a04227450935b50ea2aed38"
     },
     {
       "path": "README.es.md",
@@ -3448,28 +3443,28 @@
     },
     {
       "path": "docs/VALIDATION.md",
-      "bytes": 3057,
-      "sha256": "49f7393e1cc325209d573a5a5512bc2a36942c49a13a1eb34fee6b81eb39c8e8"
+      "bytes": 3422,
+      "sha256": "e17bd732a80d882c63bd76b0cbd615182b243f328bc197b37326a21bb73b5db6"
     },
     {
       "path": "docs/TESTING.md",
-      "bytes": 6194,
-      "sha256": "b1ffb3084cd826fefac73d11b83e43f949e856a87124c88bd5172690e5b24dbd"
+      "bytes": 8339,
+      "sha256": "590b8e2fffdba767cfe0285de05d742e9939dcd6984c55e6fc5032cf1b4ee305"
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 13867,
-      "sha256": "9f5a5127ee995667ac1699ff1271fa3f019601e28f5382d8a6f296a13d84f73c"
+      "bytes": 20809,
+      "sha256": "d4e1c90e2a0fdbe64de5d2974a7a553a44a6462529604b37e471df817e3696d5"
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 9437,
-      "sha256": "685aa78248978c13e19b18f36ad550ded422e9146d937b67b2c6637c56dff5cc"
+      "bytes": 9440,
+      "sha256": "27ff506b1572677ae3942f12552c4ebb47358124f0da0f62cc9b84ada890921e"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
-      "bytes": 11918,
-      "sha256": "2a48cb2c49c3a1fdf2d45df8d2a2745e0eca0873a2d588d8d32945b1b729ae68"
+      "bytes": 12061,
+      "sha256": "b3c8ea33c8c8674c5a6042b9acbad0f845d12892aef606eac10aa4c3211c2cde"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -3483,8 +3478,8 @@
     },
     {
       "path": "docs/RELEASE_VALIDATION_0.3.0.md",
-      "bytes": 3949,
-      "sha256": "1a98efa07e7ac76ff3612e9c38d5859e519c38557cb2a85632be62b6de527194"
+      "bytes": 4150,
+      "sha256": "e262db95f5ac26b29eb125637624aec8e03734e1333cd83784e6caf7a8034871"
     },
     {
       "path": ".gitignore",
@@ -3559,13 +3554,13 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "0caadb4f7fd5f3925c9e1932695f4cec4864b0b16e224e7d2e1096e94a0d4651"
+      "sha256": "2479c8a17c1d29bf042066fa6fe11a877c937a530c3049b0f6e193a8498d68fe"
     }
   ],
-  "bytes": 25171846,
+  "bytes": 25106094,
   "excludedTrackedPaths": 1111,
   "potentialSecrets": 0,
-  "reviewFindings": 287,
+  "reviewFindings": 285,
   "transformations": [
     {
       "file": "crates/wing-core/src/lib.rs",

@@ -14,7 +14,7 @@
 // A third finding — the reconnection interval sawtoothing backwards because each tick recomputed it from
 // a fresh timestamp — is pinned here too: the wait since the drop only ever grows.
 //
-// Needs Chrome on the debug port (the gate starts one); without it the test says so and passes.
+// Needs Chrome on the debug port (the gate starts one); absence exits 3, never a pass.
 //
 // Run: node scripts/test-desktop-meter-bridge-status-browser.mjs
 import { execFileSync } from 'node:child_process';
@@ -81,6 +81,12 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
+let backendSnapshot = {
+  state: 'idle', message: '', sessionActive: false, sessionId: 0,
+  deskModel: null, deskModelKnown: false, liveSafeMode: false,
+  health: null, meterSources: [], metersWindowOpen: true, lastAlert: null,
+};
+let backendRevision = 0;
 
 // The window's own listeners are kept, not discarded: the contracts drive the real event path — the
 // `usb-meter-stream-status` events the Rust side emits — instead of the rendering function alone. The
@@ -107,23 +113,10 @@ const STUB = `
   window.__wingMonitors = [
     { name: 'Main', position: { x: 0, y: 0 }, size: { width: 1440, height: 900 } },
   ];
-  // The answer of get_stream_state: a snapshot a test sets, and the record of every call the window
-  // made with the announcement that follows it. The bridge asks once at boot and must ask *before* it
-  // tells the dock it is ready. The answer is kept in sessionStorage as well because the stub is
-  // injected again on every navigation — a real backend keeps its state across a window reload, and a
-  // seeded variable alone would be wiped by the reload the test uses to exercise it.
-  window.__wingStreamStateAnswer = (() => {
-    try {
-      const kept = JSON.parse(sessionStorage.getItem('__wingTestStateAnswer') || '');
-      if (kept && typeof kept === 'object') return kept;
-    } catch (_) {}
-    return {
-      state: 'idle', message: '', sessionActive: false, sessionId: 0,
-      deskModel: null, deskModelKnown: false, liveSafeMode: false,
-      health: null, meterSources: [], metersWindowOpen: true, lastAlert: null,
-    };
-  })();
+  // The Node fixture injects the selected backend answer below, before application scripts run.
+  // Backend state belongs outside the reloaded document; file:// storage is not the backend.
   window.__wingStateCalls = [];
+  window.__wingStateReplies = [];
   window.__wingReadyWrites = [];
   window.__wingBridgeBooted = false;
   const originalSetItem = Storage.prototype.setItem;
@@ -136,7 +129,10 @@ const STUB = `
       invoke: async (command) => {
         if (command === 'get_stream_state') {
           window.__wingStateCalls.push(Date.now());
-          return JSON.parse(JSON.stringify(window.__wingStreamStateAnswer));
+          const snapshot = JSON.parse(JSON.stringify(window.__wingStreamStateAnswer));
+          window.__wingStateReplies.push({ revision: window.__wingBackendRevision,
+            snapshot: JSON.parse(JSON.stringify(snapshot)) });
+          return snapshot;
         }
         return {};
       },
@@ -167,10 +163,14 @@ const STUB = `
     },
   };
 `;
+const fixtureSource = () => `${STUB}
+  window.__wingStreamStateAnswer = ${JSON.stringify(backendSnapshot)};
+  window.__wingBackendRevision = ${backendRevision};
+`;
 
 await call('Page.enable');
 await call('Page.bringToFront');
-await call('Page.addScriptToEvaluateOnNewDocument', { source: STUB });
+let preload = await call('Page.addScriptToEvaluateOnNewDocument', { source: fixtureSource() });
 await call('Page.navigate', { url: BRIDGE });
 // Boot completion and a fresh document are independent of the state value under test.
 // A fixed delay could sample the old, already-booted idle document after Page.reload.
@@ -199,19 +199,28 @@ async function waitForBridgeBoot(previousToken = null) {
 }
 async function reloadBridge() {
   const previousToken = await evaluate('window.__wingTestDocument');
+  await call('Page.removeScriptToEvaluateOnNewDocument', { identifier: preload.identifier });
+  preload = await call('Page.addScriptToEvaluateOnNewDocument', { source: fixtureSource() });
   await call('Page.reload');
   await waitForBridgeBoot(previousToken);
+  const fixture = await evaluate(`({ revision: window.__wingBackendRevision, replies: window.__wingStateReplies })`);
+  assert(fixture.revision === backendRevision && fixture.replies.length === 1
+    && fixture.replies[0].revision === backendRevision
+    && JSON.stringify(fixture.replies[0].snapshot) === JSON.stringify(backendSnapshot),
+    `the fresh document must receive the selected backend fixture: expected ${JSON.stringify({ revision: backendRevision, snapshot: backendSnapshot })}, got ${JSON.stringify(fixture)}`);
 }
 await waitForBridgeBoot();
 
-// Seeds the answer the backend would give, surviving the reload the contract then performs. The state
-// a window is handed at start-up is a backend fact, not a document one: the stub re-injects on every
-// navigation, so the seeded snapshot is written where the injected script reads it.
-const seedBackendState = (snapshot) => evaluate(`(() => {
-  window.__wingStreamStateAnswer = ${JSON.stringify(snapshot)};
-  sessionStorage.setItem('__wingTestStateAnswer', JSON.stringify(window.__wingStreamStateAnswer));
-  return true;
-})()`);
+// The one authoritative backend fixture survives reload independently of browser storage.
+const seedBackendState = async (snapshot) => {
+  backendSnapshot = structuredClone(snapshot);
+  backendRevision += 1;
+  return evaluate(`(() => {
+    window.__wingStreamStateAnswer = ${JSON.stringify(backendSnapshot)};
+    window.__wingBackendRevision = ${backendRevision};
+    return true;
+  })()`);
+};
 
 
 // The three events the window can see, driven exactly as the Rust side drives them.

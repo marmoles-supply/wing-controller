@@ -48,6 +48,9 @@ GitHub's separately generated source-code downloads are different files.
 
 The source checks reused known npm dependencies and Cargo caches; a fresh
 installation of development dependencies on another machine was not measured.
+The later [test audit](TEST_AUDIT_2026-11-09.md) records fresh hosted dependency
+installation for subsequent source revisions. It does not rebuild or replace
+the binary-release evidence recorded here.
 Regenerable debug compilation cache was removed before the release build for
 disk capacity. Source, prior releases, backups and private history were retained.
 

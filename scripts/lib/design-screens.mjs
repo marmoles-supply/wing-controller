@@ -75,6 +75,13 @@
 // signal about the page. A refusal that repeats every time, or that names a region other than this swatch or a
 // difference larger than one code point, is not this: read it as a change and look at the page.
 //
+// Screenshot-lock follow-up, 2026-11-10: the full-window record now explicitly uses software compositing.
+// The same bitmap and fractional rectangle produced two final drawings in Chrome 156/157. A Canvas2D-only
+// flag failed broader repetition; --disable-gpu repeated all ten images across five fresh browsers on each
+// of two Macs. References were deliberately reviewed/refreshed; the screenshot comparison remains exact.
+// This is an opt-in caller setting, not a change to the normal renderer or the band references above.
+// See publication/TEST_AUDIT_2026-11-09.md D06 (public: docs/TEST_AUDIT_2026-11-09.md).
+//
 // If a future agent wants this genuinely pinned, the honest route is a rendering path whose dither LUT is
 // deterministic (and then, deliberately, a refresh of every band in `design/reference/**` in the same commit), not a
 // looser comparison here.
@@ -185,7 +192,7 @@ export function windowsByName(names) {
 
 /// A Chrome of this module's own. `close()` is idempotent and kills the processes it started **and only those**
 /// (matched by its own profile directory), so a run that dies half-way does not leave a browser holding the port.
-export async function startPrivateBrowser({ port = 0, log = () => {} } = {}) {
+export async function startPrivateBrowser({ port = 0, log = () => {}, softwareCompositing = false } = {}) {
   if (!existsSync(CHROME_BIN)) {
     throw Object.assign(new Error(`no Chrome at ${CHROME_BIN}: install it or set WING_CHROME_BIN`), { code: 'NO_CHROME' });
   }
@@ -193,6 +200,8 @@ export async function startPrivateBrowser({ port = 0, log = () => {} } = {}) {
   const chosen = port || (await freePort());
   const args = [
     '--headless=new',
+    // The exact screenshot lock opts in; mutation/browser/media callers retain their usual renderer.
+    ...(softwareCompositing ? ['--disable-gpu'] : []),
     `--remote-debugging-port=${chosen}`,
     `--user-data-dir=${profile}`,
     `--window-size=${VIEWPORT_WIDTH},${VIEWPORT_HEIGHT}`,
@@ -234,7 +243,7 @@ export async function startPrivateBrowser({ port = 0, log = () => {} } = {}) {
     await rm(profile, { recursive: true, force: true }).catch(() => {});
     throw Object.assign(new Error(`the private Chrome did not answer its debug port (${debug}) within 30 s`), { code: 'NO_BROWSER' });
   }
-  log(`  private Chrome ${version.Browser} on ${debug} (profile ${profile})`);
+  log(`  private Chrome ${version.Browser} on ${debug} (profile ${profile}; ${softwareCompositing ? 'software compositing, --disable-gpu' : 'automatic compositing'})`);
   let closed = false;
   const close = async ({ removeProfile = true } = {}) => {
     if (closed) return;
@@ -245,7 +254,7 @@ export async function startPrivateBrowser({ port = 0, log = () => {} } = {}) {
     await runQuiet('pkill', ['-9', '-f', profile]);
     if (removeProfile) await rm(profile, { recursive: true, force: true }).catch(() => {});
   };
-  return { port: chosen, debug, profile, version, close, child };
+  return { port: chosen, debug, profile, version, close, child, launchArguments: [...args] };
 }
 
 /// Render every requested window in every theme into `outDir`, in a fixed order, returning one entry per image with

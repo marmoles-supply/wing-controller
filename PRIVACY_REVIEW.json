@@ -1,11 +1,11 @@
 {
   "summary": {
-    "sourceRevision": "31901449ef8ab2763c4f9d5630587277669f2454",
-    "files": 712,
-    "bytes": 25171846,
+    "sourceRevision": "264c66098f6cc1db3655b91a35c3e66509cc3b18",
+    "files": 711,
+    "bytes": 25106094,
     "excludedTrackedPaths": 1111,
     "potentialSecrets": 0,
-    "reviewFindings": 287,
+    "reviewFindings": 285,
     "transformations": 6,
     "privateIdentityFragmentsChecked": 1,
     "limits": [
@@ -421,16 +421,6 @@
     },
     {
       "file": "design/screens/github-macos26/ltc-light.png",
-      "kind": "binary-human-review",
-      "severity": "review"
-    },
-    {
-      "file": "design/screens/github-macos26/meters-dark.png",
-      "kind": "binary-human-review",
-      "severity": "review"
-    },
-    {
-      "file": "design/screens/github-macos26/meters-light.png",
       "kind": "binary-human-review",
       "severity": "review"
     },

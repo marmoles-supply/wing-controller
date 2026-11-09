@@ -155,7 +155,7 @@ let results;
 let renderer = { name: 'local', images: {} };
 try {
   try {
-    browser = await startPrivateBrowser({ log: (line) => console.log(line) });
+    browser = await startPrivateBrowser({ softwareCompositing: true, log: (line) => console.log(line) });
   } catch (error) {
     console.error(`design-screens: could not start a private Chrome (${error.code || 'ERROR'}): ${error.message}`);
     process.exit(3);
@@ -163,7 +163,8 @@ try {
     const catalog = profileName === 'local' ? {} : JSON.parse(readFileSync(join(screensDir, 'renderer-profiles.json'), 'utf8'));
     const observed = { platform: process.platform, arch: process.arch,
       osVersion: process.platform === 'darwin' ? execFileSync('sw_vers', ['-productVersion'], { encoding: 'utf8' }).trim() : '',
-      chromeVersion: String(browser.version.Browser).split('/')[1] };
+      chromeVersion: String(browser.version.Browser).split('/')[1],
+      renderMode: browser.launchArguments.includes('--disable-gpu') ? 'software-compositor' : 'automatic' };
     renderer = selectRendererProfile(catalog, profileName, observed);
     console.log(`Visual renderer profile: ${renderer.name}; environment ${JSON.stringify(observed)}`);
     for (const [name, hash] of Object.entries(renderer.images)) {

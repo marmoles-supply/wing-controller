@@ -32,6 +32,11 @@ try {
   run(`step 'successful child' bash -c 'echo actual-output' || exit 10
     [ "$PASSED" -eq 1 ] && [ "\${#FAILED[@]}" -eq 0 ] || exit 11`);
   assert.equal(readFileSync(join(logs, 'successful_child.log'), 'utf8'), 'actual-output\n');
+  const verboseFailure = run(`show_failure_output "$(for ((i=0; i<60; i++)); do echo "diagnostic line $i"; done; echo INTENDED_ASSERTION_AT_END)"`);
+  assert.match(verboseFailure, /diagnostic line 0\n/);
+  assert.match(verboseFailure, /INTENDED_ASSERTION_AT_END/,
+    'a verbose capture listing must not hide the final assertion');
+  assert.doesNotMatch(verboseFailure, /diagnostic line 30\n/, 'console diagnostics stay bounded');
   run(`if step 'failed child' bash -c 'exit 7'; then exit 12; fi
     [ "$PASSED" -eq 0 ] && [ "\${#FAILED[@]}" -eq 1 ] || exit 13`);
   run(`if step_with_timeout 1 'missing seal (Chrome)' bash -c 'echo not-finished'; then exit 14; fi
@@ -55,7 +60,7 @@ try {
     node() { if [ ! -f "$count" ]; then touch "$count"; return 9; fi; echo WING_BROWSER_SUITE_OK; }
     run_browser_suite 'restart succeeds' ignored.mjs || exit 24
     [ "$PASSED" -eq 1 ] && [ "\${#FAILED[@]}" -eq 0 ] || exit 25`);
-  console.log('Gate behaviour: child failures, timeout, final seal, failed/successful restart and full logs verified.');
+  console.log('Gate behaviour: child failures, timeout, final seal, failed/successful restart, bounded failure context and full logs verified.');
 } finally {
   rmSync(logs, { recursive: true, force: true });
 }
