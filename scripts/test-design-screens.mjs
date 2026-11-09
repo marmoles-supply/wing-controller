@@ -66,10 +66,9 @@ const themes = THEMES;
 
 const CHROME_BIN = process.env.WING_CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 if (!existsSync(CHROME_BIN)) {
-  // Not a pass and not a failure: a machine without Chrome cannot produce the record, and this suite is a plain
-  // Node test (it is in the everyday loop), so it says so and leaves the gate green on a machine that cannot render.
+  // No rendering means no verdict. A missing browser must fail the gate, including in quick mode.
   console.log(`design-screens: no Chrome at ${CHROME_BIN}; set WING_CHROME_BIN to run. The visual record was NOT checked.`);
-  process.exit(0);
+  process.exit(3);
 }
 
 /// The retry budget a flaky **rasteriser** is allowed — proved here, before a browser is started, because it is the

@@ -1,9 +1,9 @@
 {
   "summary": {
-    "sourceRevision": "6f2b0079d63fc50b35f3778fc760aff3e1629d31",
-    "files": 696,
-    "bytes": 24899744,
-    "excludedTrackedPaths": 1107,
+    "sourceRevision": "e58a9baf4d54b875b4d1d29849e773acc015632e",
+    "files": 704,
+    "bytes": 24937951,
+    "excludedTrackedPaths": 1110,
     "potentialSecrets": 0,
     "reviewFindings": 283,
     "transformations": 6,
@@ -770,169 +770,169 @@
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15004,
+      "line": 15042,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15005,
+      "line": 15043,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15008,
+      "line": 15046,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15009,
+      "line": 15047,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15035,
+      "line": 15073,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15038,
+      "line": 15076,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15040,
+      "line": 15078,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 16019,
+      "line": 16057,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 16363,
+      "line": 16401,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20844,
+      "line": 20882,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20849,
+      "line": 20887,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20850,
+      "line": 20888,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20853,
+      "line": 20891,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20867,
+      "line": 20905,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 21980,
+      "line": 22018,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 22853,
+      "line": 22891,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23072,
+      "line": 23110,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23076,
+      "line": 23114,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23108,
+      "line": 23146,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23144,
+      "line": 23182,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23258,
+      "line": 23296,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24503,
+      "line": 24541,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24504,
+      "line": 24542,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24505,
+      "line": 24543,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24507,
+      "line": 24545,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24513,
+      "line": 24551,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24513,
+      "line": 24551,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24520,
+      "line": 24558,
       "kind": "lan-address",
       "severity": "review"
     },
@@ -1091,43 +1091,43 @@
     },
     {
       "file": "package-lock.json",
-      "line": 3455,
+      "line": 3457,
       "kind": "email-address",
       "severity": "review"
     },
     {
       "file": "package-lock.json",
-      "line": 11190,
+      "line": 11192,
       "kind": "email-address",
       "severity": "review"
     },
     {
       "file": "package-lock.json",
-      "line": 11531,
+      "line": 11533,
       "kind": "email-address",
       "severity": "review"
     },
     {
       "file": "package-lock.json",
-      "line": 12412,
+      "line": 12414,
       "kind": "email-address",
       "severity": "review"
     },
     {
       "file": "scripts/lib/desktop-ui-harness.mjs",
-      "line": 330,
+      "line": 335,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "scripts/lib/desktop-ui-harness.mjs",
-      "line": 411,
+      "line": 418,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "scripts/lib/desktop-ui-harness.mjs",
-      "line": 412,
+      "line": 419,
       "kind": "lan-address",
       "severity": "review"
     },

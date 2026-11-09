@@ -94,108 +94,7 @@ BROWSER_TESTS_RUN=0
 BROWSER_TESTS_SKIPPED=0
 PASSED=0
 
-step() {
-  local label="$1"
-  shift
-  printf '%-46s' "$label"
-  local started=$SECONDS
-  if output="$("$@" 2>&1)"; then
-    # The seconds are printed because a gate that "takes ages" has to say which step is the age:
-    # the browser suites were 90 % of this one's wall clock, and `--quick` exists because of that.
-    printf 'PASS (%ss)\n' "$((SECONDS - started))"
-    PASSED=$((PASSED + 1))
-    # A step that exits 0 while saying it skipped something is not the same as a step that did the work,
-    # and this line used to throw its output away: nobody ever saw the release-note suite's "skipped N
-    # note(s)" or a suite's "not landed yet" (audit 2026-10-02, S8).
-    note_from_output "$output"
-  else
-    printf 'FAIL (%ss)\n' "$((SECONDS - started))"
-    FAILED+=("$label")
-    # The head carries the failing addresses; the tail used to be all the operator saw (S9).
-    show_failure_output "$output"
-  fi
-}
-
-# Anything a passing step admits it did not check, kept visible next to its PASS.
-note_from_output() {
-  local output="$1"
-  echo "$output" | grep -iE 'skipp|unverified|not build-verified|not landed|no chrome|not checked|no browser' | head -n 5 | sed 's/^/    note: /' || true
-}
-
-# A failure's first lines, in full in a log file, because a suite prints its failures before its summary.
-show_failure_output() {
-  local output="$1"
-  local log_file
-  log_file="$(mktemp -t wing-gate-failure)" || log_file=""
-  if [ -n "$log_file" ]; then
-    printf '%s\n' "$output" >"$log_file"
-    echo "$output" | head -n 24 | sed 's/^/    /'
-    echo "    (full output: $log_file)"
-  else
-    echo "$output" | head -n 24 | sed 's/^/    /'
-  fi
-}
-
-# A browser test that hangs (a native dialog waiting for input, a moved element) must fail the
-# gate instead of blocking the session forever. macOS has no `timeout` by default, and `perl`/`gtimeout`
-# are not assumed to exist either.
-#
-# The deadline is polled in this shell rather than run as a `( sleep N; kill )` watcher subshell. That
-# watcher was the reason a finished gate went on "running" for three more minutes: its `sleep 180` is a
-# child of the script, it survives the kill of its subshell, it holds the write end of whatever pipe the
-# gate was piped into — and `tail`, and the background job, wait for every writer to close. Measured:
-# the steps of a `--quick` run add up to 15 s while the pipeline took 3 m 10 s, with 6 s of CPU. Nothing
-# was slow; the gate was holding itself open.
-step_with_timeout() {
-  local seconds="$1"
-  shift
-  local label="${1:-}"
-  shift
-  printf '%-46s' "$label"
-  local started=$SECONDS
-  local log_file
-  log_file="$(mktemp -t wing-gate-step)"
-  "$@" >"$log_file" 2>&1 &
-  local pid=$!
-  local deadline=$((SECONDS + seconds))
-  while kill -0 "$pid" 2>/dev/null && [ "$SECONDS" -lt "$deadline" ]; do
-    sleep 0.2
-  done
-  local timed_out=0
-  if kill -0 "$pid" 2>/dev/null; then
-    timed_out=1
-    kill -9 "$pid" 2>/dev/null
-  fi
-  wait "$pid"
-  local status=$?
-  local output
-  output="$(cat "$log_file" 2>/dev/null || true)"
-  # A browser suite has to say it finished. An exit status of 0 is not enough: sixteen of them used to
-  # print "SKIP: no Chrome…" and exit 0 when the browser was wedged or absent, and this gate booked that
-  # as PASS — eighteen UI suites reported green having asserted nothing (audit 2026-10-02, S1). Every
-  # suite now ends with this seal; a run that cannot reach it is a run that did not happen.
-  # Only the Chrome suites carry the seal; a plain Node test has nothing to seal and must not be asked
-  # for one. The browser calls all name Chrome in their label (including the retry's).
-  local needs_seal=0
-  case "$label" in *Chrome*) needs_seal=1 ;; esac
-  local sealed=0
-  case "$output" in *WING_BROWSER_SUITE_OK*) sealed=1 ;; esac
-  if [ "$status" -eq 0 ] && { [ "$needs_seal" -eq 0 ] || [ "$sealed" -eq 1 ]; }; then
-    printf 'PASS (%ss)\n' "$((SECONDS - started))"
-    PASSED=$((PASSED + 1))
-    note_from_output "$output"
-    rm -f "$log_file"
-  else
-    if [ "$status" -eq 0 ]; then
-      printf 'FAIL (%ss, exited 0 without finishing)\n' "$((SECONDS - started))"
-    else
-      printf 'FAIL (%ss, exit %s%s)\n' "$((SECONDS - started))" "$status" "$([ "$timed_out" -eq 1 ] && echo ", timed out after ${seconds}s")"
-    fi
-    FAILED+=("$label")
-    show_failure_output "$output"
-  fi
-  return "$status"
-}
+. "$ROOT_DIR/scripts/lib/verification-steps.sh"
 
 # Headless Chrome on this machine wedges after roughly ninety seconds of page activity — its browser
 # process shows the same ObjC class-lookup path as the application's own hang, its DevTools port stops
@@ -203,7 +102,7 @@ step_with_timeout() {
 # hits Chrome"). A browser test that dies with the browser is not a red contract, so the gate notices
 # and runs that test once more on a fresh browser instead of reporting a failure that is not one. A
 # test that fails while the browser is alive is reported as it always was: this only handles death.
-CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+CHROME_BIN="${WING_CHROME_BIN:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 CHROME_PORT=9223
 # Filled in by `start_chrome`, which uses a **fresh** directory every time: a Chrome that was SIGKILLed
 # leaves `SingletonLock` behind, and the next instance pointed at the same directory refuses to start
@@ -287,19 +186,9 @@ for (const file of ["desktop/ui/index.html", "desktop/ui/meters.html", "desktop/
   console.log(`${file} OK`);
 }'
 
-# Every Node test in scripts/ is picked up automatically, so a new test cannot be
-# forgotten. Browser-driven tests need Chrome on the debug port and are skipped with a
-# note when that is not available:
-#   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
-#     --remote-debugging-port=9223 --user-data-dir=/tmp/wing-chrome about:blank
-# One of them drives the real window, so make sure a tab is showing it instead of relying on the
-# operator having opened it by hand. The gate now starts the browser itself when the port is silent and
-# restarts it when a test dies with it, so the UI contract layer cannot be skipped or misreported just
-# because a headless Chrome went away mid-run.
-#
-# `--quick` does not touch the browser at all: on this machine bringing headless Chrome up takes about
-# three minutes when it is wedged (docs/MACOS_HANG_RUNNINGBOARD_2026-09-27.md), and that wait landed on
-# the everyday loop even though every Chrome suite was being skipped. The prologue is the browser's.
+# Discover every test-*.mjs. The full gate requires Chrome and a completion seal from each
+# named browser suite. Quick mode omits those suites explicitly; the design screenshot test
+# still starts its own private browser. Neither mode turns a missing browser into a pass.
 if [ "$QUICK" -eq 0 ]; then
   if ! chrome_alive; then
     start_chrome || true
@@ -338,24 +227,7 @@ for test_file in scripts/test-*.mjs; do
     fi
     BROWSER_TESTS_RUN=$((BROWSER_TESTS_RUN + 1))
     if chrome_alive; then
-      if ! step_with_timeout 180 "Node test: ${name} (Chrome)" node "$test_file"; then
-        # A browser that died under the test is not a verdict: the test is run again on a fresh one, up
-        # to two more times. Only a failure with the browser still alive, or a failure that survives
-        # both restarts, is reported as a failed contract.
-        attempt=0
-        while [ "$attempt" -lt 2 ] && ! chrome_alive; do
-          attempt=$((attempt + 1))
-          echo "                                             the browser died with the test: restarting it and running this one again (${attempt}/2)"
-          # The attempt that just failed was the browser's, not the contract's, so its failure entry is
-          # replaced by the retry's result.
-          FAILED=("${FAILED[@]:0:${#FAILED[@]}-1}")
-          if ! start_chrome; then break; fi
-          open_clean_tab
-          if step_with_timeout 180 "Node test: ${name} (Chrome, after a browser restart)" node "$test_file"; then
-            break
-          fi
-        done
-      fi
+      run_browser_suite "$name" "$test_file" || true
     else
       # No browser at all: a machine without Chrome skips the layer, but a machine that has the binary
       # and cannot start it is a failure — the UI contracts did not run, and that is not a skip.
@@ -378,7 +250,7 @@ done
 step "Maillot path audit (strict)" node scripts/wing-maillot-path-audit.mjs --strict
 
 if [ "$FAST" -eq 0 ]; then
-  step "Rust workspace tests" cargo test --workspace --quiet
+  step "Rust workspace tests" cargo test --workspace --locked --quiet
 else
   printf '%-46s%s\n' "Rust workspace tests" "SKIP (--fast)"
 fi

@@ -191,6 +191,8 @@ un informe. El repositorio contiene:
   LTC/MTC físico, hardware y mantenimiento.
 - [Guía para contribuir](CONTRIBUTING.md): elegir una tarea, comprobar el cambio y
   enviar una pull request.
+- [Tests y comprobaciones automáticas](docs/TESTING.md): qué se prueba y qué sigue
+  pendiente. [Ejecuciones en GitHub](https://github.com/marmoles-supply/wing-controller/actions/workflows/tests.yml).
 - [Issues](https://github.com/marmoles-supply/wing-controller/issues/new/choose),
   [auditoría](docs/AUDIT_2026-11-09.md) y [arquitectura](docs/ARCHITECTURE.md).
 - [Instrucciones de desarrollo](README.md#development) y [guía de uso](docs/guide/README.md), en inglés.

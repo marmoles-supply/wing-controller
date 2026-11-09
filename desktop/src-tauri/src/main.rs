@@ -14652,6 +14652,22 @@ mod backup_writer_tests {
         root
     }
 
+    #[test]
+    fn a_failed_backup_rename_preserves_the_destination_and_cleans_its_temporary() {
+        let root = scratch_dir("rename-failure");
+        let target = root.join("show.wcz");
+        std::fs::create_dir(&target).expect("blocked destination");
+        std::fs::write(target.join("keep"), "untouched").expect("existing contents");
+        let error = write_text_atomic(&target, "new show").expect_err("a directory cannot be replaced by a file");
+        assert!(error.contains("Could not replace"), "the actual failed operation must be reported: {error}");
+        assert_eq!(std::fs::read_to_string(target.join("keep")).unwrap(), "untouched");
+        let leftovers: Vec<_> = std::fs::read_dir(&root).unwrap()
+            .map(|entry| entry.unwrap().file_name())
+            .filter(|name| name.to_string_lossy().ends_with(".tmp")).collect();
+        assert!(leftovers.is_empty(), "failed rename must clean its temporary: {leftovers:?}");
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
     /// The 0.2.48 folder is renamed into the new name, files and all, when only it exists.
     #[test]
     fn the_old_show_folder_is_renamed_into_the_new_one() {
@@ -14905,6 +14921,28 @@ mod tests {
         assert_eq!(fs::read_to_string(&path).expect("current"), "{\"version\":2}");
         assert_eq!(fs::read_to_string(path.with_extension("json.bak")).expect("backup"), "{\"version\":1}");
         fs::remove_dir_all(dir).expect("remove test directory");
+    }
+
+    #[test]
+    fn a_failed_recovery_copy_preserves_the_current_json_and_cleans_its_temporary() {
+        let unique = SAVE_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+        let dir = std::env::temp_dir().join(format!("wing-save-failure-{}-{unique}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("library.json");
+        let original = "{\"version\":1,\"macros\":[\"keep me\"]}";
+        fs::write(&path, original).unwrap();
+        // A directory at the backup path forces failure without assuming user privileges or filling a disk.
+        let backup = path.with_extension("json.bak");
+        fs::create_dir(&backup).unwrap();
+        fs::write(backup.join("keep"), "untouched").unwrap();
+        let error = write_json_with_recovery(&path, "{\"version\":2}").expect_err("a failed backup must refuse replacement");
+        assert!(error.contains("create recovery copy"), "the failed operation must be reported: {error}");
+        assert_eq!(fs::read_to_string(&path).unwrap(), original, "a refused save must retain every original byte");
+        assert_eq!(fs::read_to_string(backup.join("keep")).unwrap(), "untouched");
+        let leftovers: Vec<_> = fs::read_dir(&dir).unwrap().map(|entry| entry.unwrap().file_name())
+            .filter(|name| name.to_string_lossy().ends_with(".tmp")).collect();
+        assert!(leftovers.is_empty(), "failed recovery copy must clean its temporary: {leftovers:?}");
+        fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

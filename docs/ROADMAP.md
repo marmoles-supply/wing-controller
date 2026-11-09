@@ -105,10 +105,14 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
 - [ ] **ARCH-01 — Extract modules gradually.** Start with one high-change
   responsibility in `main.rs` or `index.html`; retain contracts and measure runtime
   cost. File size is not a reason for a broad rewrite before live use.
-- [ ] **CI-01 — Establish reproducible macOS CI.** Measure a clean toolchain and
-  dependency install, document versions and cache boundaries, then automate the
-  appropriate gate. Keep hardware tests opt-in and signing keys private. Do not
-  count skipped browser suites as passing.
+- [ ] **CI-01 — Establish reproducible macOS CI.** Full gate and nine isolated
+  mutation probes are configured for push/PR on hosted arm64 macOS. Close only
+  after a successful hosted installation/run; record the exact run in the
+  [test audit](TEST_AUDIT_2026-11-09.md). Hardware is separate; signing keys stay private.
+- [ ] **TEST-02 — Strengthen remaining test boundaries.** Migrate older browser
+  suites to strict IPC fixtures and uncaught-exception assertions. Add independent
+  LTC fixtures with provenance, packaged-app IPC acceptance and process-kill
+  station-restore tests. Do not treat source-string contracts as behaviour coverage.
 
 Mobile work remains parked. Commercial activation is not a prerequisite for
 this source-available project and must not be enabled as incidental cleanup.

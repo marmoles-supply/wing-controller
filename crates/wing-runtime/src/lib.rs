@@ -406,6 +406,75 @@ mod tests {
 
     use super::*;
 
+    fn policy_trigger() -> MeterTrigger {
+        MeterTrigger {
+            id: "policy-boundary".to_string(),
+            address: MeterAddress { family: "source", device_id: Some(SOURCE_USB_DEVICE_ID), index: 1, value_slot: 0 },
+            threshold: 1.0,
+            direction: TriggerDirection::Rising,
+            policy: MeterTriggerPolicy { rearm_db: 0.1, stale_after_ms: 10_000, ..MeterTriggerPolicy::fast_transient() },
+        }
+    }
+
+    fn policy_state(at: Instant) -> MeterTriggerState {
+        MeterTriggerState { last_value: 0.0, last_packet_at: at, last_fire_at: None,
+            recent_min: 0.0, was_hot: false, first_hot_at: None }
+    }
+
+    fn tick(trigger: &MeterTrigger, state: &mut MeterTriggerState, value: f32, at: Instant) -> bool {
+        process_trigger_policy(trigger, state, state.last_value, value, at)
+    }
+
+    #[test]
+    fn transient_dwell_fires_at_its_boundary_and_not_before() {
+        let base = Instant::now();
+        let mut trigger = policy_trigger();
+        trigger.policy.dwell_ms = 50;
+        let mut state = policy_state(base);
+        assert!(!tick(&trigger, &mut state, 2.0, base + Duration::from_millis(10)), "the first hot sample starts dwell");
+        assert!(!tick(&trigger, &mut state, 2.0, base + Duration::from_millis(59)), "49 ms hot is too short");
+        assert!(tick(&trigger, &mut state, 2.0, base + Duration::from_millis(60)), "50 ms completes dwell");
+        assert!(!tick(&trigger, &mut state, 2.0, base + Duration::from_millis(61)), "a steady level must not repeat");
+    }
+
+    #[test]
+    fn a_cold_sample_resets_transient_dwell() {
+        let base = Instant::now();
+        let mut trigger = policy_trigger();
+        trigger.policy.dwell_ms = 50;
+        let mut state = policy_state(base);
+        for (ms, value) in [(10, 2.0), (30, 0.0), (40, 2.0), (89, 2.0)] {
+            assert!(!tick(&trigger, &mut state, value, base + Duration::from_millis(ms)), "dwell incomplete at {ms} ms");
+        }
+        assert!(tick(&trigger, &mut state, 2.0, base + Duration::from_millis(90)), "only the new hot interval counts");
+    }
+
+    #[test]
+    fn transient_cooldown_expires_at_its_exact_boundary() {
+        let base = Instant::now();
+        let mut trigger = policy_trigger();
+        trigger.policy.cooldown_ms = 1_000;
+        let mut state = policy_state(base);
+        state.last_fire_at = Some(base);
+        assert!(!tick(&trigger, &mut state, 2.0, base + Duration::from_millis(999)), "cooldown still active");
+        assert!(tick(&trigger, &mut state, 2.0, base + Duration::from_millis(1_000)), "cooldown expiry is inclusive");
+        assert!(!tick(&trigger, &mut state, 2.0, base + Duration::from_millis(1_001)), "the next cooldown has started");
+    }
+
+    #[test]
+    fn stale_gap_boundary_suppresses_only_the_first_sample_after_expiry() {
+        let base = Instant::now();
+        let mut trigger = policy_trigger();
+        trigger.policy.stale_after_ms = 50;
+        let initial = policy_state(base);
+        let mut at_boundary = initial;
+        assert!(tick(&trigger, &mut at_boundary, 2.0, base + Duration::from_millis(50)), "equal to limit is fresh");
+        let mut after_boundary = initial;
+        assert!(!tick(&trigger, &mut after_boundary, 2.0, base + Duration::from_millis(51)), "stale hot sample only establishes baseline");
+        assert!(!tick(&trigger, &mut after_boundary, 0.0, base + Duration::from_millis(52)));
+        assert!(tick(&trigger, &mut after_boundary, 2.0, base + Duration::from_millis(53)), "a fresh crossing works again");
+    }
+
     #[test]
     fn fires_rapid_consecutive_usb_meter_rising_edges() {
         let request = [MeterDescriptor::source_with_indices(
@@ -606,13 +675,16 @@ mod tests {
                 cooldown_ms: 0,
                 rearm_db: 0.1,
                 dwell_ms: 0,
-                stale_after_ms: 1,
+                stale_after_ms: 10_000,
             },
         }]);
 
         let cold = decode_report(1, &request, &[0, 0, 0, 1, 0, 0]).expect("decode");
         assert!(runtime.process_meter_event(&cold[0]).is_empty());
-        std::thread::sleep(Duration::from_millis(2));
+        // Age the recorded packet instead of depending on a 2 ms scheduler delay. The exact
+        // boundary is covered separately above with explicit Instants.
+        runtime.states.get_mut("usb1-stale").expect("cold packet state").last_packet_at =
+            Instant::now() - Duration::from_millis(10_001);
         let stale_hot = decode_report(1, &request, &[0, 0, 0, 1, 2, 0]).expect("decode");
         assert!(runtime.process_meter_event(&stale_hot[0]).is_empty());
         let cold = decode_report(1, &request, &[0, 0, 0, 1, 0, 0]).expect("decode");

@@ -11,13 +11,16 @@
 
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { registeredCommands } from './lib/command-registry.mjs';
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const main = readFileSync(`${ROOT}desktop/src-tauri/src/main.rs`, "utf8");
 
-const start = main.indexOf("generate_handler![");
-assert.ok(start > 0, "main.rs must register its commands with generate_handler!");
-const handler = main.slice(start);
+const registered = registeredCommands(main);
+// A mention in a later test/comment is not registration. This was a measured false green.
+assert.deepEqual([...registeredCommands('generate_handler![present,] later(missing);')], ['present']);
+assert.throws(() => registeredCommands('no registry here'), /registry/);
+assert.throws(() => registeredCommands('generate_handler![not an identifier]'), /entry/);
 
 /// Every window that calls `invoke`, and roughly how many distinct commands each one should be calling. The floors are
 /// deliberately loose: their job is to catch a walk that stopped finding anything (a renamed helper, a window that
@@ -39,7 +42,7 @@ for (const [name, floor] of WINDOWS) {
     called.length >= floor,
     `${name} should be calling its backend (found ${called.length}, expected at least ${floor}) — a walk that finds nothing proves nothing`,
   );
-  const missing = called.filter((command) => !new RegExp(`\\b${command}\\b`).test(handler));
+  const missing = called.filter((command) => !registered.has(command));
   assert.deepEqual(
     missing,
     [],
@@ -57,8 +60,6 @@ const called = [...allCalled].sort();
 // The other direction is a report rather than a failure: a command may be used by the meters or the clock window, or
 // by a script, and counting them by indentation would be a guess. What the gate must fail on is the direction that
 // makes a button do nothing, and that is asserted above.
-const registered = [...handler.matchAll(/^\s{4,12}([a-z0-9_]+),$/gm)].map((match) => match[1]);
-const unused = [...new Set(registered)].filter((name) => !called.includes(name));
+const unused = [...registered].filter((name) => !called.includes(name));
 
 console.log(`command registry passed: ${called.length} commands called from the window, all registered, ${unused.length} used elsewhere`);
-console.log("WING_BROWSER_SUITE_OK");

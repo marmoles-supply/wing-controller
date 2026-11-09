@@ -47,8 +47,13 @@ export async function openDesktopTab() {
   await new Promise((resolve, reject) => { socket.once('open', resolve); socket.once('error', reject); });
   let nextId = 0;
   const pending = new Map();
+  const pageErrors = [];
   socket.on('message', (data) => {
     const response = JSON.parse(data);
+    if (response.method === 'Runtime.exceptionThrown') {
+      const details = response.params.exceptionDetails;
+      pageErrors.push(details.exception?.description || details.text);
+    }
     const request = pending.get(response.id);
     if (!request) return;
     pending.delete(response.id);
@@ -67,8 +72,7 @@ export async function openDesktopTab() {
         .catch(() => 'the browser does not answer its HTTP endpoint either, so it is gone');
       console.error(
         `the browser did not answer ${method} within ${CDP_DEADLINE_MS} ms (waited ${Date.now() - started} ms): ${alive}. ` +
-        'This is the headless-Chrome wedge of docs/MACOS_HANG_RUNNINGBOARD_2026-09-27.md, not a failed check: nothing here ' +
-        'says the window is wrong.',
+        'No UI verdict was established. A browser/system wedge is one possible cause; inspect the process before diagnosing it.',
       );
       process.exit(2);
     }, CDP_DEADLINE_MS);
@@ -98,7 +102,8 @@ export async function openDesktopTab() {
     } catch (_) {}
   };
 
-  return { target, socket, call, evaluate, sleep, closeTab, url: DESKTOP_PAGE_URL };
+  await call('Runtime.enable');
+  return { target, socket, call, evaluate, sleep, closeTab, pageErrors, url: DESKTOP_PAGE_URL };
 }
 
 /// The Win95 dialog is real state: a leftover one would be read as the next check's answer.
@@ -339,7 +344,7 @@ const DEFAULT_CONFIG = {
 
 /// Install the Tauri stub in every document this tab loads. `Page.addScriptToEvaluateOnNewDocument` is why a suite can
 /// navigate and still find its stub: the browser re-applies it, not this file.
-export async function installDesktopStub(call) {
+export async function installDesktopStub(call, { strict = false } = {}) {
   await call('Page.enable');
   // The visible tab, not a background one: Chrome throttles the timers of a hidden tab (350 ms becomes seconds, and after
   // five minutes it drops to one timer a minute), and every check below is built on `setTimeout` — a backgrounded tab
@@ -348,6 +353,8 @@ export async function installDesktopStub(call) {
   await call('Page.addScriptToEvaluateOnNewDocument', {
   source: `
     window.__INVOKES = [];
+    window.__UNKNOWN_INVOKES = [];
+    const STRICT_STUB = ${JSON.stringify(strict)};
     const CATALOG = ${JSON.stringify(CATALOG)};
     const DEFAULT_CONFIG = ${JSON.stringify(DEFAULT_CONFIG)};
     let savedLibrary = null;
@@ -588,6 +595,20 @@ export async function installDesktopStub(call) {
             }, 0);
             return {};
           }
+          // Explicit disconnected startup responses for strict suites. Other suites retain their
+          // existing fixture scope; opting into strict mode makes every unconfigured call an error.
+          if (STRICT_STUB) {
+            if (cmd === 'timecode_state') return { state: 'stopped', position: null, source: null, cues: 0 };
+            if (cmd === 'get_stream_state') return { state: 'idle', request: null };
+            if (cmd === 'get_inter_app_settings') return { enabled: false, midi: {}, osc: {} };
+            if (cmd === 'get_timecode_cues') return { schema_version: 1, cues: [], offset_frames: 0, sort: 'smpte' };
+            if (cmd === 'ensure_backup_folder') return '/tmp/wing-synthetic-backups';
+            if (cmd === 'is_meters_window_open') return false;
+            if (cmd === 'log_backup_event' || cmd === 'set_timecode_macro_library') return null;
+            if (cmd === 'load_show_runner_config') return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+          }
+          window.__UNKNOWN_INVOKES.push(cmd);
+          if (STRICT_STUB) throw new Error('Unconfigured test IPC command: ' + cmd);
           return {};
         },
       },

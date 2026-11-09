@@ -688,8 +688,8 @@ mod tests {
         assert!(!crate::timecode::rate_disagrees(TimecodeRate::Fps25, measured), "and a correct declaration is never reported");
     }
 
-    /// The codec's first property: what the generator writes, the decoder reads — the whole reason the generator
-    /// exists, and the only way to prove a codec without hardware.
+    /// Internal round-trip consistency: what our generator writes, our decoder reads.
+    /// Both could share a defect. Independent LTC fixtures and hardware interoperability remain separate work.
     #[test]
     fn what_the_generator_writes_the_decoder_reads() {
         for rate in [TimecodeRate::Fps24, TimecodeRate::Fps25, TimecodeRate::Fps30] {

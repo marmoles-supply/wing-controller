@@ -13,6 +13,10 @@ contributions as well as code.
 
 ## Issue → branch → checks → pull request
 
+Read [tests, CI and evidence limits](docs/TESTING.md). Pushes and pull requests run
+the full macOS gate and selected mutation checks in GitHub Actions. Inspect the
+actual job and logs; a badge alone does not describe coverage.
+
 1. Search existing issues. For a roadmap task, put its ID in the issue title;
    describe the scope, expected behaviour and acceptance evidence. Use private
    reporting for suspected security vulnerabilities, following [SECURITY](SECURITY.md).

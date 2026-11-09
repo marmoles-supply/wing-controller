@@ -1,0 +1,74 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  desktop:
+    name: Desktop tests (macOS arm64)
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      WING_VERIFY_LOG_DIR: ${{ github.workspace }}/test-results
+      CARGO_TERM_COLOR: never
+      TZ: Europe/Madrid
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 26.8.2
+          cache: npm
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.98.1 --profile minimal && rustup default 1.98.1
+      - name: Install dependencies from lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Prepare pinned protocol reference
+        run: |
+          brew install poppler
+          node scripts/setup-protocol-reference.mjs
+          node scripts/setup-protocol-reference.mjs --check
+      - name: Record environment
+        run: |
+          mkdir -p "$WING_VERIFY_LOG_DIR"
+          {
+            git rev-parse HEAD
+            uname -m
+            sw_vers
+            node --version
+            npm --version
+            rustc --version
+            cargo --version
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --version
+            pdftotext -v
+          } > "$WING_VERIFY_LOG_DIR/environment.log" 2>&1
+          test "$(uname -m)" = arm64
+      - name: Full verification (including browser and Rust tests)
+        shell: bash
+        run: |
+          set -o pipefail
+          ./scripts/verify-all.sh 2>&1 | tee "$WING_VERIFY_LOG_DIR/gate.log"
+      - name: Prove selected tests detect deliberate defects
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/mutation-check-ci.mjs 2>&1 | tee "$WING_VERIFY_LOG_DIR/mutations.log"
+      - name: Upload complete test logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/
+          if-no-files-found: error
+          retention-days: 14

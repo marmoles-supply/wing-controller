@@ -209,6 +209,7 @@ and Spanish reports are welcome. A GitHub account is needed to submit a report.
   tests, hardware coverage, accessibility and maintenance.
 - **[Report a bug or suggest a change](https://github.com/marmoles-supply/wing-controller/issues/new/choose):** include the version, steps and expected result; remove private show/console details.
 - **[Contributing](CONTRIBUTING.md):** how to choose a task, verify a change and submit a pull request.
+- **[Tests and CI](docs/TESTING.md):** what runs, where the tests live and what they do not establish. [Latest runs](https://github.com/marmoles-supply/wing-controller/actions/workflows/tests.yml).
 - **[Audit](docs/AUDIT_2026-11-09.md) · [Architecture](docs/ARCHITECTURE.md) · [Validation](docs/VALIDATION.md):** evidence, structure and checks.
 - **[Security reporting](SECURITY.md):** report vulnerabilities privately.
 
