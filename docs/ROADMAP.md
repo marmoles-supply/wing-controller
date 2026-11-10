@@ -112,16 +112,27 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
 - [ ] **ARCH-01 — Extract modules gradually.** Start with one high-change
   responsibility in `main.rs` or `index.html`; retain contracts and measure runtime
   cost. File size is not a reason for a broad rewrite before live use.
-- [ ] **CI-01 — Establish reproducible macOS CI.** Full gate and fourteen isolated
-  mutation probes are configured for push/PR on hosted arm64 macOS. Close only
-  after a successful hosted installation/run; record the exact run in the
-  [test audit](TEST_AUDIT_2026-11-09.md). Hardware is separate; signing keys stay private.
+- [x] **CI-01 — Establish reproducible macOS CI.** Fresh hosted arm64 macOS run
+  [42725371183](https://github.com/marmoles-supply/wing-controller/actions/runs/42725371183)
+  passed the full 85-check gate,14/14 mutation probes and the selected 20-second
+  loopback soak. Push/PR execution, read-only access and retained diagnostics are
+  configured. See the [test audit](TEST_AUDIT_2026-11-09.md). Hardware is separate;
+  signing keys stay private.
+- [ ] **CI-02 — Review the artifact uploader's action runtime.** The validated
+  pinned uploader completed under GitHub's forced Node 24 runtime while warning
+  about its Node 20 action metadata. Review a native Node 24 action release, pin
+  its exact commit and verify upload/download,14-day retention and failure logs
+  with the existing read-only permissions. This does not concern the project's
+  tested Node 26.8.2 runtime.
 - [ ] **TEST-02 — Strengthen remaining test boundaries.** Migrate older browser
   suites to strict IPC fixtures and uncaught-exception assertions. Add independent
   LTC fixtures with provenance, packaged-app IPC acceptance and process-kill
   station-restore tests. Do not treat source-string contracts as behaviour coverage.
   Explicitly invoked hardware tests must refuse missing opt-in flags rather than
   return early and appear to have run.
+  The overload soak currently counts executor errors without asserting their
+  causes (`desktop/src-tauri/src/main.rs:24002`); classify expected refusals and
+  fail on unexpected errors without confusing a returned report with confirmation.
 
 Mobile work remains parked. Commercial activation is not a prerequisite for
 this source-available project and must not be enabled as incidental cleanup.

@@ -4,6 +4,31 @@ Scope: source-test credibility, failure handling, selected regression gaps and
 automatic execution. This is not a certification of the application or a complete
 review of every assertion. No release/version bump is part of this work.
 
+## Accepted source
+
+**MEASURED:** [run 42725371183](https://github.com/marmoles-supply/wing-controller/actions/runs/42725371183)
+completed successfully in 19 minutes 26 seconds for public source
+[`8ff9667`](https://github.com/marmoles-supply/wing-controller/commit/8ff9667e255c1a11d19e4933483d55c62a1ff88b).
+The downloaded reports were checked, not just the job's status.
+
+- Full standalone gate: 85 checks, including all 35 named browser suites; each
+  browser log ends with its completion marker.
+- Rust workspace: 561 passed, 15 explicitly ignored. Those ignored cases are not
+  represented as passes.
+- Mutation checks: 14/14 actual defects rejected after passing baselines; the
+  regular-workspace cache control also passed.
+- Separate synthetic loopback soak: exactly 1 test executed and passed, over 20 seconds.
+  It checks bounded dispatch/outcome accounting, including refusals and overlap
+  drops; it does not establish per-action confirmation or show endurance.
+- Environment: macOS 26.7.2 arm64, Chrome 156.0.8078.80, Node 26.8.2, npm 11.19.1,
+  Rust/Cargo 1.98.1 and Poppler 26.10.0. Fresh dependency installation succeeded.
+
+The matching engineering source also passed its full local gate (86 checks) and
+14/14 mutations. The extra local check is the private source-export hygiene
+contract, which is deliberately not exported. No physical-console/LTC or new
+installer acceptance was performed. The following acceptance-record publication
+changes documentation and generated publication metadata only.
+
 ## Method and findings
 
 The existing suite contains Rust behaviour tests, Node/VM execution tests,
@@ -39,8 +64,9 @@ then a failure naming the intended contract. Compilation failure is not success.
 
 **D01 — Run the full gate on hosted macOS arm64 for every push and PR.**
 **DOCUMENTED:** [GitHub's runner specifications](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
-list `macos-26` as a standard runner with architecture “arm64”. **INFERRED until a hosted run completes:**
-this can reproduce the macOS-specific gate without the owner's machine.
+list `macos-26` as a standard runner with architecture “arm64”. **Initially inferred,
+now MEASURED:** the accepted run above reproduces the complete gate and selected
+negative controls independently of the owner's machine.
 Consequence: longer runs, with explicit Node/Rust versions, lockfile installation,
 full history, protocol checksums and retained logs. No signing secrets or live
 console are supplied.
@@ -114,8 +140,8 @@ reinterpret a stale binary as a new application defect.
 [Hosted run 42700801637](https://github.com/marmoles-supply/wing-controller/actions/runs/42700801637)
 completed a clean dependency install, pinned protocol acquisition/extraction and
 Rust tests, but failed four frontend/visual suites. It is a failed run, not cloud
-acceptance. macOS26.7.2 arm64, Chrome156.0.8078.80, Node26.8.2, Rust1.98.1 and
-Poppler26.10.0 were recorded in its artefact.
+acceptance. macOS 26.7.2 arm64, Chrome 156.0.8078.80, Node 26.8.2, Rust 1.98.1 and
+Poppler 26.10.0 were recorded in its artefact.
 
 - Bridge reloads guessed1800ms and could read the previous booted document.
   They now wait for a changed document token plus independent boot/listener
@@ -127,10 +153,10 @@ Poppler26.10.0 were recorded in its artefact.
   Normal and reduced-motion branches are now explicitly selected and asserted;
   the original host preference is logged. The original cloud preference was not captured.
 - Four visual differences were reproduced by a separate deterministic capture,
-  [run42705465503](https://github.com/marmoles-supply/wing-controller/actions/runs/42705465503).
+  [run 42705465503](https://github.com/marmoles-supply/wing-controller/actions/runs/42705465503).
   The app UI source bytes were identical. Six images were byte-identical. Meter
-  light/dark differed only123/126pixels inside the filtered logo (18×16 region);
-  LTC light/dark differed42pixels in a native numeric input (9×7 region). Full
+  light/dark differed only 123/126 pixels inside the filtered logo (18×16 region);
+  LTC light/dark differed42 pixels in a native numeric input (9×7 region). Full
   captures were inspected and four exact variants approved with their hashes.
 
 **D04 — Keep separate explicitly selected visual records for these renderers.**
@@ -149,7 +175,7 @@ for separate records. Wider or unexplained differences require another review.
 
 ### Settings startup/polling repair
 
-[Run42707537543](https://github.com/marmoles-supply/wing-controller/actions/runs/42707537543)
+[Run 42707537543](https://github.com/marmoles-supply/wing-controller/actions/runs/42707537543)
 passed the four previously failing suites and Rust, then failed only the Settings
 cue-delivery check. The test waited600ms after a simulated state change.
 **DOCUMENTED:** its reload readiness allowed DOM presence before boot registered
@@ -163,7 +189,7 @@ revision; the test requires that exact revision to be consumed and rendered.
 All original visible/count/warning/empty assertions remain. It calls no production
 render/poll function directly. The complete Settings suite passed locally afterwards.
 
-The local full gate passed86 checks, including35 named browser suites and561 Rust
+The local full gate passed 86 checks, including35 named browser suites and561 Rust
 tests;15 Rust cases were explicitly ignored. That full pass preceded the final
 Settings-only repair; the changed Settings suite passed separately afterwards.
 This is local evidence, not a replacement for final hosted acceptance. Packaged-app startup acceptance is
@@ -171,7 +197,7 @@ tracked separately; waiting for readiness in a test does not close that task.
 
 ### Native dialog close-event ordering
 
-[Run42712520984](https://github.com/marmoles-supply/wing-controller/actions/runs/42712520984)
+[Run 42712520984](https://github.com/marmoles-supply/wing-controller/actions/runs/42712520984)
 passed Settings and Rust but failed the design workstation's focus-return check.
 It read `dialog.open === false`, then waited a zero-delay timer before checking
 focus. **DOCUMENTED:** the [HTML dialog closing algorithm](https://html.spec.whatwg.org/multipage/interactive-elements.html#close-the-dialog)
@@ -188,13 +214,13 @@ The repaired workstation suite passed locally. A separate temporary copy then
 removed only the real opener-focus handler: the same suite failed with its
 focus-return assertion, the active element was `body`, and no completion marker
 was emitted. This additional negative control is separate from the initial ten CI probes.
-The subsequent local quick gate passed51 checks and explicitly omitted35 named
-browser suites. Its screenshot check still ran; Rust again passed561/ignored15.
+The subsequent local quick gate passed 51 checks and explicitly omitted35 named
+browser suites. Its screenshot check still ran; Rust again passed 561/ignored 15.
 
-The audit also corrected the contributor setup text: the old Node20.19 minimum
-conflicted with the suite's use of `node:fs.globSync` in
+The audit also corrected the contributor setup text: the old Node 20.19 minimum
+conflicted with the suite's use of [`node:fs.globSync`](https://nodejs.org/api/fs.html#fsglobsyncpattern-options), added in Node 22, in
 `scripts/test-design-app-agreement-live.mjs:83`. Setup now names the actually
-measured Node26.8.2 and Rust1.98.1 instead of asserting an untested older range.
+measured Node 26.8.2 and Rust 1.98.1 instead of asserting an untested older range.
 
 ### Main-branch policy
 
@@ -222,9 +248,9 @@ after its actual settings have been read back.
 
 ### Failure diagnostics
 
-The first24lines-only reporter hid the visual check's explanation behind its
-successful capture listing in run42715636039. **MEASURED:** executing the old
-helper with60setup lines and a final assertion omitted that assertion from console
+The first 24lines-only reporter hid the visual check's explanation behind its
+successful capture listing in run 42715636039. **MEASURED:** executing the old
+helper with 60 setup lines and a final assertion omitted that assertion from console
 output. The shared helper now prints bounded context from both ends and preserves
 the complete log. Its executable fixture requires the final assertion to remain
 visible. The workstation focus timeout also reports only the active tag/id,
@@ -232,7 +258,7 @@ avoiding a full `body.outerHTML` dump with an embedded background image.
 
 ### Bridge backend fixture and the second hosted rejection
 
-Run42715636039 also rejected bridge startup-state adoption (session0 rather than77).
+Run 42715636039 also rejected bridge startup-state adoption (session0 rather than77).
 The earlier fresh-document barrier was insufficient to explain this: boot awaits
 `syncBridgeState()` before setting its completion flag (`meters.html:7043–7058`).
 A longer wait was therefore rejected as a repair.
@@ -252,9 +278,9 @@ probe; the earlier10/10 evidence above refers to the preceding implementation.
 
 ### Exact screenshot repeatability — 10 November follow-up
 
-Run42715636039 rejected66 pixels on one Inspector-header row in the dark main
+Run 42715636039 rejected 66 pixels on one Inspector-header row in the dark main
 window, x1325..1494/y88. Local instrumentation reproduced both complete image
-hashes. The header's rectangle was identical (1139,71.09375,402,35), as were DPR1,
+hashes. Post-capture measurements found the same header rectangle (1139,71.09375,402,35), DPR1,
 its CSS and the generated background PNG SHA-256
 `102bcbca003173a33df8626dd3dcc08435602e5ac4c8128a9dd43fcf80db6da7`.
 **MEASURED:** final composition differed despite identical bitmap and geometry.
@@ -265,10 +291,10 @@ suggested a remedy; three full captures disproved it by producing both hashes.
 That flag was not adopted. Its apparent early success was not repeatability proof.
 
 **D06 — Pin software compositing for the exact screenshot test only.**
-**MEASURED:** [capture run42719049204](https://github.com/marmoles-supply/wing-controller/actions/runs/42719049204)
+**MEASURED:** [capture run 42719049204](https://github.com/marmoles-supply/wing-controller/actions/runs/42719049204)
 and the matching local experiment each produced five byte-identical full ten-image
 sets with `--disable-gpu`:100 captures total. Eight images match between machines;
-two LTC images differ only42 pixels in the previously identified native input.
+two LTC images differ only 42 pixels in the previously identified native input.
 Full images were visually reviewed. The changed renderer also changes other
 pixels (up to132149/1600000 in the dark main window), so references were deliberately
 updated with source, flags and old/new hashes, not treated as an invisible switch.
@@ -301,14 +327,14 @@ session at the instant `wing_meters_ready` is written. The unmodified applicatio
 passes. The same missing-`await` mutation now fails with the captured session0 at
 announcement, even though session77 is adopted afterwards. This is the thirteenth
 mutation probe. The one-pixel probe also requires a numeric boundary and its exact
-1×1 region at(0,0), so an unrelated11-pixel difference cannot satisfy its evidence.
+1×1 region at (0,0), so an unrelated 11-pixel difference cannot satisfy its evidence.
 
 ### Local cue edits versus background reads
 
-[Run42721567692](https://github.com/marmoles-supply/wing-controller/actions/runs/42721567692)
+[Run 42721567692](https://github.com/marmoles-supply/wing-controller/actions/runs/42721567692)
 passed the previously repaired checks and Rust, then failed only the cue-save
 suite. Its assertion required zero IPC calls after a local nudge. **DOCUMENTED:**
-the real clock independently reads `timecode_state` every250ms
+the real clock independently reads `timecode_state` every 250ms
 (`desktop/ui/timecode.html:800–820`). **MEASURED:** that ordinary read was the sole
 recorded call in the hosted rejection; it was not a cue-list write.
 
@@ -327,3 +353,9 @@ including35 named browser suites and561 Rust passes/15 explicitly ignored cases,
 then caught13/13 mutations with its regular-workspace cache control passing.
 Those measurements precede this final cue-polling repair; final hosted acceptance
 is recorded separately when the complete job succeeds.
+
+The accepted run above closes that hosted-execution requirement. Its reports
+retain the earlier failures as separate runs; those runs have not been relabelled
+green. The uploader completed under GitHub's forced Node 24 action runtime but
+emitted a warning for its pinned action's Node 20 metadata. CI-02 tracks reviewing
+that action pin separately; project checks themselves ran with Node 26.8.2.
