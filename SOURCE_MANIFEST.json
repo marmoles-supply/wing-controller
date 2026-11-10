@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "06440b2ca62c25a7785356f7c3c7e56402383e08",
+  "sourceRevision": "0989a1ca9582971fd28d91b56d46d46a13ae4297",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/01-bug-report.yml",
@@ -2523,8 +2523,8 @@
     },
     {
       "path": "scripts/mutation-check-ci.mjs",
-      "bytes": 10405,
-      "sha256": "22b8417ca3fac96c355948c0c35759e8274039dd1d5c259e0175871b062f844e"
+      "bytes": 10791,
+      "sha256": "6ae5016eb39415a54446283b7eac6607ab8ec0f3a83d4e1cfe77929d035677e5"
     },
     {
       "path": "scripts/mutation-check-courtesy-notice.mjs",
@@ -2833,8 +2833,8 @@
     },
     {
       "path": "scripts/test-desktop-cue-save-button-browser.mjs",
-      "bytes": 24886,
-      "sha256": "df40c3038818db2aebfe8c0535b634738bdfb1a8a5337d69e845e0c09132c544"
+      "bytes": 26421,
+      "sha256": "66ba105d9bf45dfdd548cf7c42856cf7f4626ba17d8cab7ba7ea6d3bac8a4ca3"
     },
     {
       "path": "scripts/test-desktop-diagnostics-blocks-browser.mjs",
@@ -3448,18 +3448,18 @@
     },
     {
       "path": "docs/TESTING.md",
-      "bytes": 8358,
-      "sha256": "2bd5f15d9c254b1b83b182bda0587ff20849b7b2146b74fb4a3d7b18dad1996a"
+      "bytes": 8402,
+      "sha256": "633674caf0bd30d5655a0d607af162b2ad4bbffcedb511b77bd7069829544762"
     },
     {
       "path": "docs/TEST_AUDIT_2026-11-09.md",
-      "bytes": 21654,
-      "sha256": "ffa5a5dbfa1207d2671679801b51d5afa2cb1e233ad0ca48926658e726eafdef"
+      "bytes": 23162,
+      "sha256": "200bd74113e5efc37abb3a97a20735ca5587d3e9a3b0b69915f4742974cb4efc"
     },
     {
       "path": "docs/ROADMAP.md",
       "bytes": 9442,
-      "sha256": "42cfaf81311db80ea5a0e73681dadbd5c9ba6358876668b50c5b11e8ad892f5d"
+      "sha256": "f90248a204847a9647c0e78097e6dc347f883d7a32e0c279441d5b79177056bd"
     },
     {
       "path": "docs/AUDIT_2026-11-09.md",
@@ -3554,10 +3554,10 @@
     {
       "path": "desktop/release-notes/provenance.json",
       "bytes": 29499,
-      "sha256": "47eddf921cbcdee16e21b827d9dec7d0385449c5723c1fdb041ce73df64ed92e"
+      "sha256": "242050cc276b8b1478292ff8f48aab11246ac2c9ef37315e29fbd689442daaf9"
     }
   ],
-  "bytes": 25108659,
+  "bytes": 25112132,
   "excludedTrackedPaths": 1111,
   "potentialSecrets": 0,
   "reviewFindings": 285,

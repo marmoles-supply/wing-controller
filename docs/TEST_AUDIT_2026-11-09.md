@@ -302,3 +302,28 @@ passes. The same missing-`await` mutation now fails with the captured session0 a
 announcement, even though session77 is adopted afterwards. This is the thirteenth
 mutation probe. The one-pixel probe also requires a numeric boundary and its exact
 1×1 region at(0,0), so an unrelated11-pixel difference cannot satisfy its evidence.
+
+### Local cue edits versus background reads
+
+[Run42721567692](https://github.com/marmoles-supply/wing-controller/actions/runs/42721567692)
+passed the previously repaired checks and Rust, then failed only the cue-save
+suite. Its assertion required zero IPC calls after a local nudge. **DOCUMENTED:**
+the real clock independently reads `timecode_state` every250ms
+(`desktop/ui/timecode.html:800–820`). **MEASURED:** that ordinary read was the sole
+recorded call in the hosted rejection; it was not a cue-list write.
+
+The suite now waits for a real periodic state read and permits only that exact
+read command; every other command still fails the local-edit assertion. Explicit
+Save must issue exactly one cue-list write containing the nudged frame. The
+reduced-motion scenario waits for its own fresh document, and editor/save/Undo
+checks wait boundedly for their actual UI state instead of guessed delays.
+
+The repaired suite passed locally with polling observed. A temporary mutation
+made the actual local-edit hook call `saveCueList()`: the test rejected the
+recorded `set_timecode_cues` write. This is the fourteenth mutation probe.
+
+The preceding source revision also completed the full local gate86 GREEN,
+including35 named browser suites and561 Rust passes/15 explicitly ignored cases,
+then caught13/13 mutations with its regular-workspace cache control passing.
+Those measurements precede this final cue-polling repair; final hosted acceptance
+is recorded separately when the complete job succeeds.

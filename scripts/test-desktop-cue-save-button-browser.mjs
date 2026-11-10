@@ -14,9 +14,8 @@
 // same predicate that paints the "● Unsaved changes" line — so this suite also reads that line and requires the two to
 // agree. A button with a flag of its own is exactly how it ends up lying about what was saved.
 //
-// The clock window is driven end to end. The Settings window cannot render a cue without a backend, but its own dirty
-// path — the offset box, a change the panel is not told about unless the window says so — is driven for real through
-// the listeners it registers when its Timecode tab opens.
+// The clock's real HTML/handlers run with stubbed native IPC. The LTC window's own row editor and Undo control
+// are driven as well. Neither path claims packaged-app or hardware acceptance.
 //
 // Needs Chrome with `--remote-debugging-port=9223`. A suite that cannot run exits 3 rather than claiming a pass, which
 // is what the gate demands.
@@ -121,6 +120,7 @@ async function openTab(url, preload) {
 function storageStub() {
   return `
     (() => {
+      window.__cueSaveDocument = String(Date.now()) + ':' + Math.random();
       const store = new Map();
       const fake = {
         getItem: (key) => (store.has(String(key)) ? store.get(String(key)) : null),
@@ -136,8 +136,8 @@ function storageStub() {
 }
 
 /// The fake desktop frame behind the clock: enough for it to read its list, save it and grow for the panel. Everything
-/// else the window can ask is answered with an empty object, and `__INVOKES` records every call so "the edit reached
-/// no command" can be asserted rather than assumed.
+/// else the window can ask is answered with an empty object, and `__INVOKES` records every call so an edit that
+/// writes or issues an unexpected command can be distinguished from the regular timecode-state read.
 function clockStub(cues) {
   return `
     (() => {
@@ -205,7 +205,7 @@ const SAVE_STATE = `(() => {
 })()`;
 
 /// Open the clock's cue panel and nudge the one cue +1 frame, the edit the owner was making when the save got away
-/// from him. It is local: it must reach no command.
+/// from him. It is local: it must issue no write; the clock keeps polling its read-only state.
 async function nudgeTheCue(tab) {
   await tab.waitFor(`document.querySelectorAll('#cue-list .cue-row').length === 1`, 'the cue list to render');
   // Make sure it is unfolded, without folding it again when the caller already opened it.
@@ -221,6 +221,8 @@ async function nudgeTheCue(tab) {
   await tab.evaluate(
     `Array.from(document.querySelectorAll('.cue-row[data-cue-id="cue-1"] .cue-editor button')).find((b) => b.textContent.trim() === '+1f').click()`);
   await sleep(80);
+  await tab.waitFor(`window.__INVOKES.some((entry) => entry.cmd === 'timecode_state')`,
+    'a real clock-state poll after the edit, without saving the draft');
 }
 
 try {
@@ -249,7 +251,9 @@ try {
 
   // --- 2. After an edit it announces itself, and the whole unsaved state is static ---------------------
   await nudgeTheCue(clock);
-  const editCommands = await clock.evaluate(`window.__INVOKES.map((entry) => entry.cmd)`);
+  // Polling every250ms is independent of editing. Require a real poll above, then reject every
+  // other command: this permits only the documented read, not unknown calls or accidental saves.
+  const editCommands = await clock.evaluate(`window.__INVOKES.map((entry) => entry.cmd).filter((cmd) => cmd !== 'timecode_state')`);
   assert.deepEqual(editCommands, [],
     `a nudge must stay local — saving re-arms the engine — so the unsaved state comes from the draft, not from a write (got ${JSON.stringify(editCommands)})`);
 
@@ -279,7 +283,11 @@ try {
   // --- 3. Saving calms it again ------------------------------------------------------------------------
   await clock.evaluate(`document.getElementById('cue-save').click()`);
   await clock.waitFor(`window.__INVOKES.some((entry) => entry.cmd === 'set_timecode_cues')`, 'Save to reach the backend');
-  await sleep(150);
+  const saveWrites = await clock.evaluate(`window.__INVOKES.filter((entry) => entry.cmd === 'set_timecode_cues')`);
+  assert.equal(saveWrites.length, 1, 'one explicit Save must issue exactly one cue-list write');
+  assert.equal(saveWrites[0].args.cues.cues[0].at.frames, 1, 'Save must persist the nudged frame, not the original value');
+  await clock.waitFor(`!document.getElementById('cue-save').classList.contains('is-unsaved')`,
+    'the confirmed save to clear the dirty state');
   const saved = await clock.evaluate(SAVE_STATE);
   assert.equal(saved.unsaved, false, 'after the save the control must stop claiming there is anything unsaved');
   assert.equal(saved.background, calm.background,
@@ -290,7 +298,10 @@ try {
 
   // --- 4. Reduced motion: no animation, the state still unmistakable ------------------------------------
   await clock.call('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+  const previousDocument = await clock.evaluate('window.__cueSaveDocument');
   await clock.call('Page.navigate', { url: CLOCK_URL });
+  await clock.waitFor(`Boolean(window.__cueSaveDocument) && window.__cueSaveDocument !== ${JSON.stringify(previousDocument)}`,
+    'a fresh reduced-motion document');
   await clock.waitFor(`document.querySelectorAll('#cue-list .cue-row').length === 1`, 'the cue list to render again');
   assert.equal(await clock.evaluate(`window.matchMedia('(prefers-reduced-motion: reduce)').matches`), true,
     'the emulated preference must be the one the page sees, or this section measures nothing');
@@ -385,9 +396,10 @@ try {
   // made through a control the panel does not own — and the button must follow it, or it goes on saying "saved" while
   // the draft on screen is not what the engine has.
   await ltc.evaluate(`document.querySelector('#rows .cue-row .cue-edit').click()`);
-  await sleep(200);
+  await ltc.waitFor(`Array.from(document.querySelectorAll('#rows .cue-row .cue-editor button')).some((button) => button.textContent.trim() === '+1f')`,
+    'the real LTC row editor');
   await ltc.evaluate(`Array.from(document.querySelectorAll('#rows .cue-row .cue-editor button')).find((button) => button.textContent.trim() === '+1f').click()`);
-  await sleep(200);
+  await ltc.waitFor(`document.getElementById('save').classList.contains('is-unsaved')`, 'the LTC local edit to become dirty');
   const ltcDirty = await ltc.evaluate(`(() => {
     const save = document.getElementById('save');
     return {
@@ -405,7 +417,7 @@ try {
 
   // Undo: the state is derived from the draft, not latched. Taking the edit back must calm the control again.
   await ltc.evaluate(`document.getElementById('undo').click()`);
-  await sleep(250);
+  await ltc.waitFor(`!document.getElementById('save').classList.contains('is-unsaved')`, 'Undo to restore the saved draft');
   assert.equal(await ltc.evaluate(`document.getElementById('save').classList.contains('is-unsaved')`), false,
     'taking the edit back must calm the control again, not leave it latched on');
 

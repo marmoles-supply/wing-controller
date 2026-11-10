@@ -52,6 +52,7 @@ const cargo = (packageName, filter) => ['cargo', ['test', '-p', packageName, '--
 const node = name => [process.execPath, [`scripts/${name}`]];
 const suite = node('test-desktop-library-lock-browser.mjs');
 const visual = [process.execPath, ['scripts/test-design-screens.mjs', '--only', 'index']];
+const cueSave = node('test-desktop-cue-save-button-browser.mjs');
 const soakTest = ['cargo', ['test', '-p', 'wing-controller-desktop', '--locked', '--quiet',
   'tests::a_runtime_soak_keeps_every_action_bounded_and_reports_its_latency', '--', '--ignored', '--exact']];
 const cases = [
@@ -85,6 +86,10 @@ const cases = [
   { name: 'early bridge readiness announcement', file: 'desktop/ui/meters.html',
     before: '        await syncBridgeState();', after: '        syncBridgeState();',
     test: node('test-desktop-meter-bridge-status-browser.mjs'), evidence: /ready announcement must follow state adoption/ },
+  { name: 'saving a cue during a local nudge', file: 'desktop/ui/timecode.html',
+    before: '      local: () => { lastSaveFailed = ""; renderCueStatus(); },',
+    after: '      local: () => { lastSaveFailed = ""; renderCueStatus(); saveCueList(); },',
+    test: cueSave, evidence: /a nudge must stay local/ },
   { name: 'erased failure on browser restart', file: steps, before: '    if ! start_chrome; then', after: '    FAILED=()\n    if ! start_chrome; then',
     test: node('test-verification-gate.mjs'), evidence: /AssertionError/ },
   { name: 'panicking soak worker', file: main,
@@ -105,7 +110,7 @@ try {
   env.WING_CHROME_PORT = String(browser.port);
   for (const [command, args] of [cargo('wing-runtime'), cargo('wing-controller-desktop', 'a_failed_'),
     node('test-desktop-command-registry.mjs'), node('test-verification-gate.mjs'),
-    node('test-desktop-meter-bridge-status-browser.mjs'), suite, visual, soakTest]) {
+    node('test-desktop-meter-bridge-status-browser.mjs'), suite, visual, cueSave, soakTest]) {
     const result = await run(command, args);
     assert.equal(result.timedOut, false, 'baseline timed out: nothing established');
     assert.equal(result.code, 0, `baseline failed: ${result.output}`);

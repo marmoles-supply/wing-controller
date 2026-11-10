@@ -28,13 +28,14 @@ Fork runs may require GitHub's first-time contributor approval.
 | Browser interaction | `scripts/test-*-browser.mjs` | Real HTML/JavaScript in Chrome with synthetic state and stubbed native IPC |
 | Visual record | `scripts/test-design-screens.mjs` | Fresh light/dark captures match exact reviewed renderer references; no pixel tolerance or masked areas |
 | Static checks | `scripts/verify-all.sh` | TypeScript, window-script syntax and strict Maillot path/model audit |
-| Mutation checks | `scripts/mutation-check-ci.mjs` | Selected tests reject thirteen deliberately reintroduced defects after a passing baseline |
+| Mutation checks | `scripts/mutation-check-ci.mjs` | Selected tests reject fourteen deliberately reintroduced defects after a passing baseline |
 
 Mutation checks use a temporary source copy, never edit production files, and
 reject timeouts, compilation errors, missing mutation targets and zero-test
 runs as evidence. They cover dwell/cooldown/stale boundaries, refused saves,
 temporary-file cleanup, registration, locked New/Save handlers, gate retries,
-bridge startup-state adoption/readiness order, a single changed screenshot pixel and a panicking
+bridge startup-state adoption/readiness order, an accidental save during a local
+cue edit, a single changed screenshot pixel and a panicking
 soak worker. A final normal-workspace
 run checks cache isolation. Detected mutations are examples of sensitivity,
 not a coverage score.
