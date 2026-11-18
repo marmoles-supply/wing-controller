@@ -130,6 +130,28 @@ step_with_timeout() {
 }
 
 
+# Open the source page with encoded filesystem and DevTools query layers.
+open_clean_tab() {
+  local stale_tabs encoded_url
+  stale_tabs="$(curl -s --max-time 2 "http://127.0.0.1:${CHROME_PORT}/json" | node -e "let d='';process.stdin.on('data',(c)=>{d+=c}).on('end',()=>{try{for(const t of JSON.parse(d)){if(t.type!=='page')continue;const u=String(t.url||'');if(u.startsWith('http://127.0.0.1:8080')||u.includes('/desktop/ui/'))console.log(t.id)}}catch(_){}})" 2>/dev/null || true)"
+  for stale in $stale_tabs; do
+    curl -s "http://127.0.0.1:${CHROME_PORT}/json/close/${stale}" > /dev/null 2>&1 || true
+  done
+  # The DevTools query carries a URL, not a raw filesystem path. Encode both
+  # layers so spaces, percent signs and hashes cannot break the request.
+  encoded_url="$(node -e 'const {pathToFileURL}=require("node:url"); const {join}=require("node:path"); process.stdout.write(encodeURIComponent(pathToFileURL(join(process.cwd(),"desktop/ui/index.html")).href))')" || return 1
+  curl --fail --silent --show-error -X PUT "http://127.0.0.1:${CHROME_PORT}/json/new?${encoded_url}" > /dev/null 2>&1 || return 1
+  sleep 1
+}
+
+# A later suite with its own tab must not hide a refused main-loop bootstrap.
+require_clean_tab() {
+  if open_clean_tab; then return 0; fi
+  echo "                                             FAIL: the browser source tab could not be opened"
+  FAILED+=("Browser source tab preparation")
+  return 1
+}
+
 # Retry only when Chrome actually stopped answering. A failed restart must retain the original failure.
 run_browser_suite() {
   local name="$1"
@@ -145,7 +167,10 @@ run_browser_suite() {
       echo "                                             restart failed; the original test failure is retained"
       return 1
     fi
-    open_clean_tab
+    if ! open_clean_tab; then
+      echo "                                             source tab failed; the original test failure is retained"
+      return 1
+    fi
     # Replace a failure only once a retry can actually run. Moving this above start_chrome
     # used to erase a failed test when Chrome could not be restarted (audit 2026-11-09).
     FAILED=("${FAILED[@]:0:${#FAILED[@]}-1}")

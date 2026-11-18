@@ -5423,7 +5423,7 @@ try {
   //
   // `INSPECTOR_HINTS['trigger-rearm-db']` described the detector as needing a fall below the
   // threshold, while `normalize_trigger_policy` in `desktop/src-tauri/src/main.rs` treats `rearm_db`
-  // as a margin above the lowest value seen since the run. The contract fixes the ideas that must be
+  // as a margin above the lowest value seen since the last detection. The contract fixes the ideas that must be
   // there and the phrases that must not — not the whole sentence, which would make it a style checker.
   await setSelect('trigger-category', 'usb');
   // The four tuning fields carry `.meter-tuning-field`, and `updateTriggerKindUi` hides them with
@@ -5455,7 +5455,7 @@ try {
     `the Rearm hint must name the recent minimum it measures from (got "${rearmHintText}")`);
   assert.match(rearmHintText, /\brises?\b/i,
     `the Rearm hint must say the signal rises (got "${rearmHintText}")`);
-  assert.match(rearmHintText, /since that trigger|since the previous run/i,
+  assert.match(rearmHintText, /since the last detection/i,
     `the Rearm hint must say what the minimum is measured since (got "${rearmHintText}")`);
   for (const phrase of ['drop below threshold', 'below the threshold required', 'threshold required before']) {
     assert.doesNotMatch(rearmHintText, new RegExp(phrase, 'i'),

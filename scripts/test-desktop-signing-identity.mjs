@@ -20,13 +20,14 @@
 // The throwaway keychain is the point: it measures creation and idempotency without touching the login
 // keychain the owner builds with, and without adding any trust setting.
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const BUILD = `${ROOT}desktop/build-dist.sh`;
 const VERIFY = `${ROOT}scripts/verify-install.sh`;
 const CREATE = `${ROOT}scripts/create-signing-identity.sh`;

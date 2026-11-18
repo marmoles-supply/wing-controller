@@ -9,11 +9,12 @@
 // interface that was promised and not finished — both worth being told about at the gate rather than discovered in a
 // rehearsal.
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { registeredCommands } from './lib/command-registry.mjs';
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const main = readFileSync(`${ROOT}desktop/src-tauri/src/main.rs`, "utf8");
 
 const registered = registeredCommands(main);

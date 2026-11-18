@@ -121,7 +121,7 @@ Tuning is the Transient preset — Cooldown `0 ms`, Rearm `3.0 dB`, Dwell `0 ms`
 ### 10. Clip guard on a mute group
 
 - **Use it when**: any input of a range clipping should drop a group and tell you.
-- **Trigger**: Meter · Channels · IDs `1-8` · Meter Level · `>` · `+6 dB`, Cooldown `3000 ms`.
+- **Trigger**: Meter · Channels · IDs `1-8` · Meter Level · `>` · `+6 dB`, Cooldown `2000 ms`.
 - **Actions**: HUD alert (Warning, 2 s); Set `/mgrp/1/mute` = `1`.
 - **Watch out**: a range fires on whichever ID crosses first, once per frame.
 

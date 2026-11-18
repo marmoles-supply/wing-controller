@@ -29,7 +29,7 @@ use wing_core::{
 };
 use wing_runtime::{
     run_usb_meter_stress, MeterAddress, MeterStressOptions, MeterTrigger, MeterTriggerMode,
-    MeterTriggerPolicy, MeterTriggerRuntime, TriggerDirection,
+    MeterTriggerPolicy, MeterTriggerRuntime, TriggerDirection, TriggerHit,
 };
 use wing_transport::{local_ipv4_interfaces, NativeMeterTcp, UdpHub};
 
@@ -56,6 +56,7 @@ const DEFAULT_DISCOVERY_PORT: u16 = 2222;
 const DEFAULT_REPORT_ID: u32 = 1;
 const RENEW_INTERVAL: Duration = Duration::from_secs(2);
 const UDP_RECEIVE_TIMEOUT: Duration = Duration::from_millis(250);
+const METER_IF_WAIT: Duration = Duration::from_millis(125);
 const CONNECT_TIMEOUT: Duration = Duration::from_millis(3000);
 const OSC_SEND_INTERVAL: Duration = Duration::from_millis(17);
 const OSC_MAX_QUEUE_DELAY: Duration = Duration::from_secs(1);
@@ -1810,6 +1811,7 @@ struct QueuedShowAction {
     action: ConfiguredOscAction,
     cancel: Arc<AtomicBool>,
     completion: Option<std::sync::mpsc::SyncSender<Result<ActionRunResultDto, String>>>,
+    meter_cooldown: Duration,
 }
 impl QueuedShowAction {
     fn refuse(self, status: &'static str) {
@@ -1827,32 +1829,61 @@ impl QueuedShowAction {
 struct ShowSchedule {
     current_cancel: Option<Arc<AtomicBool>>,
     queued: Option<QueuedShowAction>,
+    last_meter_start: Option<Instant>,
+    cooldown_reported: bool,
 }
 impl ShowSchedule {
     // Admission and hand-off each happen under ONE lock. There is no busy/queue
     // publication gap and no intermediate idle state which could lose a queued run.
-    fn admit(&mut self, job: QueuedShowAction, strategy: &str) -> (Option<QueuedShowAction>, &'static str) {
+    fn admit(
+        &mut self,
+        job: QueuedShowAction,
+        strategy: &str,
+        now: Instant,
+    ) -> (Option<QueuedShowAction>, Option<&'static str>) {
+        if !job.meter_cooldown.is_zero()
+            && self
+                .last_meter_start
+                .is_some_and(|start| now.saturating_duration_since(start) < job.meter_cooldown)
+        {
+            job.refuse("cooldown");
+            // Keep the reason visible without filling the session log with every noisy frame.
+            let report = !self.cooldown_reported;
+            self.cooldown_reported = true;
+            return (None, report.then_some("cooldown"));
+        }
         if self.current_cancel.is_none() {
-            self.current_cancel = Some(job.cancel.clone());
-            return (Some(job), "started");
+            self.start(&job, now);
+            return (Some(job), Some("started"));
         }
         match strategy {
             "restart" => {
                 self.current_cancel.as_ref().unwrap().store(true, Ordering::SeqCst);
                 if let Some(old) = self.queued.replace(job) { old.refuse("superseded"); }
-                (None, "restarted")
+                (None, Some("restarted"))
             }
-            "queue_one" if self.queued.is_none() => { self.queued = Some(job); (None, "queued") }
-            _ => { job.refuse("dropped"); (None, "dropped") }
+            "queue_one" if self.queued.is_none() => { self.queued = Some(job); (None, Some("queued")) }
+            _ => { job.refuse("dropped"); (None, Some("dropped")) }
         }
     }
-    fn finish(&mut self, stopped: bool) -> Option<QueuedShowAction> {
-        self.current_cancel = None;
-        while let Some(next) = self.queued.take() {
-            if stopped || next.cancel.load(Ordering::SeqCst) { next.refuse(RUN_STATUS_CANCELLED); }
-            else { self.current_cancel = Some(next.cancel.clone()); return Some(next); }
+
+    fn start(&mut self, job: &QueuedShowAction, now: Instant) {
+        self.current_cancel = Some(job.cancel.clone());
+        if !job.meter_cooldown.is_zero() {
+            self.last_meter_start = Some(now);
+            self.cooldown_reported = false;
         }
-        None
+    }
+
+    fn finish(&mut self, stopped: bool, now: Instant) -> Option<QueuedShowAction> {
+        self.current_cancel = None;
+        let next = self.queued.take()?;
+        if stopped || next.cancel.load(Ordering::SeqCst) {
+            next.refuse(RUN_STATUS_CANCELLED);
+            return None;
+        }
+        self.start(&next, now);
+        Some(next)
     }
 }
 #[derive(Clone)]
@@ -1891,7 +1922,220 @@ struct ConfiguredMacro {
     conditions: ConfiguredConditions,
     action: ConfiguredOscAction,
     overlap_strategy: String,
+    meter_cooldown: Duration,
+    meter_if_timing: MeterIfTiming,
+    meter_if_key: Option<MeterIfKey>,
     runtime: ShowActionRuntime,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+enum MeterIfTiming {
+    #[default]
+    Immediate,
+    NextReport,
+}
+
+impl MeterIfTiming {
+    fn is_immediate(&self) -> bool {
+        *self == Self::Immediate
+    }
+}
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+struct MeterIfKey {
+    trigger: MeterAddress,
+    threshold_bits: u32,
+    rising: bool,
+    classifier: MeterAddress,
+}
+
+impl MeterIfKey {
+    fn new(subscription: &MeterSubscription, conditions: &ConfiguredConditions) -> Option<Self> {
+        let [trigger] = subscription.triggers.as_slice() else { return None };
+        let mut classifier = None;
+        for condition in &conditions.rows {
+            let [address] = condition.targets.as_slice() else { return None };
+            if address != &trigger.address {
+                if classifier.is_some_and(|previous| previous != address) {
+                    return None;
+                }
+                classifier = Some(address);
+            }
+        }
+        Some(Self {
+            trigger: trigger.address.clone(),
+            threshold_bits: if trigger.threshold == 0.0 { 0 } else { trigger.threshold.to_bits() },
+            rising: trigger.direction == TriggerDirection::Rising,
+            classifier: classifier?.clone(),
+        })
+    }
+}
+
+impl ConfiguredMacro {
+    fn waiting_meter_if_key(&self) -> Option<&MeterIfKey> {
+        self.meter_if_key.as_ref().filter(|_| self.meter_if_timing == MeterIfTiming::NextReport)
+    }
+}
+
+struct PendingMeterIf {
+    key: MeterIfKey,
+    crossed_at: Instant,
+    trigger_value: f32,
+    classifier_at_crossing: f32,
+}
+
+impl PendingMeterIf {
+    fn from_hit(key: &MeterIfKey, hit: &TriggerHit, meters: &MeterStateCache, frame: Instant) -> Option<Self> {
+        Some(Self {
+            key: key.clone(),
+            crossed_at: frame,
+            trigger_value: hit.value,
+            classifier_at_crossing: Self::frame_value(meters, &key.classifier, frame)?,
+        })
+    }
+
+    fn deadline(&self) -> Instant {
+        self.crossed_at + METER_IF_WAIT
+    }
+
+    fn frame_value(meters: &MeterStateCache, address: &MeterAddress, frame: Instant) -> Option<f32> {
+        let (value, observed_at) = meters.get(&meter_address_key(address))?;
+        (*observed_at == frame && value.is_finite()).then_some(*value)
+    }
+
+    fn snapshot(&self, meters: &MeterStateCache, frame: Instant) -> Option<MeterStateCache> {
+        if frame <= self.crossed_at || frame >= self.deadline() {
+            return None;
+        }
+        // A later report may catch a late leading edge or see a short pulse already over.
+        // The higher of the two readings preserves either observation for the whole group.
+        let next = Self::frame_value(meters, &self.key.classifier, frame)?;
+        let classifier = self.classifier_at_crossing.max(next);
+        Some(HashMap::from([
+            (meter_address_key(&self.key.trigger), (self.trigger_value, self.crossed_at)),
+            (meter_address_key(&self.key.classifier), (classifier, frame)),
+        ]))
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum MeterIfOutcome {
+    Ready,
+    Blocked,
+    TimedOut,
+    MissingAtCrossing,
+    SubscriptionChanged,
+}
+
+#[derive(Default)]
+struct MeterIfDecisions {
+    pending: Vec<PendingMeterIf>,
+}
+
+impl MeterIfDecisions {
+    fn discard_due(
+        &mut self, app: &tauri::AppHandle, macros: &[ConfiguredMacro], now: Instant,
+        subscription_changed: bool,
+    ) {
+        self.pending.retain(|pending| {
+            let outcome = if subscription_changed {
+                MeterIfOutcome::SubscriptionChanged
+            } else if now >= pending.deadline() {
+                MeterIfOutcome::TimedOut
+            } else {
+                return true;
+            };
+            for index in meter_if_members(macros, &pending.key) {
+                report_meter_if_skip(app, &macros[index], outcome);
+            }
+            false
+        });
+    }
+
+    fn receive_timeout(&self, now: Instant) -> Duration {
+        self.pending.iter().map(|pending| pending.deadline().saturating_duration_since(now))
+            .min().unwrap_or(UDP_RECEIVE_TIMEOUT).max(Duration::from_millis(1))
+    }
+
+    fn evaluate_frame(
+        &mut self,
+        macros: &[ConfiguredMacro],
+        hits: &[TriggerHit],
+        meters: &MeterStateCache,
+        osc: &OscStateCache,
+        frame: Instant,
+    ) -> Vec<(usize, MeterIfOutcome)> {
+        let mut outcomes = Vec::new();
+        self.pending.retain(|pending| {
+            if frame >= pending.deadline() {
+                outcomes.extend(meter_if_members(macros, &pending.key)
+                    .map(|index| (index, MeterIfOutcome::TimedOut)));
+            } else if let Some(snapshot) = pending.snapshot(meters, frame) {
+                outcomes.extend(meter_if_members(macros, &pending.key).map(|index| (
+                    index, meter_if_outcome(&macros[index], &snapshot, osc, frame),
+                )));
+            } else {
+                return true;
+            }
+            false
+        });
+
+        let mut seen = HashSet::new();
+        for hit in hits {
+            let id = macro_id_from_trigger_id(&hit.trigger_id);
+            if !seen.insert(id) {
+                continue;
+            }
+            let Some((index, config)) = macros.iter().enumerate().find(|(_, config)| config.id == id) else {
+                continue;
+            };
+            if let Some(key) = config.waiting_meter_if_key() {
+                if !self.pending.iter().any(|pending| &pending.key == key) {
+                    if let Some(pending) = PendingMeterIf::from_hit(key, hit, meters, frame) {
+                        self.pending.push(pending);
+                    } else {
+                        outcomes.extend(meter_if_members(macros, key)
+                            .map(|index| (index, MeterIfOutcome::MissingAtCrossing)));
+                    }
+                }
+            } else {
+                outcomes.push((index, meter_if_outcome(config, meters, osc, frame)));
+            }
+        }
+        outcomes
+    }
+}
+
+fn meter_if_members<'a>(macros: &'a [ConfiguredMacro], key: &'a MeterIfKey) -> impl Iterator<Item = usize> + 'a {
+    macros.iter().enumerate().filter_map(move |(index, config)| {
+        (config.waiting_meter_if_key() == Some(key)).then_some(index)
+    })
+}
+
+fn meter_if_outcome(
+    config: &ConfiguredMacro, meters: &MeterStateCache, osc: &OscStateCache, frame: Instant,
+) -> MeterIfOutcome {
+    if conditions_match_at(&config.conditions, meters, osc, frame) {
+        MeterIfOutcome::Ready
+    } else {
+        MeterIfOutcome::Blocked
+    }
+}
+
+fn report_meter_if_skip(app: &tauri::AppHandle, config: &ConfiguredMacro, outcome: MeterIfOutcome) {
+    let (state, reason) = match outcome {
+        MeterIfOutcome::Ready => return,
+        MeterIfOutcome::Blocked => ("blocked", "trigger hit ignored because IF conditions are not met"),
+        MeterIfOutcome::TimedOut => ("if_timeout", "trigger discarded because the IF meter sent no fresh report within 125 ms"),
+        MeterIfOutcome::MissingAtCrossing => ("if_cancelled", "trigger discarded because the crossing report did not contain the IF meter"),
+        MeterIfOutcome::SubscriptionChanged => ("if_cancelled", "trigger discarded because the meter subscription changed while waiting for the IF"),
+    };
+    emit_action_event(
+        app, state, &format!("{reason} ({})", config.name), None, 0,
+        Some(config.id.clone()), Some(config.name.clone()),
+    );
+    emit_macro_runtime_event(app, &config.runtime, state, reason);
 }
 
 #[derive(Clone)]
@@ -2435,6 +2679,8 @@ struct ShowRunnerConfigDto {
     trigger_value: Option<String>,
     #[serde(default = "default_trigger_meter_mode")]
     trigger_meter_mode: String,
+    #[serde(default, skip_serializing_if = "MeterIfTiming::is_immediate")]
+    meter_if_timing: MeterIfTiming,
     #[serde(default = "default_trigger_meter_cooldown_ms")]
     trigger_meter_cooldown_ms: u64,
     #[serde(default = "default_trigger_meter_rearm_db")]
@@ -3112,6 +3358,7 @@ fn fire_macro(
     let (reply, result) = std::sync::mpsc::sync_channel(1);
     submit_show_action(&app, lease.stream_stop.clone(), runtime, QueuedShowAction {
         wing_ip, local_ip, action, cancel: lease.cancel.clone(), completion: Some(reply),
+        meter_cooldown: Duration::ZERO,
     }, &config.macro_overlap_strategy);
     result.recv().map_err(|_| "The macro runner stopped without an outcome".to_string())?
 
@@ -6402,9 +6649,24 @@ fn load_macro_library(app: tauri::AppHandle) -> Result<MacroLibraryDto, String> 
 fn save_macro_library(
     app: tauri::AppHandle,
     state: tauri::State<'_, LiveSafetyState>,
-    library: MacroLibraryDto,
+    mut library: MacroLibraryDto,
+    share_meter_if_timing: Option<bool>,
 ) -> Result<MacroLibraryDto, String> {
+    if share_meter_if_timing == Some(true) {
+        share_selected_meter_if_timing(&mut library);
+    }
     save_macro_library_and_publish(&app, &state, library)
+}
+
+fn share_selected_meter_if_timing(library: &mut MacroLibraryDto) {
+    let Some(selected) = library.macros.get(library.selected_index) else { return };
+    let timing = selected.meter_if_timing;
+    let Some(key) = meter_if_key_for_config(selected) else { return };
+    for other in &mut library.macros {
+        if other.meter_if_timing != timing && meter_if_key_for_config(other).as_ref() == Some(&key) {
+            other.meter_if_timing = timing;
+        }
+    }
 }
 
 /// The command body, guard first, so the refusal can be tested without a Tauri application.
@@ -6723,6 +6985,7 @@ fn start_wing_usb_stream(
     trigger_operator: Option<String>,
     trigger_edge_mode: Option<String>,
     trigger_meter_mode: Option<String>,
+    meter_if_timing: Option<MeterIfTiming>,
     trigger_meter_cooldown_ms: Option<u64>,
     trigger_meter_rearm_db: Option<f32>,
     trigger_meter_dwell_ms: Option<u64>,
@@ -6778,6 +7041,7 @@ fn start_wing_usb_stream(
         trigger_threshold: normalize_threshold(threshold),
         trigger_value: None,
         trigger_meter_mode: trigger_meter_mode.unwrap_or_else(default_trigger_meter_mode),
+        meter_if_timing: meter_if_timing.unwrap_or_default(),
         trigger_meter_cooldown_ms: trigger_meter_cooldown_ms
             .unwrap_or_else(default_trigger_meter_cooldown_ms),
         trigger_meter_rearm_db: trigger_meter_rearm_db
@@ -7118,6 +7382,7 @@ fn run_wing_usb_stream(
     let mut runtime = MeterTriggerRuntime::new();
     runtime.replace_triggers(subscription.triggers.clone());
     let mut meter_state_cache = MeterStateCache::new();
+    let mut meter_if_decisions = MeterIfDecisions::default();
     let mut osc_state_cache = OscStateCache::new();
     let mut osc_trigger_state = HashMap::<String, bool>::new();
     let mut stats = StreamStats::new();
@@ -7166,6 +7431,7 @@ fn run_wing_usb_stream(
 
     while !stop.load(Ordering::Relaxed) {
         let now = Instant::now();
+        meter_if_decisions.discard_due(&app, &configured_macros, now, false);
         let elapsed = now.duration_since(last_rx_instant.unwrap_or(started_at));
         if stream_timed_out(started_at, last_rx_instant, now, network_timeout) {
             stop.store(true, Ordering::SeqCst);
@@ -7219,6 +7485,7 @@ fn run_wing_usb_stream(
                 let mut asked = false;
                 let mut send_failed = false;
                 if let Some(tcp_stream) = tcp.as_mut() {
+                    meter_if_decisions.discard_due(&app, &configured_macros, now, true);
                     active_report_id = next_meter_report_id(active_report_id);
                     let request = request_payload(listen_port, active_report_id, &active_descriptors);
                     match tcp_stream.send_native_meter_payload(&request) {
@@ -7292,6 +7559,7 @@ fn run_wing_usb_stream(
             if !descriptors_changed {
                 continue;
             }
+            meter_if_decisions.discard_due(&app, &configured_macros, now, true);
 
             online_announced = false;
             emit_stream_status_for(&app, session_id, "connecting", "updating native meter subscription");
@@ -7412,10 +7680,10 @@ fn run_wing_usb_stream(
         // (40 channels, 120-band RTA) was truncated and `recv_once` returned the piece without a
         // warning, so the decoding fell short and out of step.
         let mut buffer = [0_u8; 32768];
-        match udp.recv_once(&mut buffer, UDP_RECEIVE_TIMEOUT) {
+        match udp.recv_once(&mut buffer, meter_if_decisions.receive_timeout(Instant::now())) {
             Ok((len, source)) => {
-                // Frame arrival: from here to the action emitted to the window is the trigger
-                // latency the Diagnostics card reports.
+                // Diagnostics measures processing of this frame. An opted-in IF may resolve on a
+                // later frame, so its wait is outside that measurement.
                 let frame_arrival = Instant::now();
                 if source.ip() != expected_ip {
                     continue;
@@ -7507,60 +7775,34 @@ fn run_wing_usb_stream(
                     .iter()
                     .flat_map(|event| runtime.process_meter_event(event))
                     .collect::<Vec<_>>();
-                update_meter_state_cache(&mut meter_state_cache, &events);
+                // Timestamp the whole decoded Channel 3 report together. Its report ID names
+                // the Maillot meter collection, so it cannot identify successive frames.
+                update_meter_state_cache(&mut meter_state_cache, &events, frame_arrival);
                 stats.record_packet(len, events.len(), hits.len());
                 let mut action_sent = None;
-                let mut seen_macros = HashSet::new();
-                for hit in &hits {
-                    let macro_id = macro_id_from_trigger_id(&hit.trigger_id).to_string();
-                    if !seen_macros.insert(macro_id.clone()) {
-                        continue;
-                    }
-                    let Some(macro_config) =
-                        configured_macros.iter().find(|item| item.id == macro_id)
-                    else {
-                        continue;
-                    };
-                    if conditions_match(
-                        &macro_config.conditions,
-                        &meter_state_cache,
-                        &osc_state_cache,
-                    ) {
-                        maybe_start_show_action(
+                for (index, outcome) in meter_if_decisions.evaluate_frame(
+                    &configured_macros, &hits, &meter_state_cache, &osc_state_cache, frame_arrival,
+                ) {
+                    let macro_config = &configured_macros[index];
+                    if outcome == MeterIfOutcome::Ready {
+                        let admitted = maybe_start_show_action(
                             &app,
                             stop.clone(),
-                            macro_config.runtime.clone(),
-                            wing_ip.clone(),
+                            macro_config,
+                            &wing_ip,
                             local_ip,
-                            macro_config.action.clone(),
-                            &macro_config.overlap_strategy,
+                            macro_config.meter_cooldown,
                         );
-                        action_sent = preview_configured_action(&macro_config.action).ok();
+                        if admitted {
+                            action_sent = preview_configured_action(&macro_config.action).ok();
+                        }
                     } else {
-                        emit_action_event(
-                            &app,
-                            "blocked",
-                            &format!(
-                                "trigger hit ignored because IF conditions are not met ({})",
-                                macro_config.name
-                            ),
-                            None,
-                            0,
-                            Some(macro_config.id.clone()),
-                            Some(macro_config.name.clone()),
-                        );
-                        emit_macro_runtime_event(
-                            &app,
-                            &macro_config.runtime,
-                            "blocked",
-                            "trigger hit blocked by IF conditions",
-                        );
+                        report_meter_if_skip(&app, macro_config, outcome);
                     }
                 }
                 if !hits.is_empty() {
-                    // Arrival on the socket -> trigger evaluated -> action emitted to the UI, which is
-                    // the delay an operator actually feels. Measured after the actions so it covers
-                    // the whole path, and only for frames that fired something.
+                    // For frames with a detection, measure from socket receipt through the IF and
+                    // scheduler decisions. The action thread sends and verifies writes separately.
                     stats.record_trigger_latency(
                         u64::try_from(frame_arrival.elapsed().as_micros()).unwrap_or(u64::MAX),
                     );
@@ -7866,6 +8108,16 @@ fn trigger_subscription_for_config(
     )
 }
 
+fn meter_if_key_for_config(config: &ShowRunnerConfigDto) -> Option<MeterIfKey> {
+    let subscription = trigger_subscription_for_config(config).ok()?;
+    let conditions = configured_conditions(
+        Some(config.logical_operator.clone()),
+        Some(config.conditions.clone()),
+        subscription.condition_stale_after_ms(),
+    ).ok()?;
+    MeterIfKey::new(&subscription, &conditions)
+}
+
 /// Result of compiling a macro library for the runtime.
 struct ConfiguredLibraryMacros {
     macros: Vec<ConfiguredMacro>,
@@ -7932,7 +8184,39 @@ fn configured_macros_from_library(
         }
     }
 
+    let mut waiting = HashMap::new();
+    for config in &macros {
+        if let Some(key) = config.waiting_meter_if_key() {
+            waiting.entry(key.clone()).or_insert(meter_if_detector_policy(&config.subscription.triggers[0]));
+        }
+    }
+    let incompatible: HashSet<_> = macros.iter().filter_map(|config| {
+        let key = config.meter_if_key.as_ref()?;
+        let policy = waiting.get(key)?;
+        (config.meter_if_timing.is_immediate() || meter_if_detector_policy(&config.subscription.triggers[0]) != *policy)
+            .then(|| key.clone())
+    }).collect();
+    macros.retain(|config| {
+        if config.meter_if_key.as_ref().is_some_and(|key| incompatible.contains(key)) {
+            skipped.push(format!("{}: macros sharing this trigger and IF meter must use the same IF timing and meter detector settings.", config.name));
+            false
+        } else {
+            true
+        }
+    });
     Ok(ConfiguredLibraryMacros { macros, skipped })
+}
+
+fn meter_if_detector_policy(trigger: &MeterTrigger) -> MeterTriggerPolicy {
+    let mut policy = trigger.policy;
+    if trigger.direction == TriggerDirection::Falling || policy.mode == MeterTriggerMode::Level {
+        // Rearm and dwell belong to rising Transient. Preset defaults in hidden Level edge fields
+        // must not separate two macros that have identical effective detectors.
+        policy.mode = MeterTriggerMode::Level;
+        policy.rearm_db = 0.0;
+        policy.dwell_ms = 0;
+    }
+    policy
 }
 
 /// The value a trigger compares with, as text: the number for the numeric kinds, the text itself for
@@ -8613,6 +8897,9 @@ fn validate_macro_config_for_model(
     model: DeskModel,
 ) -> Vec<String> {
     let mut problems = Vec::new();
+    if !config.meter_if_timing.is_immediate() && meter_if_key_for_config(config).is_none() {
+        problems.push("Wait for next report needs one meter trigger and one other meter for the IF. Any remaining IF gates must use one of those two meters.".into());
+    }
     if config.trigger_category.trim().is_empty()
         || config.trigger_ids.trim().is_empty()
         || config.trigger_parameter.trim().is_empty()
@@ -8772,8 +9059,12 @@ fn configured_macro_from_config(
         subscription.condition_stale_after_ms(),
     )?;
     add_condition_descriptors(&mut subscription, &conditions);
+    let meter_if_key = MeterIfKey::new(&subscription, &conditions);
     for trigger in &mut subscription.triggers {
         trigger.id = format!("{id}::{}", trigger.id);
+        // Consume meter edges even during a cooldown. The shared macro scheduler starts the
+        // interval after the IF passes, when a meter-triggered run takes the execution slot.
+        trigger.policy.cooldown_ms = 0;
     }
     for trigger in &mut subscription.osc_triggers {
         trigger.id = format!("{id}::{}", trigger.id);
@@ -8788,6 +9079,9 @@ fn configured_macro_from_config(
         conditions,
         action,
         overlap_strategy: normalize_macro_overlap_strategy(config.macro_overlap_strategy),
+        meter_cooldown: Duration::from_millis(config.trigger_meter_cooldown_ms),
+        meter_if_timing: config.meter_if_timing,
+        meter_if_key,
         runtime,
     })
 }
@@ -8801,13 +9095,17 @@ fn merged_subscription_for_macros(macros: &[ConfiguredMacro]) -> Result<MeterSub
     let mut osc_triggers = Vec::new();
     let mut display_meters = Vec::new();
     let mut summaries = Vec::new();
+    let mut shared_meter_if_triggers = HashSet::new();
     let mut condition_stale_after_ms = default_trigger_meter_stale_after_ms();
 
     for macro_config in macros {
         for descriptor in &macro_config.subscription.descriptors {
             raw_descriptors.push(descriptor.clone());
         }
-        triggers.extend(macro_config.subscription.triggers.clone());
+        let shared = macro_config.waiting_meter_if_key();
+        if shared.is_none_or(|key| shared_meter_if_triggers.insert(key)) {
+            triggers.extend(macro_config.subscription.triggers.clone());
+        }
         osc_triggers.extend(macro_config.subscription.osc_triggers.clone());
         for display in &macro_config.subscription.display_meters {
             if display_meters
@@ -9267,8 +9565,8 @@ fn add_condition_descriptors(
 fn update_meter_state_cache(
     cache: &mut MeterStateCache,
     events: &[wing_core::meters::DecodedMeterEvent],
+    now: Instant,
 ) {
-    let now = Instant::now();
     for event in events {
         for (value_slot, value) in event.values.iter().enumerate() {
             let address = MeterAddress {
@@ -9499,13 +9797,22 @@ fn conditions_match(
     meter_cache: &MeterStateCache,
     osc_cache: &OscStateCache,
 ) -> bool {
+    conditions_match_at(conditions, meter_cache, osc_cache, Instant::now())
+}
+
+fn conditions_match_at(
+    conditions: &ConfiguredConditions,
+    meter_cache: &MeterStateCache,
+    osc_cache: &OscStateCache,
+    now: Instant,
+) -> bool {
     if conditions.rows.is_empty() {
         return true;
     }
     let results = conditions
         .rows
         .iter()
-        .map(|condition| condition_matches(condition, meter_cache, osc_cache))
+        .map(|condition| condition_matches(condition, meter_cache, osc_cache, now))
         .collect::<Vec<_>>();
 
     if conditions.logical_operator == "OR" {
@@ -9574,11 +9881,10 @@ fn process_osc_state_triggers(
                 maybe_start_show_action(
                     app,
                     stop.clone(),
-                    macro_config.runtime.clone(),
-                    wing_ip.to_string(),
+                    macro_config,
+                    wing_ip,
                     local_ip,
-                    macro_config.action.clone(),
-                    &macro_config.overlap_strategy,
+                    Duration::ZERO,
                 );
             } else {
                 emit_action_event(
@@ -9635,8 +9941,8 @@ fn condition_matches(
     condition: &ConfiguredCondition,
     meter_cache: &MeterStateCache,
     osc_cache: &OscStateCache,
+    now: Instant,
 ) -> bool {
-    let now = Instant::now();
     let meter_match = !condition.targets.is_empty()
         && condition.targets.iter().all(|target| {
             let Some((value, observed_at)) = meter_cache.get(&meter_address_key(target)) else {
@@ -11431,24 +11737,61 @@ fn configured_osc_action_for_config(config: &ShowRunnerConfigDto) -> Option<Conf
 fn maybe_start_show_action(
     app: &tauri::AppHandle,
     stop: Arc<AtomicBool>,
-    runtime: ShowActionRuntime,
-    wing_ip: String,
+    macro_config: &ConfiguredMacro,
+    wing_ip: &str,
     local_ip: Option<Ipv4Addr>,
-    action: ConfiguredOscAction,
-    overlap_strategy: &str,
-) {
-    submit_show_action(app, stop, runtime, QueuedShowAction {
-        wing_ip, local_ip, action, cancel: Arc::new(AtomicBool::new(false)), completion: None,
-    }, overlap_strategy);
+    meter_cooldown: Duration,
+) -> bool {
+    submit_show_action(
+        app,
+        stop,
+        macro_config.runtime.clone(),
+        QueuedShowAction {
+            wing_ip: wing_ip.to_string(),
+            local_ip,
+            action: macro_config.action.clone(),
+            cancel: Arc::new(AtomicBool::new(false)),
+            completion: None,
+            meter_cooldown,
+        },
+        &macro_config.overlap_strategy,
+    )
 }
 
-fn submit_show_action(app: &tauri::AppHandle, stop: Arc<AtomicBool>, runtime: ShowActionRuntime,
-    job: QueuedShowAction, overlap_strategy: &str) {
-    if stop.load(Ordering::SeqCst) || job.cancel.load(Ordering::SeqCst) {
-        job.refuse(RUN_STATUS_CANCELLED); return;
-    }
+fn submit_show_action(
+    app: &tauri::AppHandle,
+    stop: Arc<AtomicBool>,
+    runtime: ShowActionRuntime,
+    job: QueuedShowAction,
+    overlap_strategy: &str,
+) -> bool {
     let strategy = normalize_macro_overlap_strategy(overlap_strategy.to_string());
-    let (start, event) = runtime.schedule.lock().unwrap_or_else(|e| e.into_inner()).admit(job, &strategy);
+    let meter_cooldown = job.meter_cooldown;
+    let (start, event) = {
+        let mut schedule = runtime.schedule.lock().unwrap_or_else(|e| e.into_inner());
+        if stop.load(Ordering::SeqCst) || job.cancel.load(Ordering::SeqCst) {
+            job.refuse(RUN_STATUS_CANCELLED);
+            return false;
+        }
+        schedule.admit(job, &strategy, Instant::now())
+    };
+    let Some(event) = event else { return false };
+    if event == "cooldown" {
+        emit_action_event(
+            app,
+            event,
+            &format!(
+                "{}: meter trigger skipped during the {} ms cooldown",
+                runtime.macro_name,
+                meter_cooldown.as_millis()
+            ),
+            None,
+            0,
+            Some(runtime.macro_id.clone()),
+            Some(runtime.macro_name.clone()),
+        );
+        return false;
+    }
     if let Ok(mut counters) = runtime.counters.lock() {
         match event {
             "dropped" => counters.dropped = counters.dropped.saturating_add(1),
@@ -11463,6 +11806,7 @@ fn submit_show_action(app: &tauri::AppHandle, stop: Arc<AtomicBool>, runtime: Sh
             Some(runtime.macro_id.clone()), Some(runtime.macro_name.clone()));
         emit_macro_runtime_event(app, &runtime, event, "overlap policy applied");
     }
+    matches!(event, "started" | "queued" | "restarted")
 }
 
 fn spawn_show_action(
@@ -11472,7 +11816,7 @@ fn spawn_show_action(
     job: QueuedShowAction,
     start_message: &'static str,
 ) {
-    let QueuedShowAction { wing_ip, local_ip, action, cancel: action_stop, completion } = job;
+    let QueuedShowAction { wing_ip, local_ip, action, cancel: action_stop, completion, .. } = job;
     thread::spawn(move || {
         emit_action_event(
             &app,
@@ -11565,7 +11909,7 @@ fn spawn_show_action(
 
         if let Some(reply) = completion { let _ = reply.try_send(result); }
         let next = runtime.schedule.lock().unwrap_or_else(|e| e.into_inner())
-            .finish(stream_stop.load(Ordering::SeqCst));
+            .finish(stream_stop.load(Ordering::SeqCst), Instant::now());
         if let Some(next) = next {
             spawn_show_action(app, stream_stop, runtime, next, "queued overlap action started");
         }
@@ -12887,6 +13231,7 @@ fn default_show_runner_config() -> ShowRunnerConfigDto {
         trigger_threshold: -18.0,
         trigger_value: None,
         trigger_meter_mode: default_trigger_meter_mode(),
+        meter_if_timing: MeterIfTiming::Immediate,
         trigger_meter_cooldown_ms: default_trigger_meter_cooldown_ms(),
         trigger_meter_rearm_db: default_trigger_meter_rearm_db(),
         trigger_meter_dwell_ms: default_trigger_meter_dwell_ms(),
@@ -13416,6 +13761,7 @@ fn normalize_show_runner_config(config: ShowRunnerConfigDto) -> ShowRunnerConfig
             default.trigger_threshold
         },
         trigger_meter_mode: normalize_trigger_meter_mode(config.trigger_meter_mode),
+        meter_if_timing: config.meter_if_timing,
         trigger_meter_cooldown_ms: config.trigger_meter_cooldown_ms.min(2_000),
         trigger_meter_rearm_db: if config.trigger_meter_rearm_db.is_finite() {
             config.trigger_meter_rearm_db.clamp(0.1, 24.0)
@@ -16004,6 +16350,7 @@ mod tests {
             trigger_threshold: 999.0,
             trigger_value: None,
             trigger_meter_mode: "level".to_string(),
+            meter_if_timing: MeterIfTiming::Immediate,
             trigger_meter_cooldown_ms: 99_999,
             trigger_meter_rearm_db: 99.0,
             trigger_meter_dwell_ms: 99_999,
@@ -16409,6 +16756,7 @@ mod tests {
             trigger_threshold: 12.0,
             trigger_value: None,
             trigger_meter_mode: "transient".to_string(),
+            meter_if_timing: MeterIfTiming::Immediate,
             trigger_meter_cooldown_ms: 0,
             trigger_meter_rearm_db: 3.0,
             trigger_meter_dwell_ms: 0,
@@ -19283,7 +19631,7 @@ mod tests {
 
         assert!(!conditions_match(&conditions, &cache, &osc_cache));
 
-        update_meter_state_cache(&mut cache, &events);
+        update_meter_state_cache(&mut cache, &events, Instant::now());
 
         assert!(conditions_match(&conditions, &cache, &osc_cache));
     }
@@ -24156,26 +24504,225 @@ mod tests {
         let job = || {
             let (tx, rx) = std::sync::mpsc::sync_channel(1);
             (QueuedShowAction { wing_ip: "127.0.0.1".into(), local_ip: None,
-                action: ConfiguredOscAction { steps: vec![] }, cancel: Arc::new(AtomicBool::new(false)), completion: Some(tx) }, rx)
+                action: ConfiguredOscAction { steps: vec![] }, cancel: Arc::new(AtomicBool::new(false)),
+                completion: Some(tx), meter_cooldown: Duration::ZERO }, rx)
         };
         let mut state = ShowSchedule::default();
+        let now = Instant::now();
         let (a, _) = job(); let cancel_a = a.cancel.clone();
-        assert!(state.admit(a, "drop").0.is_some());
-        let (b, dropped) = job(); assert_eq!(state.admit(b,"drop").1,"dropped");
+        assert!(state.admit(a, "drop", now).0.is_some());
+        let (b, dropped) = job(); assert_eq!(state.admit(b, "drop", now).1, Some("dropped"));
         assert_eq!(dropped.try_recv().unwrap().unwrap().status,"dropped");
-        let (c, superseded) = job(); assert_eq!(state.admit(c,"queue_one").1,"queued");
-        let (d, overflow) = job(); state.admit(d,"queue_one");
+        let (c, superseded) = job(); assert_eq!(state.admit(c, "queue_one", now).1, Some("queued"));
+        let (d, overflow) = job(); state.admit(d, "queue_one", now);
         assert_eq!(overflow.try_recv().unwrap().unwrap().status,"dropped");
-        let (e, stopped) = job(); assert_eq!(state.admit(e,"restart").1,"restarted");
+        let (e, stopped) = job(); assert_eq!(state.admit(e, "restart", now).1, Some("restarted"));
         assert!(cancel_a.load(Ordering::SeqCst));
         assert_eq!(superseded.try_recv().unwrap().unwrap().status,"superseded");
-        assert!(state.finish(true).is_none());
+        assert!(state.finish(true, now).is_none());
         assert_eq!(stopped.try_recv().unwrap().unwrap().status,RUN_STATUS_CANCELLED);
         assert!(state.current_cancel.is_none());
-        let (a, _) = job(); state.admit(a,"drop");
-        let (b, _) = job(); let next_cancel = b.cancel.clone(); state.admit(b,"queue_one");
-        assert!(state.finish(false).is_some());
+        let (a, _) = job(); state.admit(a, "drop", now);
+        let (b, _) = job(); let next_cancel = b.cancel.clone(); state.admit(b, "queue_one", now);
+        assert!(state.finish(false, now).is_some());
         assert!(Arc::ptr_eq(state.current_cancel.as_ref().unwrap(), &next_cancel), "handoff retains ownership atomically");
+    }
+
+    #[test]
+    fn meter_cooldown_is_shared_by_macro_and_starts_on_scheduler_handoff() {
+        let base = Instant::now();
+        let at = |ms| base + Duration::from_millis(ms);
+        let job = |cooldown_ms| QueuedShowAction {
+            wing_ip: "127.0.0.1".into(),
+            local_ip: None,
+            action: ConfiguredOscAction { steps: vec![] },
+            cancel: Arc::new(AtomicBool::new(false)),
+            completion: None,
+            meter_cooldown: Duration::from_millis(cooldown_ms),
+        };
+        let mut schedule = ShowSchedule::default();
+        assert!(schedule.admit(job(0), "drop", at(0)).0.is_some());
+        assert_eq!(schedule.admit(job(250), "drop", at(10)).1, Some("dropped"));
+        assert_eq!(schedule.admit(job(250), "queue_one", at(20)).1, Some("queued"));
+        assert!(schedule.last_meter_start.is_none());
+        assert!(schedule.finish(false, at(100)).is_some());
+        assert_eq!(schedule.admit(job(250), "restart", at(199)).1, Some("cooldown"));
+        assert!(schedule.queued.is_none());
+        assert!(!schedule.current_cancel.as_ref().unwrap().load(Ordering::SeqCst));
+        assert!(schedule.finish(false, at(200)).is_none());
+        assert!(matches!(schedule.admit(job(250), "drop", at(349)), (None, None)));
+        assert!(schedule.admit(job(250), "drop", at(350)).0.is_some());
+        schedule.finish(false, at(351));
+        assert!(schedule.admit(job(0), "drop", at(352)).0.is_some());
+        schedule.finish(false, at(353));
+        assert_eq!(schedule.admit(job(250), "drop", at(354)).1, Some("cooldown"));
+        assert!(ShowSchedule::default().admit(job(250), "drop", at(354)).0.is_some());
+    }
+
+    #[test]
+    fn meter_cooldown_preserves_fresh_hits_after_an_if_block_and_consumes_rejected_edges() {
+        let mut config = default_show_runner_config();
+        config.trigger_category = "usb".into();
+        config.trigger_ids = "47".into();
+        config.trigger_parameter = "meter".into();
+        config.trigger_threshold = -40.0;
+        config.trigger_meter_mode = "transient".into();
+        config.trigger_meter_cooldown_ms = 250;
+        config.conditions = vec![ShowConditionDto {
+            label: "USB 47 below -20 dB".into(),
+            target_category: "usb".into(),
+            target_ids: "47".into(),
+            target_parameter: "meter".into(),
+            target_model: None,
+            send_id: None,
+            operator: "<".into(),
+            value: "-20".into(),
+            enabled: true,
+        }];
+        let compiled = configured_macro_from_config("macro-1".into(), config).expect("meter macro");
+        assert_eq!(compiled.meter_cooldown, Duration::from_millis(250));
+        let subscription = merged_subscription_for_macros(std::slice::from_ref(&compiled)).unwrap();
+        let mut detector = MeterTriggerRuntime::new();
+        detector.replace_triggers(subscription.triggers);
+        let mut meters = MeterStateCache::new();
+        let osc = OscStateCache::new();
+        let mut sample = |db: i16| {
+            // Channel 3, Maillot table 5: USB source levels travel together in 1/256 dB.
+            let mut packet = DEFAULT_REPORT_ID.to_be_bytes().to_vec();
+            for index in 1..=48 {
+                let level = if index == 47 { db } else { -90 };
+                packet.extend_from_slice(&(level * 256).to_be_bytes());
+            }
+            let events = decode_report(DEFAULT_REPORT_ID, &subscription.descriptors, &packet).unwrap();
+            let hit = events.iter().any(|event| !detector.process_meter_event(event).is_empty());
+            update_meter_state_cache(&mut meters, &events, Instant::now());
+            hit.then(|| conditions_match(&compiled.conditions, &meters, &osc))
+        };
+
+        assert_eq!(sample(-90), None);
+        assert_eq!(sample(-18), Some(false), "the first crossing is vetoed by IF");
+        assert_eq!(sample(-90), None);
+        assert_eq!(sample(-38), Some(true), "a fresh crossing still reaches the scheduler");
+        let mut schedule = ShowSchedule::default();
+        let job = || QueuedShowAction {
+            wing_ip: "127.0.0.1".into(),
+            local_ip: None,
+            action: compiled.action.clone(),
+            cancel: Arc::new(AtomicBool::new(false)),
+            completion: None,
+            meter_cooldown: compiled.meter_cooldown,
+        };
+        let base = Instant::now();
+        assert!(schedule.admit(job(), "drop", base).0.is_some());
+        schedule.finish(false, base);
+        assert_eq!(sample(-34), Some(true), "the detector consumes a hot rebound");
+        assert_eq!(schedule.admit(job(), "drop", base + Duration::from_millis(100)).1, Some("cooldown"));
+        assert_eq!(sample(-34), None, "a held value has no edge to replay when the interval expires");
+        assert_eq!(sample(-90), None);
+        assert_eq!(sample(-30), Some(true));
+        assert!(schedule.admit(job(), "drop", base + Duration::from_millis(250)).0.is_some());
+    }
+
+    #[test]
+    fn meter_if_timing_shares_one_decision_for_piano_and_vox() {
+        let condition = |id: &str, operator: &str, value: &str| ShowConditionDto {
+            label: format!("USB {id} {operator} {value}"),
+            target_category: "usb".into(), target_ids: id.into(), target_parameter: "meter".into(),
+            target_model: None, send_id: None, operator: operator.into(), value: value.into(), enabled: true,
+        };
+        let mut piano = default_show_runner_config();
+        piano.name = "PIANO".into();
+        piano.enabled = true;
+        piano.trigger_category = "usb".into();
+        piano.trigger_ids = "46".into();
+        piano.trigger_parameter = "meter".into();
+        piano.trigger_threshold = -10.0;
+        piano.trigger_meter_mode = "level".into();
+        piano.conditions = vec![condition("46", ">", "-10"), condition("46", "<", "0"), condition("47", ">", "-18")];
+        let mut vox = piano.clone();
+        vox.name = "VOX".into();
+        vox.conditions = vec![condition("47", "<", "-40"), condition("46", "<", "0")];
+        let mut other = piano.clone();
+        other.name = "Start show".into();
+        other.trigger_threshold = -40.0;
+        other.conditions = vec![condition("46", "<", "-20")];
+        let mut library = MacroLibraryDto {
+            schema_version: default_macro_library_schema_version(), selected_index: 0,
+            macros: vec![piano, vox, other],
+        };
+        let compile = |library: &MacroLibraryDto| {
+            configured_macros_from_library(Some(library.clone()), default_show_runner_config()).unwrap()
+        };
+        let immediate = compile(&library);
+        assert!(immediate.skipped.is_empty());
+        library.macros[0].meter_if_timing = MeterIfTiming::NextReport;
+        let mixed = compile(&library);
+        assert_eq!(mixed.macros.len(), 1, "neither member may race the other");
+        assert_eq!(mixed.skipped.len(), 2);
+        share_selected_meter_if_timing(&mut library);
+        assert_eq!(library.macros[1].meter_if_timing, MeterIfTiming::NextReport);
+        assert_eq!(library.macros[2].meter_if_timing, MeterIfTiming::Immediate);
+        let delayed = compile(&library);
+        assert!(delayed.skipped.is_empty());
+
+        let scenario = |macros: &[ConfiguredMacro], crossing_if, next_if, next_ms| {
+            let subscription = merged_subscription_for_macros(macros).unwrap();
+            let mut runtime = MeterTriggerRuntime::new();
+            runtime.replace_triggers(subscription.triggers);
+            let mut decisions = MeterIfDecisions::default();
+            let mut meters = MeterStateCache::new();
+            let osc = OscStateCache::new();
+            let base = Instant::now();
+            let mut sample = |ms, usb46: i16, usb47: Option<i16>| {
+                // Maillot Channel 3 table 5. Both USB values decode in one source report, in 1/256 dB.
+                let mut packet = DEFAULT_REPORT_ID.to_be_bytes().to_vec();
+                for index in 1..=48 {
+                    let level = match index { 46 => usb46, 47 => usb47.unwrap_or(-90), _ => -90 };
+                    packet.extend_from_slice(&(level * 256).to_be_bytes());
+                }
+                let mut events = decode_report(DEFAULT_REPORT_ID, &subscription.descriptors, &packet).unwrap();
+                if usb47.is_none() {
+                    events.retain(|event| event.index != 47);
+                }
+                let hits: Vec<_> = events.iter().flat_map(|event| runtime.process_meter_event(event)).collect();
+                let now = base + Duration::from_millis(ms);
+                update_meter_state_cache(&mut meters, &events, now);
+                decisions.evaluate_frame(macros, &hits, &meters, &osc, now).into_iter()
+                    .filter(|(index, _)| *index < 2).collect::<Vec<_>>()
+            };
+            assert!(sample(0, -90, Some(-90)).is_empty());
+            let crossing = sample(50, -8, Some(crossing_if));
+            let next = sample(next_ms, -90, next_if);
+            let after = sample(next_ms + 150, -90, Some(-90));
+            (crossing, next, after)
+        };
+        use MeterIfOutcome::{Blocked, Ready, TimedOut};
+        assert_eq!(scenario(&immediate.macros, -90, Some(-14), 100).0, [(0, Blocked), (1, Ready)]);
+        for (crossing_if, next_if, expected) in [
+            (-90, -14, [(0, Ready), (1, Blocked)]),
+            (-14, -90, [(0, Ready), (1, Blocked)]),
+            (-90, -90, [(0, Blocked), (1, Ready)]),
+            (-30, -90, [(0, Blocked), (1, Blocked)]),
+        ] {
+            let (crossing, next, after) = scenario(&delayed.macros, crossing_if, Some(next_if), 100);
+            assert!(crossing.is_empty());
+            assert_eq!(next, expected);
+            assert!(after.is_empty(), "consume the shared hit exactly once");
+        }
+        let (_, missing, expired) = scenario(&delayed.macros, -14, None, 100);
+        assert!(missing.is_empty(), "cached classifier cannot replace a fresh report");
+        assert_eq!(expired, [(0, TimedOut), (1, TimedOut)]);
+        let (_, late, after) = scenario(&delayed.macros, -14, Some(-14), 175);
+        assert_eq!(late, [(0, TimedOut), (1, TimedOut)]);
+        assert!(after.is_empty());
+
+        library.macros[1].trigger_meter_mode = "transient".into();
+        assert_eq!(compile(&library).skipped.len(), 2);
+        library.macros[0].meter_if_timing = MeterIfTiming::Immediate;
+        share_selected_meter_if_timing(&mut library);
+        assert_eq!(library.macros[1].meter_if_timing, MeterIfTiming::Immediate);
+        assert!(compile(&library).skipped.is_empty());
+        assert!(serde_json::to_value(&library.macros[1]).unwrap().get("meterIfTiming").is_none());
     }
 
     #[test]

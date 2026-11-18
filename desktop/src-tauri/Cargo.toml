@@ -1,6 +1,6 @@
 [package]
 name = "wing-controller-desktop"
-version = "0.3.0"
+version = "0.3.2"
 edition = "2021"
 publish = false
 license-file = "../../LICENSE"

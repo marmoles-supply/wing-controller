@@ -33,12 +33,13 @@
 //
 // Run: node scripts/test-desktop-build-identity.mjs
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SANITISER = `${ROOT}scripts/build-paths.sh`;
 const BUILD = `${ROOT}desktop/build-dist.sh`;
 const CONFIG = `${ROOT}desktop/src-tauri/tauri.conf.json`;

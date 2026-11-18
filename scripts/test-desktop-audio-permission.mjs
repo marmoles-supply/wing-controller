@@ -9,10 +9,11 @@
 // exist too.** The day somebody removes the feature they may remove the key; the day somebody adds a second one, this
 // test is where they find out what else macOS wants.
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const INPUT = `${ROOT}desktop/src-tauri/src/ltc_device.rs`;
 const PLIST = `${ROOT}desktop/src-tauri/Info.plist`;
 

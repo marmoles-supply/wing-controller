@@ -26,12 +26,13 @@
 // git destroyed uncommitted work once. It restores only a file that still holds the bytes this run wrote,
 // and it starts its own headless Chrome when the debug port is silent, killing only the browser it started.
 
+import { fileURLToPath } from "node:url";
 import { execFileSync, spawn } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const TARGET = "desktop/ui/index.html";
 const SUITE = "scripts/test-desktop-hud-panic-browser.mjs";
 const DEBUG_PORT = Number(process.env.WING_CHROME_PORT || 9223);

@@ -8,8 +8,8 @@ Windows o Linux. No necesitas herramientas de desarrollo.
 
 ## Descargar e instalar
 
-1. **[Descarga el DMG v0.3.0 para Apple Silicon](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg)**
-   y **[SHA256SUMS.txt](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/SHA256SUMS.txt)**.
+1. **[Descarga el DMG v0.3.2 para Apple Silicon](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.2/WING_CONTROLLER_v0.3.2_AppleSilicon.dmg)**
+   y **[SHA256SUMS.txt](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.2/SHA256SUMS.txt)**.
    Ambos deben ser de la misma release. Los enlaces **Source code** de GitHub son
    código para desarrolladores, no la aplicación.
 2. Comprueba la descarga. En Terminal, escribe `shasum -a 256 `, arrastra el DMG a
@@ -19,7 +19,7 @@ Windows o Linux. No necesitas herramientas de desarrollo.
 4. **Expulsa la imagen de disco** y abre la copia de Aplicaciones. No ejecutes la
    aplicación directamente desde el DMG.
 
-Lee las [notas de la release](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0)
+Lee las [notas de la release](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.2)
 y el [disclaimer completo, en inglés](../DISCLAIMER.md). Es software independiente
 sin garantías, no oficial de Behringer/Music Tribe, y cada usuario es responsable
 de probar y operar su sistema.

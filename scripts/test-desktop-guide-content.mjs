@@ -93,7 +93,8 @@ assert.ok(
 // is not.
 const ALLOWED_IDENTIFIERS = new Set([
   // Codes that appear literally in the session log.
-  'action_blocked', 'action_completed', 'config_saved', 'hud_alert_ignored_after_panic',
+  'action_blocked', 'action_completed', 'action_cooldown', 'action_if_cancelled', 'action_if_timeout',
+  'config_saved', 'hud_alert_ignored_after_panic',
   'library_imported', 'live_lock_blocked', 'live_macros_reapply_skipped_armed', 'live_start',
   'network_disconnected', 'panic_stop_requested', 'station_backup_export_cancelled',
   'station_backup_exported_successfully',

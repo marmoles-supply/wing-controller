@@ -68,31 +68,73 @@ that has none (matrices have no sends, a main has no bus send).
 ### Threshold, comparison, edge
 
 - **Threshold** in dB: new macros start at **-18 dB**, clamped to **-120..24**.
-- **Comparison**: `>` rises above, `<` falls below, `==`, `!=`. Meter triggers
-  only arm with `>` or `<`; preflight rejects `==`/`!=`. `>=` and `<=` normalize to
-  `>` and `<`.
-- **Edge**: **ON edge** (default), **OFF edge** or **ON/OFF edges**. It picks the directions watched: OFF =
-  falling, ON/OFF = both, ON = rising — or falling when the comparison is **Falls below**.
+- **Comparison**: **Rises above** detects a crossing from below the threshold. **Falls below**
+  detects a crossing from above it. A reading at the threshold counts as reaching it.
+- The **Edge** selector is shown for OSC state triggers. Choose whether the comparison becoming
+  true, becoming false, or both can trigger a macro. Older saved meter macros can also carry
+  a separate edge setting.
 
 ## Tuning
 
-**Advanced Trigger Tuning** has a Response preset plus five knobs. *Fast
-transients* = transient, 0 ms, 3 dB, 0 ms, 1500 ms; *Stable level* = level, 80 ms, 3 dB, 60 ms,
-1500 ms.
+In **Advanced Trigger Tuning**, **Fast transients** uses Transient, 3 dB rearm and
+0 ms for both dwell and cooldown. **Stable level** uses Level edge with an 80 ms
+cooldown. Both presets use a 1500 ms stale timeout. Choose **Custom tuning** to
+set each control separately.
 
 | Knob | Default | Range | Meaning |
 | --- | --- | --- | --- |
-| Mode | transient | transient / level | Transient fires on a rise from the recent minimum; level on a plain crossing |
-| Cooldown | 0 ms | 0..2000 | Minimum time between two runs, both modes |
-| Rearm | 3.0 dB | 0.1..24 | After a run, level must rise this far above the lowest value seen since that run |
-| Dwell | 0 ms | 0..1000 | Level must stay above the threshold this long before firing |
-| Stale after | 1500 ms | 250..10000 | Longer silence re-baselines instead of firing |
+| Mode | Transient | Transient / Level edge | Level edge requires a new threshold crossing. Rising Transient can also detect a rise above the threshold without a new crossing. |
+| Cooldown | 0 ms | 0–2000 ms | Time from the start of a meter-triggered run during which the same macro discards new meter triggers. Applies to both modes and all meter channels in that macro. |
+| Rearm | 3.0 dB | 0.1–24 dB | How far the level must rise from the lowest value since the last detection to fire again above the threshold in rising Transient mode. |
+| Dwell | 0 ms | 0–1000 ms | How long reports must keep the level at or above the threshold before a rising Transient trigger can fire. |
+| Stale | 1500 ms | 250–10000 ms | After a longer gap in reports, the first reading sets a new reference level. |
 
-Ranges are enforced by the app. Rearm and dwell apply to the rising transient
-path only; level mode and falling edges use the crossing plus cooldown. Rearm
-is measured from the lowest value seen since the previous run, not from the
-threshold itself, so a signal that stays loud can fire again after it forms a
-new low and rises by that margin.
+For example, with a threshold of −40 dB and a 3 dB rearm, a pulse that rises from
+silence to −38 dB and then to −34 dB can produce two hits in Transient. Level
+edge detects the first crossing. A later dip below −40 dB and a rise back above
+it creates another crossing in either mode.
+
+With a **250 ms cooldown**, a new hit 100 ms after the run starts is discarded.
+An eligible hit at 250 ms can run, subject to IF and overlap rules. A hit refused
+by an IF or dropped by the overlap policy leaves the timer alone. If the overlap
+policy queues a run, its cooldown starts when the run takes the execution slot.
+The Session Log shows the first hit skipped in each cooldown interval. The timer
+is scoped to meter triggers and resets when a new live session starts.
+
+Both modes see the same meter reports, approximately 50 ms apart. A pulse can
+be missed if none of the received reports reaches its threshold. Dwell and rearm
+apply only to rising Transient triggers. Level edge and falling triggers use the
+crossing with the configured cooldown.
+
+## IF timing
+
+**Immediate** is the default, including for existing shows. It checks all IF
+gates as soon as the meter trigger is detected. A single report can already
+contain both the trigger level and the IF level.
+
+Use **Wait for next report** when a second meter distinguishes two cues whose
+pulses may appear in neighbouring reports. This setting requires one trigger
+meter and one other meter in the IF gates. Additional gates may check either of
+those two meters. The app keeps the trigger meter's value at the crossing and
+waits for the first subsequent report carrying the other meter. It uses the
+higher of that meter's value at the crossing and its new value. This covers a
+pulse that arrives one report late or has already fallen by the next report.
+Keep unrelated pulses outside the wait window, since either reading can
+influence the decision.
+
+Macros with the same trigger meter, threshold, direction and other IF meter
+share the timing. Saving a timing change in one updates all of them. In Wait
+mode, they use one detector and the same pair of values. Use the same detector
+settings across the group. Level edge is a good starting point for one pulse
+per cue. A group with mismatched timing or detector settings is flagged and
+skipped when connecting.
+
+The normal wait is about one meter interval (approximately 50 ms). After
+125 ms without a fresh IF report the app discards the hit and writes
+`action_if_timeout` to Session Log. A missing IF level at the crossing or
+a change in meter subscription discards the hit with `action_if_cancelled`.
+The usual overlap rules still apply, and the cooldown starts when a run takes
+the execution slot. OSC, MIDI and timecode triggers retain their own timing.
 
 ## Why you do not get a run storm
 

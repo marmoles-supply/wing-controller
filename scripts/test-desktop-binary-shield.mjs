@@ -25,6 +25,7 @@
 //
 // Run: node scripts/test-desktop-binary-shield.mjs
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createDecipheriv, createHash } from "node:crypto";
@@ -32,7 +33,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } 
 import { tmpdir } from "node:os";
 import { join, relative, sep } from "node:path";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const ROOT_MANIFEST = `${ROOT}Cargo.toml`;
 const GENERATOR = `${ROOT}scripts/build-ui-vault.mjs`;
 const AUDIT = `${ROOT}scripts/audit-binary-shield.mjs`;

@@ -152,15 +152,6 @@ start_chrome() {
 # `test-desktop-macro-edit-browser.mjs` failed that way inside the gate (it attached to a tab with an
 # empty macro library and found no row at all).
 # EVERY tab of both windows is closed and one clean tab is opened.
-open_clean_tab() {
-  local stale_tabs
-  stale_tabs="$(curl -s --max-time 2 "http://127.0.0.1:${CHROME_PORT}/json" | node -e "let d='';process.stdin.on('data',(c)=>{d+=c}).on('end',()=>{try{for(const t of JSON.parse(d)){if(t.type!=='page')continue;const u=String(t.url||'');if(u.startsWith('http://127.0.0.1:8080')||u.includes('/desktop/ui/'))console.log(t.id)}}catch(_){}})" 2>/dev/null || true)"
-  for stale in $stale_tabs; do
-    curl -s "http://127.0.0.1:${CHROME_PORT}/json/close/${stale}" > /dev/null 2>&1 || true
-  done
-  curl -s -X PUT "http://127.0.0.1:${CHROME_PORT}/json/new?file://$(pwd)/desktop/ui/index.html" > /dev/null 2>&1 || true
-  sleep 1
-}
 
 echo "=============================================="
 echo "  WING CONTROLLER · verification gate"
@@ -194,7 +185,7 @@ if [ "$QUICK" -eq 0 ]; then
     start_chrome || true
   fi
   if chrome_alive; then
-    open_clean_tab
+    require_clean_tab || true
   fi
 fi
 for test_file in scripts/test-*.mjs; do
@@ -215,7 +206,7 @@ for test_file in scripts/test-*.mjs; do
       start_chrome || true
       if chrome_alive; then
         echo "                                             a fresh browser: the previous one died between tests"
-        open_clean_tab
+        require_clean_tab || true
       fi
     fi
     # This machine's headless Chrome also dies after roughly ten minutes of cumulative work (its browser
@@ -223,7 +214,7 @@ for test_file in scripts/test-*.mjs; do
     if [ "$BROWSER_TESTS_RUN" -gt 0 ] && [ $((BROWSER_TESTS_RUN % 8)) -eq 0 ] && chrome_alive; then
       echo "                                             a fresh browser for the next tests (headless Chrome dies after ~10 minutes here)"
       start_chrome || true
-      open_clean_tab
+      require_clean_tab || true
     fi
     BROWSER_TESTS_RUN=$((BROWSER_TESTS_RUN + 1))
     if chrome_alive; then

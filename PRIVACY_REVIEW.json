@@ -1,9 +1,9 @@
 {
   "summary": {
-    "sourceRevision": "36d91300c8c6cc06b3235f28a3712005a5ae46be",
-    "files": 711,
-    "bytes": 25115007,
-    "excludedTrackedPaths": 1111,
+    "sourceRevision": "ba98ac10c4d2f3e48399b4f2d7fad06cb5e2cff3",
+    "files": 715,
+    "bytes": 25170178,
+    "excludedTrackedPaths": 1114,
     "potentialSecrets": 0,
     "reviewFindings": 285,
     "transformations": 6,
@@ -774,175 +774,175 @@
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 12876,
+      "line": 13220,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15042,
+      "line": 15388,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15043,
+      "line": 15389,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15046,
+      "line": 15392,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15047,
+      "line": 15393,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15073,
+      "line": 15419,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15076,
+      "line": 15422,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 15078,
+      "line": 15424,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 16057,
+      "line": 16404,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 16401,
+      "line": 16748,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20882,
+      "line": 21230,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20887,
+      "line": 21235,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20888,
+      "line": 21236,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20891,
+      "line": 21239,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 20905,
+      "line": 21253,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 22018,
+      "line": 22366,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 22891,
+      "line": 23239,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23110,
+      "line": 23458,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23114,
+      "line": 23462,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23146,
+      "line": 23494,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23182,
+      "line": 23530,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 23296,
+      "line": 23644,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24547,
+      "line": 25094,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24548,
+      "line": 25095,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24549,
+      "line": 25096,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24551,
+      "line": 25098,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24557,
+      "line": 25104,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24557,
+      "line": 25104,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/src-tauri/src/main.rs",
-      "line": 24564,
+      "line": 25111,
       "kind": "lan-address",
       "severity": "review"
     },
@@ -988,97 +988,97 @@
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 8218,
+      "line": 8226,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 8229,
+      "line": 8237,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 8941,
+      "line": 8949,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 9987,
+      "line": 9995,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 12091,
+      "line": 12099,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 15399,
+      "line": 15444,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 16506,
+      "line": 16567,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 16741,
+      "line": 16797,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 17353,
+      "line": 17412,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 17773,
+      "line": 17832,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 19221,
+      "line": 19280,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 21265,
+      "line": 21320,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 23323,
+      "line": 23379,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 25258,
+      "line": 25314,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 30007,
+      "line": 30069,
       "kind": "lan-address",
       "severity": "review"
     },
     {
       "file": "desktop/ui/index.html",
-      "line": 31910,
+      "line": 31972,
       "kind": "lan-address",
       "severity": "review"
     },
@@ -1161,12 +1161,6 @@
     },
     {
       "file": "scripts/test-desktop-build-identity.mjs",
-      "line": 78,
-      "kind": "home-path",
-      "severity": "review"
-    },
-    {
-      "file": "scripts/test-desktop-build-identity.mjs",
       "line": 79,
       "kind": "home-path",
       "severity": "review"
@@ -1179,7 +1173,13 @@
     },
     {
       "file": "scripts/test-desktop-build-identity.mjs",
-      "line": 80,
+      "line": 81,
+      "kind": "home-path",
+      "severity": "review"
+    },
+    {
+      "file": "scripts/test-desktop-build-identity.mjs",
+      "line": 81,
       "kind": "home-path",
       "severity": "review"
     },
@@ -1473,7 +1473,7 @@
     },
     {
       "file": "scripts/wing-soak-windows.mjs",
-      "line": 256,
+      "line": 257,
       "kind": "lan-address",
       "severity": "review"
     },

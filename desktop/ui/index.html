@@ -7552,7 +7552,7 @@
               <div class="value-hint" id="trigger-kind-hint">Native meter trigger: optimized for fast audio transients.</div>
               <!-- Meters watch a crossing, which the comparator already names: the Edge selector was
                    the second, contradictory half of the same decision ("Falls below" + "ON edge"). -->
-              <div class="value-hint hidden" id="trigger-crossing-note">Meter crossing: "Rises above" fires on the upward crossing, "Falls below" on the downward one. There is no separate edge.</div>
+              <div class="value-hint hidden" id="trigger-crossing-note">“Rises above” and “Falls below” choose the direction. Advanced Trigger Tuning controls when a meter can fire again.</div>
 
               <div style="margin-top: 6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
                 <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: var(--font-base); font-weight: bold; color: var(--ink);">
@@ -7572,7 +7572,7 @@
               <details class="advanced accessory-drawer response-details" id="meter-response-details" style="margin-top: 6px;">
                 <summary>Advanced Trigger Tuning</summary>
                 <div class="form-grid">
-                  <label class="wide-input">
+                  <label class="wide-input" data-inspector="trigger-response-preset">
                     Response
                     <select id="trigger-response-preset">
                       <option value="fast">Fast transients</option>
@@ -7580,26 +7580,34 @@
                       <option value="custom">Custom tuning</option>
                     </select>
                   </label>
-                  <label class="meter-tuning-field">
+                  <label id="meter-if-timing-field" class="wide-input hidden" data-inspector="meter-if-timing">
+                    IF timing
+                    <select id="meter-if-timing">
+                      <option value="immediate">Immediate</option>
+                      <option value="nextReport">Wait for next report</option>
+                    </select>
+                    <div id="meter-if-timing-shared" class="value-hint hidden"></div>
+                  </label>
+                  <label class="meter-tuning-field" data-inspector="trigger-meter-mode">
                     Mode
                     <select id="trigger-meter-mode">
                       <option value="transient">Transient</option>
                       <option value="level">Level edge</option>
                     </select>
                   </label>
-                  <label class="meter-tuning-field">
+                  <label class="meter-tuning-field" data-inspector="trigger-cooldown-ms">
                     Cooldown ms
                     <input type="text" id="trigger-cooldown-ms" value="0" inputmode="numeric" />
                   </label>
-                  <label class="meter-tuning-field">
+                  <label class="meter-tuning-field" data-inspector="trigger-rearm-db">
                     Rearm dB
                     <input type="text" id="trigger-rearm-db" value="3" inputmode="decimal" />
                   </label>
-                  <label class="meter-tuning-field">
+                  <label class="meter-tuning-field" data-inspector="trigger-dwell-ms">
                     Dwell ms
                     <input type="text" id="trigger-dwell-ms" value="0" inputmode="numeric" />
                   </label>
-                  <label class="meter-tuning-field">
+                  <label class="meter-tuning-field" data-inspector="trigger-stale-ms">
                     Stale ms
                     <input type="text" id="trigger-stale-ms" value="1500" inputmode="numeric" />
                   </label>
@@ -8491,8 +8499,8 @@
                 <div class="health-item"><span>Rate</span><strong id="health-rate">0.0 Hz</strong></div>
                 <div class="health-item"><span>Bytes</span><strong id="health-bytes">0 B/s</strong></div>
                 <div class="health-item"><span>Decode</span><strong id="health-decode">0 us</strong></div>
-                <div class="health-item"><span>Trigger</span><strong id="health-trigger-latency" title="No trigger has fired since the stream started">&#8211;</strong></div>
-                <div class="health-item" title="How many times a macro’s trigger conditions were evaluated and met. It is not a count of events: one frame can carry many."><span>Evaluations</span><strong id="health-hits">0</strong></div>
+                <div class="health-item"><span>Trigger</span><strong id="health-trigger-latency" title="No meter trigger has been detected in this session">&#8211;</strong></div>
+                <div class="health-item" title="Meter trigger detections before IF, cooldown and overlap checks."><span>Evaluations</span><strong id="health-hits">0</strong></div>
                 <div class="health-item" title="Time since the last datagram arrived from the console (not a latency)"><span>Last RX</span><strong id="health-rx">never</strong></div>
                 <div class="health-item" title="Time since the last meter subscription renewal was sent (not a latency)"><span>Last renew</span><strong id="health-renew">never</strong></div>
                 <div class="health-item"><span>Events</span><strong id="health-events">0</strong></div>
@@ -13378,6 +13386,43 @@
         }
       }
 
+      // Visibility mirrors the supported editor shape. Rust resolves and compares the actual
+      // meter addresses before it saves the shared timing or starts a session.
+      function meterIfTimingKey(config) {
+        const triggerInfo = parameterInfo("trigger", config.triggerCategory, config.triggerParameter);
+        if (valueKindOf(triggerInfo || {}) !== "db_meter") return null;
+        const singleMeterIds = (value) => parseChannelRange(
+          normalizeIdListDashes(value).replace(/\s*-\s*/g, "-"), 256,
+        );
+        const [triggerId, extraTriggerId] = singleMeterIds(config.triggerIds);
+        if (!triggerId || extraTriggerId) return null;
+        const trigger = `${config.triggerCategory}:${triggerId}:${config.triggerParameter}`;
+        let other = null;
+        for (const gate of config.conditions || []) {
+          if (gate.enabled === false) continue;
+          if (valueKindOf(conditionParameterInfo(gate)) !== "db_meter") return null;
+          const [id, extraId] = singleMeterIds(gate.targetIds);
+          if (!id || extraId) return null;
+          const meter = `${gate.targetCategory}:${id}:${gate.targetParameter}`;
+          if (meter === trigger) continue;
+          if (other && other !== meter) return null;
+          other = meter;
+        }
+        return other && JSON.stringify([trigger, Number(config.triggerThreshold), config.triggerOperator, other]);
+      }
+
+      function syncMeterIfTiming(config) {
+        const key = meterIfTimingKey(config);
+        const field = document.getElementById("meter-if-timing-field");
+        const hint = document.getElementById("meter-if-timing-shared");
+        field.classList.toggle("hidden", !key);
+        const peers = key ? macroLibrary.macros
+          .filter((macro, index) => index !== macroLibrary.selectedIndex && meterIfTimingKey(macro) === key)
+          .map(safeMacroName) : [];
+        hint.textContent = peers.length ? `Saving a timing change also updates ${peers.join(", ")}.` : "";
+        hint.classList.toggle("hidden", peers.length === 0);
+      }
+
       const triggerEdgeField = document.getElementById("trigger-edge-field");
       const triggerCrossingNote = document.getElementById("trigger-crossing-note");
       const triggerValueInput = document.getElementById("trigger-value");
@@ -16138,12 +16183,15 @@
         return converted;
       }
 
-      async function saveMacroLibraryState(message = "library_saved") {
+      async function saveMacroLibraryState(message = "library_saved", shareMeterIfTiming = false) {
         // Any library change leaves the backup out of date.
         markBackupChanged();
         refreshShowBlockStatus();
         macroLibrary = normalizeLibraryForSave(macroLibrary);
-        macroLibrary = await invoke("save_macro_library", { library: macroLibrary });
+        macroLibrary = await invoke("save_macro_library", {
+          library: macroLibrary,
+          ...(shareMeterIfTiming ? { shareMeterIfTiming } : {}),
+        });
         reportMacroLibraryLength();
         renderMacroLibrary();
         appendLog(message);
@@ -16450,18 +16498,22 @@
           actionSteps,
           conditions,
         });
+        const previousLibrary = { ...macroLibrary, macros: [...macroLibrary.macros] };
+        const previousTiming = previousLibrary.macros[selectedIndex]?.meterIfTiming || "immediate";
+        const shareMeterIfTiming = (stored.meterIfTiming || "immediate") !== previousTiming;
         if (macroLibrary.macros.length === 0 || selectedIndex < 0 || selectedIndex >= macroLibrary.macros.length) {
           macroLibrary.macros.push(stored);
           macroLibrary.selectedIndex = macroLibrary.macros.length - 1;
         } else {
-          macroLibrary.macros[selectedIndex] = stored;
+          macroLibrary.macros[selectedIndex] = { ...stored, id: previousLibrary.macros[selectedIndex].id };
         }
         // Audit 2026-09-22: the "unsaved" marker was cleared BEFORE the real write and
         // no caller had `try/catch`, so a failure left the exit warning disabled and
         // the operator closed the app believing it had been saved. Now it is only cleared if it was saved.
         try {
-          await saveMacroLibraryState(`macro_saved ${safeMacroName(config)}`);
+          await saveMacroLibraryState(`macro_saved ${safeMacroName(config)}`, shareMeterIfTiming);
         } catch (error) {
+          macroLibrary = previousLibrary;
           appendLog(`macro_save_failed ${String(error)}`);
           streamOutput.textContent = `macro_save_failed\n${String(error)}`;
           draftDirty = true;
@@ -16501,20 +16553,24 @@
         const triggerValue = numericTrigger ? "" : triggerValueFromUi(triggerInfo);
         const rawThreshold = numericTrigger ? document.getElementById("threshold").value : triggerValue;
         const numericThreshold = Number(String(rawThreshold ?? "").trim());
-        return {
-          name: document.getElementById("macro-name")?.value?.trim() || "New WING macro",
-          wingIp: (document.getElementById("wing-ip-top")?.value || document.getElementById("wing-ip")?.value || "192.168.1.10").trim(),
+        const timingConfig = {
           triggerCategory: triggerCategory.value,
           triggerIds: triggerIds.value.trim(),
           triggerParameter: triggerParameter.value,
           triggerOperator: triggerOperator.value,
+          triggerThreshold: Number.isFinite(numericThreshold) ? numericThreshold : 0,
+          conditions: readConditionsFromUi(),
+        };
+        return {
+          ...timingConfig,
+          name: document.getElementById("macro-name")?.value?.trim() || "New WING macro",
+          wingIp: (document.getElementById("wing-ip-top")?.value || document.getElementById("wing-ip")?.value || "192.168.1.10").trim(),
           // A meter watches a crossing, which the comparator names; the edge selector is only
           // meaningful for state parameters and is hidden for meters.
           triggerEdgeMode: triggerKind === "db_meter" ? "on" : triggerEdgeMode.value,
           // `triggerThreshold` stays the numeric field for meters and every other numeric kind;
           // `triggerValue` carries the comparison when the kind is not a plain number (a name, a
           // model, a user-button mode, or 0/1 for an on/off parameter).
-          triggerThreshold: Number.isFinite(numericThreshold) ? numericThreshold : 0,
           triggerValue,
           // The trigger's own destination when it watches a send: a send with no index is the
           // self-send the console ignores, so the backend refuses it. The same field name the steps
@@ -16532,13 +16588,13 @@
             stripKeyOf(triggerCategory.value, triggerIds.value),
           ),
           triggerMeterMode: document.getElementById("trigger-meter-mode").value,
+          meterIfTiming: meterIfTimingKey(timingConfig) ? document.getElementById("meter-if-timing").value : "immediate",
           triggerMeterCooldownMs: Number(document.getElementById("trigger-cooldown-ms").value || 0),
           triggerMeterRearmDb: Number(document.getElementById("trigger-rearm-db").value || 3),
           triggerMeterDwellMs: Number(document.getElementById("trigger-dwell-ms").value || 0),
           triggerMeterStaleAfterMs: Number(document.getElementById("trigger-stale-ms").value || 1500),
           macroOverlapStrategy: document.getElementById("macro-overlap-strategy").value,
           logicalOperator: logicalOperator.value,
-          conditions: readConditionsFromUi(),
           actionAddress: primaryStep.actionAddress,
           actionArgKind: primaryStep.actionArgKind,
           actionValue: primaryStep.actionValue,
@@ -16760,6 +16816,7 @@
         setTriggerValueInUi(config);
         updateTriggerKindUi();
         document.getElementById("trigger-meter-mode").value = config.triggerMeterMode || "transient";
+        document.getElementById("meter-if-timing").value = config.meterIfTiming || "immediate";
         document.getElementById("macro-overlap-strategy").value = config.macroOverlapStrategy || "drop";
         document.getElementById("trigger-cooldown-ms").value = String(config.triggerMeterCooldownMs ?? 0);
         document.getElementById("trigger-rearm-db").value = String(config.triggerMeterRearmDb ?? 3);
@@ -16822,6 +16879,7 @@
         const qualifiers = meterTrigger
           ? [mode, `cooldown ${Number(config.triggerMeterCooldownMs) || 0} ms`]
           : [edgeLabel(config.triggerEdgeMode || "on"), `cooldown ${Number(config.triggerMeterCooldownMs) || 0} ms`];
+        if (config.meterIfTiming === "nextReport") qualifiers.push("wait for IF report");
         return `${categoryLabel(config.triggerCategory)} ${config.triggerIds} ${parameterLabel("trigger", config.triggerCategory, config.triggerParameter)}${sendTargetText(config.triggerParameter, config.sendId, info)} ${comparator} ${valueText} (${qualifiers.join(", ")})`;
       }
 
@@ -16865,7 +16923,7 @@
           recipeTriggerDetail.innerHTML = `
             <div class="recipe-fact">${escapeHtml(source)} · ${escapeHtml(parameter)}</div>
             <div class="recipe-fact">${escapeHtml(comparison)}</div>
-            ${chips([edgeLabel(config.triggerEdgeMode || "on"), mode, `cooldown ${Number(config.triggerMeterCooldownMs) || 0} ms`])}`;
+            ${chips([edgeLabel(config.triggerEdgeMode || "on"), mode, `cooldown ${Number(config.triggerMeterCooldownMs) || 0} ms`, ...(config.meterIfTiming === "nextReport" ? ["wait for IF report"] : [])])}`;
         }
 
         // IF: one row per gate, with the AND/OR that joins them written between the rows.
@@ -17188,6 +17246,7 @@
         syncLiveLockUi();
         const liveLocked = liveLockActive();
         const config = readConfigFromUi();
+        syncMeterIfTiming(config);
         const enabledCount = enabledMacroCount();
         const sessionActive = streamMode === "live" || streamMode === "connecting" || streamMode === "reconnecting";
         const activeEnabledCount = sessionActive && liveSessionEnabledCount !== null ? liveSessionEnabledCount : enabledCount;
@@ -18401,7 +18460,7 @@
         return false;
       }
 
-      ["macro-name", "trigger-category", "trigger-ids", "trigger-parameter", "trigger-send-id", "trigger-operator", "trigger-edge-mode", "threshold", "trigger-value", "trigger-toggle", "trigger-options", "trigger-response-preset", "trigger-meter-mode", "macro-overlap-strategy", "trigger-cooldown-ms", "trigger-rearm-db", "trigger-dwell-ms", "trigger-stale-ms", "condition-enabled", "logical-operator", "condition-category", "condition-ids", "condition-parameter", "condition-send-id", "condition-operator", "condition-value", "condition-text-value", "condition-toggle", "condition-options", "target-category", "target-ids", "target-parameter", "send-id", "osc-address", "osc-kind", "osc-value", "action-mode", "delay-ms", "fade-ms", "fade-from-mode", "fade-start", "fade-to-mode", "fade-end", "hud-alert-title", "hud-alert-message", "hud-alert-urgency", "hud-alert-display", "hud-alert-flash", "hud-alert-sound", "hud-alert-target-window"].forEach((id) => {
+      ["macro-name", "trigger-category", "trigger-ids", "trigger-parameter", "trigger-send-id", "trigger-operator", "trigger-edge-mode", "threshold", "trigger-value", "trigger-toggle", "trigger-options", "trigger-response-preset", "trigger-meter-mode", "meter-if-timing", "macro-overlap-strategy", "trigger-cooldown-ms", "trigger-rearm-db", "trigger-dwell-ms", "trigger-stale-ms", "condition-enabled", "logical-operator", "condition-category", "condition-ids", "condition-parameter", "condition-send-id", "condition-operator", "condition-value", "condition-text-value", "condition-toggle", "condition-options", "target-category", "target-ids", "target-parameter", "send-id", "osc-address", "osc-kind", "osc-value", "action-mode", "delay-ms", "fade-ms", "fade-from-mode", "fade-start", "fade-to-mode", "fade-end", "hud-alert-title", "hud-alert-message", "hud-alert-urgency", "hud-alert-display", "hud-alert-flash", "hud-alert-sound", "hud-alert-target-window"].forEach((id) => {
         document.getElementById(id).addEventListener("input", () => {
           markDraftChanged();
           if (id === "trigger-response-preset") applyTriggerResponsePreset();
@@ -20969,19 +21028,15 @@
         document.getElementById("health-renew").textContent = health.lastRenewMsAgo == null ? "never" : `${health.lastRenewMsAgo} ms ago`;
         document.getElementById("health-events").textContent = String(health.decodedEvents || 0);
         document.getElementById("health-dropped").textContent = String(health.droppedMeterCount || 0);
-        // The delay an operator actually feels: frame on the socket -> trigger -> action in the UI.
         const triggerLatency = document.getElementById("health-trigger-latency");
         if (triggerLatency) {
           const samples = Number(health.triggerLatencySamples || 0);
           triggerLatency.textContent = samples > 0
             ? `${health.triggerLatencyP50Micros || 0} / ${health.triggerLatencyP95Micros || 0} us`
             : "\u2013";
-          // The clock stops when the action is handed to the action thread: the OSC write and the painting
-          // are NOT inside it (main.rs:5294-5302). The tooltip said "emitted to the window", which promises
-          // more than it measures (guide, chapter 8).
           triggerLatency.title = samples > 0
-            ? `Trigger latency p50 / p95 over the last ${samples} evaluations (worst ${health.triggerLatencyMaxMicros || 0} us): frame arrival, trigger evaluation and the action handed to the action thread. The OSC write and the UI paint are not included.`
-            : "No trigger has fired since the stream started";
+            ? `Trigger processing p50 / p95 over the last ${samples} frames with a detection (worst ${health.triggerLatencyMaxMicros || 0} us). This measures processing of the detection frame. Wait for next report adds time until the next IF report.`
+            : "No meter trigger has been detected in this session";
         }
 
         const topRate = document.getElementById("top-health-rate");
@@ -21403,6 +21458,7 @@
           triggerOperator: config.triggerOperator,
           triggerEdgeMode: config.triggerEdgeMode,
           triggerMeterMode: config.triggerMeterMode,
+          meterIfTiming: config.meterIfTiming,
           triggerMeterCooldownMs: config.triggerMeterCooldownMs,
           triggerMeterRearmDb: config.triggerMeterRearmDb,
           triggerMeterDwellMs: config.triggerMeterDwellMs,
@@ -28396,8 +28452,8 @@
         },
         "top-health-hits": {
           title: "Total Trigger Evaluations",
-          desc: "Cumulative count of times a macro’s trigger conditions were evaluated and met, and its timeline dispatched. Not a count of meter events: one frame can carry many.",
-          tip: "If this count rises too quickly, check your trigger threshold and cooldown settings."
+          desc: "Meter trigger detections before IF, cooldown and overlap checks.",
+          tip: "Check Session Log for a started, blocked or cooldown event."
         },
         "top-health-rate": {
           title: "Meter Packet Rate (Hz)",
@@ -28557,28 +28613,34 @@
         },
         "trigger-edge-mode": {
           title: "Trigger Edge Mode",
-          desc: "Specifies when the trigger fires: on rising edge (Rises), falling edge (Falls), or both.",
-          tip: "'ON edge' fires once when rising above threshold and prevents re-triggering while audio stays high."
+          desc: "For OSC state triggers, choose whether the condition becoming true, becoming false, or both can trigger the macro.",
+          tip: "Meter triggers take their direction from Rises above or Falls below."
         },
         "trigger-response-preset": {
           title: "Response Tuning Preset",
-          desc: "Quick behavior preset: 'Fast transients' for drums/percussion, 'Stable level' for sustained tracks.",
-          tip: "Fast transients sets optimal cooldown and rearm hysteresis automatically."
+          desc: "Fast transients uses a 3 dB rearm with 0 ms dwell and cooldown. Stable level uses Level edge with an 80 ms cooldown.",
+          tip: "Choose Custom tuning to set the mode and cooldown independently."
         },
         "trigger-cooldown-ms": {
-          title: "Cooldown Interval (ms)",
-          desc: "Minimum mandatory milliseconds enforced between consecutive trigger activations.",
-          tip: "50-100 ms prevents a single snare hit with reverb tail from firing 5 times."
+          title: "Meter Trigger Cooldown (ms)",
+          desc: "From the start of a meter-triggered run, ignore new meter triggers for this macro for 0–2000 ms. A hit blocked by an IF does not start the timer.",
+          tip: "With 250 ms, a second hit 100 ms later is discarded. Set 0 to disable. Keep the interval shorter than the closest intended repeats."
+        },
+        "meter-if-timing": {
+          cat: "MACRO EDITOR",
+          title: "IF timing",
+          desc: "Immediate checks the IF at the crossing. Wait for next report keeps the trigger level and uses the higher of the crossing and next fresh readings from the other IF meter. A missing report after 125 ms discards the hit.",
+          tip: "Saving changes the timing for macros with the same crossing and IF meter. Use the same detector settings for all of them. Keep unrelated pulses outside the wait window."
         },
         "trigger-rearm-db": {
-          title: "Rearm Hysteresis (dB)",
-          desc: "After a trigger, transient mode re-arms when the signal rises by this many dB above the lowest value seen since that trigger.",
-          tip: "It is not a drop-below-threshold rule: a signal that stays loud can fire again after it forms a new low and rises by this margin."
+          title: "Transient Rearm (dB)",
+          desc: "Rising Transient can trigger again when the level rises by this amount from its lowest value since the last detection, even above the threshold.",
+          tip: "With a −40 dB threshold and 3 dB rearm, a rise from −38 to −34 dB can produce a second hit."
         },
         "trigger-dwell-ms": {
           title: "Dwell Time (ms)",
-          desc: "Duration the signal must remain continuously beyond threshold before firing.",
-          tip: "Use 0 ms for percussive transients; use 200-500 ms to detect continuous open microphones."
+          desc: "For a rising Transient trigger, how long the reported level must stay at or above the threshold before it can fire.",
+          tip: "At 0 ms the first qualifying reading is enough. Level edge and falling triggers use the crossing alone."
         },
         "macro-overlap-strategy": {
           title: "Overlap Policy",
@@ -28766,8 +28828,8 @@
         },
         "health-hits": {
           title: "Total Trigger Evaluations",
-          desc: "Cumulative count of times a macro’s trigger conditions were evaluated and met in this session. A macro that never fires keeps this at zero however busy the desk is.",
-          tip: "Allows auditing how often the triggers really matched during the performance."
+          desc: "Meter trigger detections before IF, cooldown and overlap checks.",
+          tip: "Check Session Log for a started, blocked or cooldown event."
         },
         "log-output": {
           title: "Session Event Log",
@@ -29002,14 +29064,14 @@
         "trigger-stale-ms": {
           cat: "MACRO EDITOR",
           title: "Meter Stale Timeout (ms)",
-          desc: "How long a meter value may go without a fresh frame before the trigger ignores it instead of acting on stale data.",
-          tip: "1500 ms suits a healthy link. Lower it to react faster on a dedicated VLAN; raise it on a busy Wi-Fi bridge."
+          desc: "After a gap longer than this interval, the next reading establishes a new reference level.",
+          tip: "The first reading after the gap cannot trigger. This setting leaves the meter reporting rate unchanged."
         },
         "trigger-meter-mode": {
           cat: "MACRO EDITOR",
           title: "Meter Trigger Mode",
-          desc: "Transient reacts to a fast level jump (a hit or a shout); Sustained requires the level to stay over the threshold for the dwell time; Either accepts both.",
-          tip: "Transient is the usual choice for feedback detection; Sustained for 'still too loud after two seconds'."
+          desc: "Level edge needs a new threshold crossing. Rising Transient can also detect a new rise while the level stays above the threshold.",
+          tip: "Both use the same meter reports. Level edge helps when one rising pulse should produce one hit."
         },
 
         // --- HUD alert step fields ---

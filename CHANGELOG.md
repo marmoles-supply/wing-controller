@@ -11,6 +11,28 @@ ships.
 
 ## [Unreleased]
 
+## [Desktop 0.3.2] - 2026-11-18
+
+- Add configurable meter IF timing, shared detectors and decision windows for
+  matching macros. Expire deferred hits without a fresh IF report after 125 ms
+  and clear pending decisions when subscriptions change.
+- Include the 0.3.1 meter cooldown changes in the next public installer; update
+  the Inspector, hover help and guide for the timing choices.
+- Support spaces in test/build paths, sanitise both physical and logical source
+  roots, and check named macOS volumes in the release binary privacy audit.
+- Publish the latest source, tests and Apple Silicon packages with matching
+  third-party sources, legal notices and checksums.
+
+## [Desktop 0.3.1] - 2026-11-13
+
+- Start a meter trigger's cooldown when the macro takes its execution slot. Each macro shares
+  one interval across its meter inputs. A trigger blocked by an IF leaves the interval available
+  for the next eligible cue.
+- Discard triggers received during cooldown and record the first suppressed trigger in each
+  interval in Session Log.
+- Explain Transient, Level edge, rearm, dwell and cooldown in the guide, Inspector and hover
+  help. Diagnostics distinguishes meter detections from macro execution.
+
 ## [Desktop 0.3.0] - 2026-11-09
 
 - Publish the first Apple Silicon community beta with installation instructions,

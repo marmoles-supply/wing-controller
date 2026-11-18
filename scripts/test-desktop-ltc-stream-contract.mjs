@@ -15,10 +15,11 @@
 // What it can **not** prove is that CoreAudio answers quickly, or that a real device opens: those need hardware.
 // What it proves is that no command in the LTC input path can block the thread that paints the window.
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const MAIN = readFileSync(`${ROOT}desktop/src-tauri/src/main.rs`, "utf8");
 const DEVICE = readFileSync(`${ROOT}desktop/src-tauri/src/ltc_device.rs`, "utf8");
 const HTML = readFileSync(`${ROOT}desktop/ui/index.html`, "utf8");

@@ -46,17 +46,23 @@ _wing_append_flag() {
 
 # Exports the sanitised flags for the rest of this shell, keeping anything the caller already set.
 wing_export_sanitised_build_paths() {
-  local repo_root
+  local repo_root physical_repo physical_home
   repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  physical_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
   # Anything the caller already asked for stays first; rustc applies prefixes in the order it receives them.
   WING_ENCODED_RUSTFLAGS="${CARGO_ENCODED_RUSTFLAGS:-}"
 
-  # The most specific prefix first: the repository lives under `$HOME`, and a general remap of `$HOME` would
-  # otherwise swallow it and send every project path to the same place.
-  _wing_append_flag "--remap-path-prefix=${repo_root}=/build/src"
+  # rustc uses the LAST matching mapping, not the first. General prefixes go before
+  # the repository. Resolve symlinks as well: an external volume can have a private
+  # name even when the logical checkout is under a home directory.
+  # https://doc.rust-lang.org/rustc/remap-source-paths.html
   if [ -n "${HOME:-}" ]; then
     _wing_append_flag "--remap-path-prefix=${HOME}=/build"
+    if [ -d "$HOME" ]; then
+      physical_home="$(cd "$HOME" && pwd -P)"
+      [ "$physical_home" = "$HOME" ] || _wing_append_flag "--remap-path-prefix=${physical_home}=/build"
+    fi
   fi
   # A toolchain installed outside `$HOME` (Homebrew on Apple Silicon, or a Homebrew prefix elsewhere).
   if [ -n "${HOMEBREW_PREFIX:-}" ]; then
@@ -66,6 +72,8 @@ wing_export_sanitised_build_paths() {
   elif [ -d /usr/local/Homebrew ]; then
     _wing_append_flag "--remap-path-prefix=/usr/local/Homebrew=/toolchain"
   fi
+  _wing_append_flag "--remap-path-prefix=${repo_root}=/build/src"
+  [ "$physical_repo" = "$repo_root" ] || _wing_append_flag "--remap-path-prefix=${physical_repo}=/build/src"
 
   export CARGO_ENCODED_RUSTFLAGS="$WING_ENCODED_RUSTFLAGS"
   unset WING_ENCODED_RUSTFLAGS

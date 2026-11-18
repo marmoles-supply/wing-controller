@@ -2,10 +2,10 @@
 // No Chrome, console, Cargo or production files are touched. An exit code is part of every assertion.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const library = fileURLToPath(new URL('./lib/verification-steps.sh', import.meta.url));
 const logs = mkdtempSync(join(tmpdir(), 'wing-gate-contract-'));
@@ -24,6 +24,29 @@ function run(body) {
   return result.stdout;
 }
 try {
+  const spacedCheckout = realpathSync(logs) + '/checkout % # with spaces';
+  mkdirSync(spacedCheckout);
+  run(`CHROME_PORT=9223
+    mkdir -p "$WING_VERIFY_LOG_DIR/checkout % # with spaces"
+    cd "$WING_VERIFY_LOG_DIR/checkout % # with spaces"
+    curl() {
+      case "$*" in
+        *'/json/new?'*) printf '%s\\n' "$@" > "$WING_VERIFY_LOG_DIR/new-tab-request" ;;
+        *) printf '[]' ;;
+      esac
+    }
+    sleep() { :; }
+    open_clean_tab || exit 26`);
+  const newTabRequest = readFileSync(join(logs, 'new-tab-request'), 'utf8').split('\n').find(value => value.startsWith('http://'));
+  assert.equal(decodeURIComponent(new URL(newTabRequest).search.slice(1)), pathToFileURL(join(spacedCheckout, 'desktop/ui/index.html')).href,
+    'the actual gate must encode filesystem characters and the DevTools query without losing either URL layer');
+  run(`CHROME_PORT=9223
+    curl() { case "$*" in *'/json/new?'*) return 22 ;; *) printf '[]' ;; esac; }
+    sleep() { :; }
+    if open_clean_tab; then exit 27; fi`);
+  run(`open_clean_tab() { return 1; }
+    if require_clean_tab; then exit 28; fi
+    [ "$PASSED" -eq 0 ] && [ "\${#FAILED[@]}" -eq 1 ] || exit 29`);
   const missingChrome = spawnSync(process.execPath, [fileURLToPath(new URL('./test-design-screens.mjs', import.meta.url))], {
     env: { ...process.env, WING_CHROME_BIN: join(logs, 'no-such-browser') }, encoding: 'utf8', timeout: 10_000,
   });
@@ -51,6 +74,15 @@ try {
     open_clean_tab() { exit 21; }
     if run_browser_suite 'restart fails' /no-such-test.mjs; then exit 22; fi
     [ "\${#FAILED[@]}" -eq 1 ] || exit 23`);
+  run(`alive=0
+    chrome_alive() { [ "$alive" -eq 1 ]; }
+    start_chrome() { alive=1; }
+    open_clean_tab() { return 1; }
+    node() { echo child >> "$WING_VERIFY_LOG_DIR/bootstrap-child-calls"; return 9; }
+    if run_browser_suite 'bootstrap fails' ignored.mjs; then exit 30; fi
+    [ "$PASSED" -eq 0 ] && [ "\${#FAILED[@]}" -eq 1 ] || exit 31`);
+  assert.equal(readFileSync(join(logs, 'bootstrap-child-calls'), 'utf8'), 'child\n',
+    'a refused retry bootstrap must retain the failure and must not run a second child');
   run(`alive=0
     chrome_alive() { [ "$alive" -eq 1 ]; }
     start_chrome() { alive=1; }

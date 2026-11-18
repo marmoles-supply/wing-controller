@@ -26,12 +26,13 @@
 // the bytes this run started with or the bytes this script last wrote - a foreign change means another
 // writer is in the tree, so it leaves the file alone and says so, loudly, with the backup path.
 
+import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const TARGET = "desktop/src-tauri/src/main.rs";
 const TEST_NAME = "a_macro_with_no_trigger_of_its_own_is_complete_and_simply_does_not_listen";
 

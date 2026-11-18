@@ -56,6 +56,7 @@
 //
 // Needs Chrome on the debug port (`scripts/verify-all.sh` documents how it is started); the port is
 // `WING_CHROME_PORT` when set, 9223 otherwise.
+import { fileURLToPath } from "node:url";
 import { execFile, execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
@@ -63,7 +64,7 @@ import WebSocket from 'ws';
 
 const DEBUG_PORT = Number(process.env.WING_CHROME_PORT || 9223);
 const CHROME_PORT = Number.isFinite(DEBUG_PORT) && DEBUG_PORT > 0 ? DEBUG_PORT : 9223;
-const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const USAGE = `usage: node scripts/wing-soak-windows.mjs [--minutes n] [--meters n] [--frame-hz n] [--trace-hz n] [--sample-seconds n]`;
 

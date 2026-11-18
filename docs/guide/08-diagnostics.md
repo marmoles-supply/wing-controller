@@ -13,15 +13,15 @@ Counters start at zero on each session.
 | **Rate** | Hz, 1 decimal. Meter frames/s over the window since the previous update (a frame or the 500 ms tick), smoothed 0.5; never a session average. | ~15-20 Hz: a frame every ~50 ms. | `0.0 Hz` live: no meter subscription, or a stale report id. |
 | **Bytes** | B/s, integer. Same window; decoded meter frame bytes only. | Moves with Rate; Bytes ÷ Rate ≈ one frame. | Near 32768 × Rate, frames hit the 32 KiB buffer and truncate. |
 | **Decode** | µs, integer. The **last measured** decode, frame arrival to the end of decoding, successes only. | Tens to hundreds of µs. | Climbs with Rate unchanged when the Mac is busy. Rejected datagrams never update it. |
-| **Trigger** | `p50 / p95` µs or `–`; nearest-rank percentiles over the last 256 evaluations. | p50 of a few hundred µs; p95 not ten times above. | `–`: nothing fired yet. p95 far above p50: stalls. |
-| **Evaluations** | Cumulative trigger fires per frame. | Grows only when your triggers cross. | Not "actions sent": IF-blocked macros count; two triggers on one macro count twice, one action starts. |
+| **Trigger** | `p50 / p95` µs or `–`, over the last 256 frames with a detection. | p50 of a few hundred µs. | `–` means no meter trigger detected yet. A p95 far above p50 can indicate stalls. |
+| **Evaluations** | Cumulative meter detections before IF, cooldown and overlap checks. | Increases when the meter detector finds a hit. | Use Session Log to see whether a detected hit started a run. |
 | **Last RX** | Time **since** the last accepted datagram, `N ms ago` or `never`. | Tens of ms with meters flowing, hundreds with only OSC state. | Rejected datagrams and other source IPs do not refresh it; the watchdog drops the session after 3.5 s. |
 | **Last renew** | Time since the app last **sent** a renewal. | Resets every 2 s, never past ~2 s. | Past ~5 s the thread is stalled; the console stops meter data 5 s after a renew. |
 | **Events** | Cumulative decoded meter readings per frame. | Grows whenever Rate is non-zero. | Cannot freeze while Rate moves. |
 | **Dropped** | Cumulative meter datagrams rejected as truncated or undecodable. | `0` for a whole show. | Each is also an `ignored undecodable meter datagram` row; socket-queue losses are **not** counted. |
 | **Scale** | Static label `1/256 dB → dBFS`. | — | Raw 1/256 dB integers ÷ 256; exceptions: V2 slots 6 and 9 raw, FX slots 4-8 × 6/2048. |
 
-Caveats. The **Trigger** tooltip says the clock stops when the action is handed to the action thread, and that is exactly where it stops; the OSC write and the UI paint are not included. On disconnect only Rate, Bytes and Decode blank to `–`; the other rows keep their last value. The payload always reports `state` as `live`, and the card ignores it.
+**Trigger** measures processing of the report that detects the trigger. **Wait for next report** adds time outside that measurement. OSC writes and UI painting happen separately. On disconnect the readings are marked stale.
 
 ## OSC monitor
 
@@ -33,7 +33,7 @@ A healthy session shows a slow TX trickle: meter frames are never traced per fra
 
 ## Log
 
-Two readouts share the name. The collapsible **Log** block is a status line rewritten in place: each live frame replaces it with `packet=N label=value …` plus `trigger_hit=…`/`action=…` when something fired; otherwise the last status message.
+The collapsible **Log** shows the latest meter frame or stream status. `trigger_hit` shows a detection before the IF and scheduling checks. An `action` preview means the scheduler accepted a run. In **Wait for next report**, look for the outcome on a later report. Session Log shows `action_blocked` when the IF fails, `action_if_timeout` when no fresh IF report arrives within 125 ms, `action_if_cancelled` when the IF level is missing at the crossing or the subscription changes during the wait, and `action_cooldown` when a repeat is skipped.
 
 The **Session Log** card is the history: newest first, `HH:MM:SS event …`, capped at 160 lines. Names include `live_start`, `stream_live`, `stream_error`, `network_disconnected`, `trigger …` and `action_completed: … packets=…`, `step_verify_failed: …`, `panic_stop_requested`, `config_saved` and `library_imported`. Three examples:
 

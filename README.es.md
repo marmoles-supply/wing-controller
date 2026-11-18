@@ -13,9 +13,9 @@ mensajes MIDI/OSC y HUD para el operador. Las asignaciones MIDI/OSC entrantes y
 los cues LTC/MTC ofrecen otras formas de lanzar secuencias. Sigue mezclando con
 la consola o con tu aplicación de control habitual.
 
-**[Descargar para Mac Apple Silicon — v0.3.0 beta](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg)**
+**[Descargar para Mac Apple Silicon — v0.3.2 beta](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.2/WING_CONTROLLER_v0.3.2_AppleSilicon.dmg)**
 
-[Instalación paso a paso](docs/INSTALLATION.es.md) · [Release y checksums](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0) · [Guía de uso, en inglés](docs/guide/README.md) · [Feedback](https://github.com/marmoles-supply/wing-controller/issues/new/choose) · [English](README.md)
+[Instalación paso a paso](docs/INSTALLATION.es.md) · [Release y checksums](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.2) · [Guía de uso, en inglés](docs/guide/README.md) · [Feedback](https://github.com/marmoles-supply/wing-controller/issues/new/choose) · [English](README.md)
 
 **Solo para Mac Apple Silicon / serie M.** Está firmada con un certificado propio, **sin notarización de Apple**. La guía explica cómo autorizar la primera
 apertura. No hay instalador compatible con Intel, Windows o Linux; tampoco se ha

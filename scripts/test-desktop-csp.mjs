@@ -22,10 +22,11 @@
 //
 // Run: node scripts/test-desktop-csp.mjs
 
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const config = JSON.parse(readFileSync(`${ROOT}desktop/src-tauri/tauri.conf.json`, "utf8"));
 const security = config?.app?.security ?? {};
 

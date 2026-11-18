@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceRevision": "36d91300c8c6cc06b3235f28a3712005a5ae46be",
+  "sourceRevision": "ba98ac10c4d2f3e48399b4f2d7fad06cb5e2cff3",
   "notes": [
     {
       "version": "0.1.2",
@@ -641,6 +641,22 @@
       "sha256": "147da3b2f3298ef853da133699fba722c10a91817b11e1f41355fe9ff6e55a87",
       "status": "version-json-history",
       "recordedAt": "658618b77144aaddbb76876b9bd5b42a624ba4b4"
+    },
+    {
+      "version": "0.3.1",
+      "build": "20261113.1",
+      "buildDate": "2026-11-13",
+      "sha256": "f5f0588fefd58b6d2480ad5ae22ce170e9212f23e6b287e41d0704fbccdac6db",
+      "status": "version-json-history",
+      "recordedAt": "477fd89596b206a13d08fe424c5348c81d7eb8e0"
+    },
+    {
+      "version": "0.3.2",
+      "build": "20261118.1",
+      "buildDate": "2026-11-18",
+      "sha256": "16331fd80f14a51a3f2cbe59bff12a592278e63326e12a43a14583bdb05487b8",
+      "status": "version-json-history",
+      "recordedAt": "66fa78c53af28e5c781e79a48c469467329e9e14"
     },
     {
       "version": "1.2.1",

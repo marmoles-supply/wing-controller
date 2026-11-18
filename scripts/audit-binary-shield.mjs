@@ -44,11 +44,12 @@
 // Usage: node scripts/audit-binary-shield.mjs [path-to-binary]
 // Exit:  0 the binary is clean, 1 it leaks, 2 the audit could not be run.
 
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SHIELD_MAGIC = Buffer.from("WCVLT1\0\0", "latin1");
 const EXCERPT_LENGTH = 64;
 const EXCERPTS_PER_FILE = 8;
@@ -125,7 +126,7 @@ if (crateNameStrings > CRATE_NAME_STRING_LIMIT) {
 //     2026-10-09: 261 strings containing `/Users/<account>`, which named the account the build ran under.
 // ---------------------------------------------------------------------------
 const machinePaths = [];
-for (const pattern of ["/Users/", "/home/"]) {
+for (const pattern of ["/Users/", "/home/", "/Volumes/"]) {
   let count = 0;
   let at = bytes.indexOf(pattern, 0);
   while (at !== -1) {

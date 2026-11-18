@@ -79,7 +79,11 @@ await call('Page.addScriptToEvaluateOnNewDocument', {
         invoke: async (cmd, args) => {
           window.__INVOKES.push(cmd);
           if (cmd === 'load_macro_library') return { schemaVersion: 1, selectedIndex: 0, macros: [] };
-          if (cmd === 'target_catalog') return { categories: [], targetParametersByCategory: {}, triggerParametersByCategory: {} };
+          if (cmd === 'save_macro_library') {
+            window.__TIMING_SAVE = args;
+            return args.library;
+          }
+          if (cmd === 'target_catalog') throw new Error('Use the packaged target catalogue');
           return {};
         },
       },
@@ -212,6 +216,107 @@ assert.deepEqual(readFromId, [],
   `these controls have no description of their own, so the inspector read their id aloud: ${JSON.stringify(readFromId)}`);
 assert.ok(sweep.length >= 40, `the sweep must cover the window's controls (only ${sweep.length} found)`);
 console.log(`4. ${sweep.length} visible controls all answer with a title, a section and a real description`);
+
+// The tuning labels and their controls must explain the same settings in both help surfaces.
+const previousHoverSetting = await evaluate(`localStorage.getItem('wing_hover_tooltip')`);
+try {
+  await evaluate(`(() => {
+    localStorage.setItem('wing_hover_tooltip', 'true');
+    for (const [id, value] of [
+      ['trigger-category', 'usb'],
+      ['trigger-parameter', 'meter'],
+      ['trigger-ids', '46'],
+      ['trigger-response-preset', 'custom'],
+    ]) {
+      const select = document.getElementById(id);
+      select.value = value;
+      select.dispatchEvent(new Event('input', { bubbles: true }));
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    document.getElementById('meter-response-details').open = true;
+  })()`);
+  assert.equal(await evaluate(`document.getElementById('meter-if-timing-field').classList.contains('hidden')`), true,
+    'IF timing is absent without a second meter');
+  await evaluate(`(() => {
+    for (const [id, value] of [['condition-category', 'usb'], ['condition-parameter', 'meter'], ['condition-ids', '47']]) {
+      const field = document.getElementById(id);
+      field.value = value;
+      field.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const enabled = document.getElementById('condition-enabled');
+    enabled.checked = true;
+    enabled.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  assert.equal(await evaluate(`document.getElementById('meter-if-timing').value`), 'immediate');
+  const tuningHints = [
+    ['meter-if-timing', /Immediate.*crossing.*higher.*125 ms/],
+    ['trigger-meter-mode', /Level edge needs a new threshold crossing.*Transient/],
+    ['trigger-cooldown-ms', /start of a meter-triggered run.*blocked by an IF/],
+    ['trigger-rearm-db', /Rising Transient.*lowest value since the last detection/],
+    ['trigger-dwell-ms', /rising Transient.*stay at or above/],
+    ['trigger-stale-ms', /gap.*new reference level/],
+  ];
+  for (const [id, expected] of tuningHints) {
+    const label = `label[data-inspector="${id}"]`;
+    assert.ok(await evaluate(`(() => {
+      const label = document.querySelector(${JSON.stringify(label)});
+      return label?.getBoundingClientRect().height > 0 && getComputedStyle(label).visibility === 'visible';
+    })()`),
+      `${id} must be visible in Custom tuning`);
+    await evaluate(`document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' }))`);
+    const hint = await hover(label);
+    assert.equal(hint.id, `#${id}`);
+    assert.match(hint.desc, expected);
+    let balloon;
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      balloon = await evaluate(`(() => {
+        const tip = document.getElementById('win95-hover-tooltip');
+        if (getComputedStyle(tip).display === 'none') return '';
+        return tip.querySelector('.win95-hover-tooltip-desc')?.textContent.trim() || '';
+      })()`);
+      if (balloon === hint.desc) break;
+      await sleep(100);
+    }
+    assert.equal(balloon, hint.desc, `${id}: hover should show the Inspector explanation`);
+  }
+  console.log('4b. Meter trigger tuning explains the same rules in Inspector and hover');
+  const timingSave = await evaluate(`(async () => {
+    const select = document.getElementById('meter-if-timing');
+    const base = readConfigFromUi();
+    const library = {
+      schemaVersion: 1, selectedIndex: 0,
+      macros: [
+        { ...base, id: 'mk-20', name: 'Piano', enabled: true },
+        { ...base, id: 'mk-21', name: 'Vox', enabled: true },
+      ],
+    };
+    macroLibrary = library;
+    applyConfig(library.macros[0]);
+    const sharedHint = document.getElementById('meter-if-timing-shared').textContent;
+    select.value = 'nextReport';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    const dirty = draftDirty;
+    const selectedTiming = readConfigFromUi().meterIfTiming;
+    const saved = await upsertCurrentDraftIntoLibrary();
+    return {
+      sharedHint, dirty, selectedTiming, saved,
+      share: window.__TIMING_SAVE?.shareMeterIfTiming,
+      id: window.__TIMING_SAVE?.library.macros[0].id,
+    };
+  })()`);
+  assert.match(timingSave.sharedHint, /also updates Vox/);
+  assert.equal(timingSave.dirty, true);
+  assert.equal(timingSave.selectedTiming, 'nextReport');
+  assert.equal(timingSave.saved, true);
+  assert.equal(timingSave.share, true);
+  assert.equal(timingSave.id, 'mk-20', 'saving a timing change preserves existing cue references');
+} finally {
+  await evaluate(`(() => {
+    const previous = ${JSON.stringify(previousHoverSetting)};
+    if (previous === null) localStorage.removeItem('wing_hover_tooltip');
+    else localStorage.setItem('wing_hover_tooltip', previous);
+  })()`);
+}
 
 // --- 5. The Meter Bridge answers for its controls too ----------------------
 // The bridge has no Inspector panel: its ScreenTip is the only readout, so this drives the real

@@ -124,7 +124,9 @@ maintenance. An unchecked task is not automatically a reproduced runtime defect.
   its exact commit and verify upload/download,14-day retention and failure logs
   with the existing read-only permissions. This does not concern the project's
   tested Node 26.8.2 runtime.
-- [ ] **TEST-02 — Strengthen remaining test boundaries.** Migrate older browser
+- [ ] **TEST-02 — Strengthen remaining test boundaries.** Add packaged WebKit
+  foreground/background and close/reopen readiness checks; a native PID count
+  alone does not establish that the UI loaded (see [0.3.2 validation](RELEASE_VALIDATION_0.3.2.md)). Migrate older browser
   suites to strict IPC fixtures and uncaught-exception assertions. Add independent
   LTC fixtures with provenance, packaged-app IPC acceptance and process-kill
   station-restore tests. Do not treat source-string contracts as behaviour coverage.

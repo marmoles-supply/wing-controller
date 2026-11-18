@@ -8,7 +8,7 @@
 look for an Apple M-series chip. Intel Macs are not supported. No developer tools
 are needed to install the application.
 
-1. **[Download WING CONTROLLER v0.3.0 for Apple Silicon](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg).** Check it against `SHA256SUMS.txt` from the same release before opening it.
+1. **[Download WING CONTROLLER v0.3.2 for Apple Silicon](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.2/WING_CONTROLLER_v0.3.2_AppleSilicon.dmg).** Check it against `SHA256SUMS.txt` from the same release before opening it.
 2. Open the DMG and **drag WING CONTROLLER.app into Applications**.
 3. **Eject the disk image**, then open the installed copy from Applications using the [first-launch instructions](#first-launch-on-macos).
 
@@ -18,8 +18,8 @@ opening it. If macOS blocks first launch, use the app-specific instructions belo
 
 ## Download the application
 
-Open the [v0.3.0 community beta release](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0)
-and expand **Assets**. Download **WING_CONTROLLER_v0.3.0_AppleSilicon.dmg** and
+Open the [v0.3.2 community beta release](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.2)
+and expand **Assets**. Download **WING_CONTROLLER_v0.3.2_AppleSilicon.dmg** and
 **SHA256SUMS.txt**. The `AppleSilicon.zip` is an alternative application archive;
 GitHub's separate **Source code** downloads and **Code → Download ZIP** contain
 developer source, not the application. No developer tools are needed to install
@@ -41,7 +41,7 @@ an old binary contains newer source changes.
 2. In Terminal, change to the download folder and run:
 
    ```sh
-   shasum -a 256 "WING_CONTROLLER_v0.3.0_AppleSilicon.dmg"
+   shasum -a 256 "WING_CONTROLLER_v0.3.2_AppleSilicon.dmg"
    ```
 
    Compare the **complete hash** with the DMG's entry in `SHA256SUMS.txt`.

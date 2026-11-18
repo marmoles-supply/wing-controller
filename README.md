@@ -11,9 +11,9 @@ and combine console actions with MIDI/OSC messages and operator HUDs. Incoming
 MIDI/OSC bindings and LTC/MTC cues provide additional ways to launch sequences.
 Keep mixing with your console or preferred control app.
 
-[![Download for Apple Silicon — v0.3.0 beta](assets/product/download-mac.svg)](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg)
+[![Download for Apple Silicon — v0.3.2 beta](assets/product/download-mac.svg)](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.2/WING_CONTROLLER_v0.3.2_AppleSilicon.dmg)
 
-[Installation guide](docs/INSTALLATION.md) · [Release notes and checksums](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0) · [Operator guide](docs/guide/README.md) · [Feedback](https://github.com/marmoles-supply/wing-controller/issues/new/choose) · [Español](README.es.md)
+[Installation guide](docs/INSTALLATION.md) · [Release notes and checksums](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.2) · [Operator guide](docs/guide/README.md) · [Feedback](https://github.com/marmoles-supply/wing-controller/issues/new/choose) · [Español](README.es.md)
 
 **Apple Silicon / M-series Macs only.** The application is self-signed and **not notarised by Apple**; the installation guide
 explains first-launch approval.
@@ -30,7 +30,7 @@ and help with [community testing](docs/COMMUNITY_TESTING.md).
 
 ## Install
 
-1. **[Download the Mac DMG](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.0/WING_CONTROLLER_v0.3.0_AppleSilicon.dmg)** from this repository's Releases. Check it against `SHA256SUMS.txt` from the same release.
+1. **[Download the Mac DMG](https://github.com/marmoles-supply/wing-controller/releases/download/v0.3.2/WING_CONTROLLER_v0.3.2_AppleSilicon.dmg)** from this repository's Releases. Check it against `SHA256SUMS.txt` from the same release.
 2. Open the DMG and **drag WING CONTROLLER.app to Applications**.
 3. **Eject the DMG**, then open the copy in Applications. If macOS blocks it, follow the [first-launch instructions](docs/INSTALLATION.md#first-launch-on-macos).
 
@@ -222,10 +222,10 @@ and Spanish reports are welcome. A GitHub account is needed to submit a report.
 | Intel / Windows / Linux | No supported desktop installer |
 | WING consoles | WING-family protocols; model, firmware and feature availability vary |
 | Mobile | Original Expo source retained; mobile work is parked |
-| Release | [v0.3.0 community beta](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.0) |
+| Release | [v0.3.2 community beta](https://github.com/marmoles-supply/wing-controller/releases/tag/v0.3.2) |
 
 Read [known limitations](docs/KNOWN_LIMITATIONS.md) before relying on a feature.
-The [package validation](docs/RELEASE_VALIDATION_0.3.0.md) records checks of the
+The [package validation](docs/RELEASE_VALIDATION_0.3.2.md) records checks of the
 installer separately from hardware/show acceptance.
 
 ## Licence
@@ -270,11 +270,20 @@ Node generates the UI vault during Cargo compilation. No maintainer signing key,
 activation key, customer data or generated Android directory is needed to verify
 this source checkout.
 
+For installer packaging, the measured Tauri CLI is **2.11.5**. Cache that exact
+version with `npm exec --yes --package=@tauri-apps/cli@2.11.5 -- tauri --version`,
+and create your own stable signing identity with
+`./scripts/create-signing-identity.sh`. Save your work and quit the installed app
+before release verification: the installed-copy checks launch and close it.
+Run the full gate, then `./scripts/release.sh VERSION --install`, replacing
+`VERSION` with the version in `version.json`. A previously issued local DMG is
+never overwritten; new versions need synchronised metadata and release notes.
+
 ## Verification
 
 See the [dated verification record](docs/VALIDATION.md) for measured results,
 environment, dependency-cache use and what was not established.
-The [0.3.0 package validation](docs/RELEASE_VALIDATION_0.3.0.md) records installer,
+The [0.3.2 package validation](docs/RELEASE_VALIDATION_0.3.2.md) records installer,
 signature, architecture and checksum checks separately.
 
 ```sh
